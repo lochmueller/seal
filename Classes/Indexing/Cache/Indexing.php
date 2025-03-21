@@ -1,6 +1,6 @@
 <?php
 
-namespace Lochmueller\Searl\Indexing\Cache;
+namespace Lochmueller\Seal\Indexing\Cache;
 
 class Indexing
 {

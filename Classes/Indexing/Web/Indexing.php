@@ -1,6 +1,6 @@
 <?php
 
-namespace Lochmueller\Searl\Indexing\Web;
+namespace Lochmueller\Seal\Indexing\Web;
 
 class Indexing
 {

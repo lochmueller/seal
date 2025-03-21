@@ -1,6 +1,6 @@
 <?php
 
-namespace Lochmueller\Searl;
+namespace Lochmueller\Seal;
 
 use CmsIg\Seal\Engine;
 use CmsIg\Seal\EngineInterface;

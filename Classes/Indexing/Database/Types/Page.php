@@ -1,6 +1,6 @@
 <?php
 
-namespace Lochmueller\Searl\Indexing\Database\Types;
+namespace Lochmueller\Seal\Indexing\Database\Types;
 
 class Page implements TypeInterface
 {

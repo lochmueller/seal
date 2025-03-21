@@ -2,7 +2,7 @@
 
 namespace Lochmueller\Seal\Indexing\Database\Types;
 
-interface TypeInterface
+class Address implements TypeInterface
 {
 
 }
