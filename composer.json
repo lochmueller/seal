@@ -1,0 +1,31 @@
+{
+  "name": "lochmueller/seal",
+  "type": "typo3-cms-extension",
+  "description": "SEAL - Search Engine Abstraction Layer",
+  "license": "GPL-2.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "Lochmueller\\Seal\\": "Classes/"
+    }
+  },
+  "require": {
+    "php": "^8.3",
+    "typo3/cms-core": "^13.4",
+    "cmsig/seal": "^0.7"
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "seal",
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web"
+    }
+  },
+  "config": {
+    "vendor-dir": ".Build/vendor",
+    "bin-dir": ".Build/bin",
+    "allow-plugins": {
+      "typo3/cms-composer-installers": true,
+      "typo3/class-alias-loader": true
+    }
+  }
+}
