@@ -3,11 +3,18 @@
 namespace Seal\Adapter;
 
 use CmsIg\Seal\Adapter\IndexerInterface;
+use CmsIg\Seal\Marshaller\Marshaller;
 use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Task\TaskInterface;
 
 class Typo3Indexer implements IndexerInterface
 {
+
+    private readonly Marshaller $marshaller;
+    public function __construct()
+    {
+        $this->marshaller = new Marshaller();
+    }
 
     public function save(Index $index, array $document, array $options = []): TaskInterface|null
     {
