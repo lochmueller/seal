@@ -11,7 +11,11 @@
   "require": {
     "php": "^8.3",
     "typo3/cms-core": "^13.4",
+    "typo3/cms-extbase": "^13.4",
     "cmsig/seal": "^0.7"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.75"
   },
   "extra": {
     "typo3/cms": {
@@ -27,5 +31,8 @@
       "typo3/cms-composer-installers": true,
       "typo3/class-alias-loader": true
     }
+  },
+  "scripts": {
+    "code-fix": "PHP_CS_FIXER_IGNORE_ENV=1 .Build/bin/php-cs-fixer fix Classes --rules=@PER-CS2.0:risky,@PER-CS2.0,declare_strict_types --allow-risky yes"
   }
 }

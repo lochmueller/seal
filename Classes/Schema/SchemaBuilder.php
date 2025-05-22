@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lochmueller\Seal\Schema;
 
 use CmsIg\Seal\Schema\Field;
@@ -8,11 +10,13 @@ use CmsIg\Seal\Schema\Schema;
 
 class SchemaBuilder
 {
-public function getSchema(){
-    return new Schema([$this->getPageIndex()]);
-}
+    public function getSchema()
+    {
+        return new Schema([$this->getPageIndex()]);
+    }
 
-    public function getPageIndex(){
+    public function getPageIndex()
+    {
 
         return new Index('page', [
             'id' => new Field\IdentifierField('id'),

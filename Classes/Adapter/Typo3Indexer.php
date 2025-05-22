@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Seal\Adapter;
 
 use CmsIg\Seal\Adapter\IndexerInterface;
@@ -9,7 +11,6 @@ use CmsIg\Seal\Task\TaskInterface;
 
 class Typo3Indexer implements IndexerInterface
 {
-
     private readonly Marshaller $marshaller;
     public function __construct()
     {
@@ -26,7 +27,7 @@ class Typo3Indexer implements IndexerInterface
         // TODO: Implement delete() method.
     }
 
-    public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = [],): TaskInterface|null
+    public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): TaskInterface|null
     {
         // TODO: Implement bulk() method.
     }

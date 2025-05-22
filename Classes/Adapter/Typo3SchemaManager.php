@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Seal\Adapter;
 
 use CmsIg\Seal\Adapter\SchemaManagerInterface;
@@ -12,7 +14,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Typo3SchemaManager implements SchemaManagerInterface
 {
-
     public function existIndex(Index $index): bool
     {
         /** @var Connection $connection */

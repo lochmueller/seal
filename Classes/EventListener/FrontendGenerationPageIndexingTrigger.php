@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\EventListener;
 
-
 use Lochmueller\Seal\Indexing\Cache\Indexing;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
@@ -16,15 +15,11 @@ use TYPO3\CMS\Frontend\Event\AfterCacheableContentIsGeneratedEvent;
 use TYPO3\CMS\IndexedSearch\Event\EnableIndexingEvent;
 use TYPO3\CMS\IndexedSearch\Indexer;
 
-final class FrontendGenerationPageIndexingTrigger
+class FrontendGenerationPageIndexingTrigger
 {
-
-
     public function __construct(
         private Indexing $cacheIndexing,
-    )
-    {
-    }
+    ) {}
 
     #[AsEventListener('seal-cache-indexer')]
     public function indexPageContent(AfterCacheableContentIsGeneratedEvent $event): void
@@ -48,7 +43,7 @@ final class FrontendGenerationPageIndexingTrigger
         if ($languageAspect->getId() !== $languageAspect->getContentId()) {
             $this->timeTracker->setTSlogMessage(
                 'Index page? No, languageId was different from contentId which indicates that the page contains'
-                . ' fall-back content and that would be falsely indexed as localized content.'
+                . ' fall-back content and that would be falsely indexed as localized content.',
             );
             return;
         }
@@ -88,4 +83,3 @@ final class FrontendGenerationPageIndexingTrigger
         // Call Cache Indexer
     }
 }
-

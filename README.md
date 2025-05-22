@@ -3,6 +3,9 @@
 ## Extension structure in Classes
 
 - Adapter - The seal TYPO3 Adapter for local database
+- Command - Collection of CLI tools
+- Event - All events of EXT:seal
+- EventListener - Usage of external and internal events
 - Indexing - all related to different index processes
 - Indexing/Cache - Index process based on cache (like EXT:indexed_search)
 - Indexing/Database - Index process based on database (like EXT:ke_search)

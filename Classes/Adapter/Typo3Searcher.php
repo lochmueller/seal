@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Seal\Adapter;
 
 use CmsIg\Seal\Adapter\SearcherInterface;
@@ -10,6 +12,7 @@ use CmsIg\Seal\Search\Search;
 class Typo3Searcher implements SearcherInterface
 {
     private readonly Marshaller $marshaller;
+
     public function __construct()
     {
         $this->marshaller = new Marshaller();

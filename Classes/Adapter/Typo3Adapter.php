@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Seal\Adapter;
 
 use CmsIg\Seal\Adapter\AdapterInterface;
@@ -13,8 +15,7 @@ class Typo3Adapter implements AdapterInterface
         private ?Typo3SchemaManager $schemaManager = null,
         private ?Typo3Indexer       $indexer = null,
         private ?Typo3Searcher      $searcher = null,
-    )
-    {
+    ) {
         $this->schemaManager = $schemaManager ?? new Typo3SchemaManager();
         $this->indexer = $indexer ?? new Typo3Indexer();
         $this->searcher = $searcher ?? new Typo3Searcher();
