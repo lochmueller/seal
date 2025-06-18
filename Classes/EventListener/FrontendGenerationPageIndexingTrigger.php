@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\EventListener;
 
+use Lochmueller\Seal\Indexing\Cache\CacheIndexing;
 use Lochmueller\Seal\Indexing\Cache\Indexing;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
@@ -18,7 +19,7 @@ use TYPO3\CMS\IndexedSearch\Indexer;
 class FrontendGenerationPageIndexingTrigger
 {
     public function __construct(
-        private Indexing $cacheIndexing,
+        private CacheIndexing $cacheIndexing,
     ) {}
 
     #[AsEventListener('seal-cache-indexer')]

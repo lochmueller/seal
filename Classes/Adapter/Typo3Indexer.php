@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Seal\Adapter;
+namespace Lochmueller\Seal\Adapter;
 
 use CmsIg\Seal\Adapter\IndexerInterface;
 use CmsIg\Seal\Marshaller\Marshaller;
@@ -11,7 +11,8 @@ use CmsIg\Seal\Task\TaskInterface;
 
 class Typo3Indexer implements IndexerInterface
 {
-    private readonly Marshaller $marshaller;
+    private Marshaller $marshaller;
+
     public function __construct()
     {
         $this->marshaller = new Marshaller();

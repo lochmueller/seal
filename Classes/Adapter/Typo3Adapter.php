@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Seal\Adapter;
+namespace Lochmueller\Seal\Adapter;
 
 use CmsIg\Seal\Adapter\AdapterInterface;
 use CmsIg\Seal\Adapter\IndexerInterface;

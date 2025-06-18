@@ -10,4 +10,5 @@ ExtensionUtility::configurePlugin(
     'Search',
     [SearchController::class => 'list'],
     [SearchController::class => 'search'],
+    ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
 );
