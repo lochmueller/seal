@@ -11,9 +11,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class Seal
 {
-    public function __construct(protected EventDispatcherInterface $eventDispatcher)
-    {
-    }
+    public function __construct(protected EventDispatcherInterface $eventDispatcher) {}
 
     public function buildEngine(): EngineInterface
     {

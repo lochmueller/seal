@@ -12,14 +12,17 @@ use TYPO3\CMS\Core\Attribute\AsEventListener;
 
 final class BuildEngineDefaultEventListener
 {
-    public function __construct(protected SchemaBuilder $schemaBuilder){}
+    public function __construct(
+        protected SchemaBuilder $schemaBuilder,
+        protected Typo3Adapter $typo3Adapter,
+    ) {}
 
     #[AsEventListener('seal-build-default-engine')]
     public function buildDefaultEngine(BuildEngineEvent $event): void
     {
         if ($event->engine === null) {
             $event->engine = new Engine(
-                new Typo3Adapter(),
+                $this->typo3Adapter,
                 $this->schemaBuilder->getSchema(),
             );
 

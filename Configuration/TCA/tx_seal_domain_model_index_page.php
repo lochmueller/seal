@@ -13,12 +13,35 @@ return [
         'rootLevel' => '1',
     ],
     'columns' => [
+        'id' => [
+            'exclude' => 0,
+            'label' => 'ID', # @todo LLL
+            'config' => [
+                'type' => 'input',
+                'size' => '30',
+            ],
+        ],
+        'language' => [
+            'exclude' => 0,
+            'label' => 'Language', # @todo LLL
+            'config' => [
+                'type' => 'input',
+                'size' => '30',
+            ],
+        ],
         'title' => [
             'exclude' => 0,
             'label' => 'Title', # @todo LLL
             'config' => [
                 'type' => 'input',
                 'size' => '30',
+            ],
+        ],
+        'tags' => [
+            'exclude' => 0,
+            'label' => 'Tags', # @todo LLL
+            'config' => [
+                'type' => 'text',
             ],
         ],
         'content' => [
