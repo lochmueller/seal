@@ -9,6 +9,7 @@ use Lochmueller\Seal\Seal;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\PageTitle\PageTitleProviderManager;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Frontend\Event\AfterCacheableContentIsGeneratedEvent;
 
 class FrontendGenerationPageIndexingTrigger
@@ -54,6 +55,7 @@ class FrontendGenerationPageIndexingTrigger
             #'crdate' => $pageRecord['crdate'],
             #'mtime' => $tsfe->register['SYS_LASTCHANGED'] ?? $pageRecord['SYS_LASTCHANGED'],
         ];
+
 
         $this->seal->buildEngine()->saveDocument('page', $page);
     }

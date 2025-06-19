@@ -5,24 +5,21 @@ declare(strict_types=1);
 namespace Lochmueller\Seal;
 
 use CmsIg\Seal\EngineInterface;
-use Lochmueller\Seal\Event\BuildEngineEvent;
-use Lochmueller\Seal\Exception\NoSealEngineException;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Lochmueller\Seal\Engine\EngineFactory;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 class Seal
 {
-    public function __construct(protected EventDispatcherInterface $eventDispatcher) {}
+    public function __construct(protected EngineFactory $engineFactory) {}
 
     public function buildEngine(): EngineInterface
     {
-        /** @var BuildEngineEvent $buildEngine */
-        $buildEngine = $this->eventDispatcher->dispatch(new BuildEngineEvent());
+        return $this->engineFactory->buildEngine();
+    }
 
-        if ($buildEngine->engine !== null) {
-            return $buildEngine->engine;
-        }
-
-        throw new NoSealEngineException('No EXT:seal engine engine found', 123789123);
+    public function buildEngineBySite(SiteInterface $site): EngineInterface
+    {
+        return $this->engineFactory->buildEngineBySite($site);
     }
 
 
