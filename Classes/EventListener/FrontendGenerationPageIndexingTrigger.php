@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\EventListener;
 
 use Lochmueller\Seal\Indexing\Cache\CacheIndexing;
+use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\PageTitle\PageTitleProviderManager;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Frontend\Event\AfterCacheableContentIsGeneratedEvent;
 
 class FrontendGenerationPageIndexingTrigger
@@ -31,6 +31,7 @@ class FrontendGenerationPageIndexingTrigger
         $pageInformation = $request->getAttribute('frontend.page.information');
         $pageRecord = $pageInformation->getPageRecord();
         $tsfe = $request->getAttribute('frontend.controller');
+        $site = $request->getAttribute('site');
 
         if ($pageRecord['no_search'] ?? false) {
             return;
@@ -53,10 +54,10 @@ class FrontendGenerationPageIndexingTrigger
             'content' => strip_tags($tsfe->content),
 
             #'crdate' => $pageRecord['crdate'],
-            #'mtime' => $tsfe->register['SYS_LASTCHANGED'] ?? $pageRecord['SYS_LASTCHANGED'],
+            #'mtime' => $pageRecord['SYS_LASTCHANGED'],
         ];
 
 
-        $this->seal->buildEngine()->saveDocument('page', $page);
+        $this->seal->buildEngineBySite($site)->saveDocument(SchemaBuilder::DEFAULT_INDEX, $page);
     }
 }

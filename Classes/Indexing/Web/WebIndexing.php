@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Indexing\Web;
 
-class WebIndexing {}
+use Lochmueller\Seal\Indexing\IndexingInterface;
+
+class WebIndexing implements IndexingInterface {}

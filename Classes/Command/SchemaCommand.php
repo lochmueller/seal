@@ -19,7 +19,6 @@ class SchemaCommand extends Command
 {
     public function __construct(protected SiteFinder $siteFinder, protected Seal $seal)
     {
-
         parent::__construct();
     }
 
@@ -27,7 +26,6 @@ class SchemaCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
         foreach ($this->siteFinder->getAllSites() as $site) {
             $engine = $this->seal->buildEngineBySite($site);
             $engine->createSchema();

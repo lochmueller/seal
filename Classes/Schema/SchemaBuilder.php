@@ -12,13 +12,14 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class SchemaBuilder
 {
+    public const DEFAULT_INDEX = 'page';
+
     public function __construct(protected EventDispatcherInterface $eventDispatcher) {}
 
     public function getSchema(): Schema
     {
         $schema = new Schema([
-            'page' => $this->getPageIndex(),
-            'document' => $this->getDocumentIndex(),
+            self::DEFAULT_INDEX => $this->getPageIndex(),
         ]);
 
         $event = new BuildSchemaEvent($schema);
@@ -27,24 +28,14 @@ class SchemaBuilder
 
     public function getPageIndex(): Index
     {
-        return new Index('page', [
-            'id' => new Field\IdentifierField('id'),
-            'language' => new Field\IntegerField('language'),
-            'title' => new Field\TextField('title', sortable: true),
-            'tags' => new Field\TextField('tags', multiple: true, filterable: true),
-            'content' => new Field\TextField('content', searchable: false),
-        ]);
-    }
-
-    public function getDocumentIndex(): Index
-    {
-        return new Index('document', [
-            'id' => new Field\IdentifierField('id'),
-            'language' => new Field\IntegerField('language'),
-            'title' => new Field\TextField('title', sortable: true),
-            'tags' => new Field\TextField('tags', multiple: true, filterable: true),
-            'content' => new Field\TextField('content', searchable: false),
-            'extension' => new Field\TextField('extension', searchable: false),
+        return new Index(SchemaBuilder::DEFAULT_INDEX, [
+            'id' => new Field\IdentifierField('id'), // Page ID or PageID incl. suffix and record ID. Example: 128 or 291-tx_news-12839
+            'language' => new Field\IntegerField('language'), // Language UID. Example: 129
+            'site' => new Field\TextField('site', searchable: false), // Site identifier. Example: portal
+            'title' => new Field\TextField('title', sortable: true), // Title. Example: Homepage - My Company
+            'tags' => new Field\TextField('tags', multiple: true, filterable: true), // @todo handle format // default tags are. "page", "file", "plugin", "tx_news"
+            'content' => new Field\TextField('content'), // Content. Example: I am a long string example
+            'extension' => new Field\TextField('extension'), // File extension. Example: html, pdf, png
         ]);
     }
 }

@@ -12,6 +12,7 @@ use CmsIg\Seal\Task\TaskInterface;
 class Typo3Indexer implements IndexerInterface
 {
     private readonly Marshaller $marshaller;
+
     public function __construct(private Typo3AdapterHelper $adapterHelper)
     {
         $this->marshaller = new Marshaller();
@@ -32,6 +33,24 @@ class Typo3Indexer implements IndexerInterface
 
     public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): TaskInterface|null
     {
-        // TODO: Implement bulk() method.
+        // @todo optimize
+        $connection = $this->adapterHelper->getConnection();
+
+        foreach ($deleteDocumentIdentifiers as $deleteDocumentIdentifier) {
+            $connection->delete($this->adapterHelper->getTableName($index), ['id' => $deleteDocumentIdentifier]);
+        }
+
+        $bulk = [];
+        foreach ($saveDocuments as $saveDocument) {
+            $bulk[] = $saveDocument;
+            if (sizeof($bulk) >= $bulkSize) {
+                $connection->bulkInsert($this->adapterHelper->getTableName($index), $bulk);
+                $bulk = [];
+            }
+        }
+
+        if (!empty($bulk)) {
+            $connection->bulkInsert($this->adapterHelper->getTableName($index), $bulk);
+        }
     }
 }

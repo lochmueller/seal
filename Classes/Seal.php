@@ -12,11 +12,6 @@ class Seal
 {
     public function __construct(protected EngineFactory $engineFactory) {}
 
-    public function buildEngine(): EngineInterface
-    {
-        return $this->engineFactory->buildEngine();
-    }
-
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
         return $this->engineFactory->buildEngineBySite($site);

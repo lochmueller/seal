@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Indexing\Cache;
 
-class CacheIndexing {}
+use Lochmueller\Seal\Indexing\IndexingInterface;
+
+class CacheIndexing implements IndexingInterface {}

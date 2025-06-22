@@ -6,8 +6,10 @@ namespace Lochmueller\Seal\Controller;
 
 use CmsIg\Seal\Search\Condition\SearchCondition;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
+use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
@@ -22,9 +24,9 @@ class SearchController extends ActionController
 
     public function listAction(): ResponseInterface
     {
-        $engine = $this->seal->buildEngine();
+        $engine = $this->seal->buildEngineBySite($GLOBALS['TYPO3_REQUEST']->getAttribute('site'));
 
-        $result = $engine->createSearchBuilder('page')
+        $result = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
             ->addFilter(new SearchCondition('Test'))
             ->getResult();
 
