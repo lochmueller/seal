@@ -33,6 +33,6 @@
     }
   },
   "scripts": {
-    "code-fix": "PHP_CS_FIXER_IGNORE_ENV=1 .Build/bin/php-cs-fixer fix Classes --rules=@PER-CS2.0:risky,@PER-CS2.0,declare_strict_types --allow-risky yes"
+    "code-fix": "PHP_CS_FIXER_IGNORE_ENV=1 .Build/bin/php-cs-fixer fix Classes --rules=@PER-CS2.0:risky,@PER-CS2.0,declare_strict_types,no_unused_imports --allow-risky yes"
   }
 }

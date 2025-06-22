@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\EventListener\ResolveAdapter;
 
 use CmsIg\Seal\Adapter\Typesense\TypesenseAdapter;
-use Lochmueller\Seal\Adapter\Typo3Adapter;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
 use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Typesense\Client;

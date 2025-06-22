@@ -6,7 +6,6 @@ namespace Lochmueller\Seal\Pagination;
 
 use CmsIg\Seal\Search\Result;
 use TYPO3\CMS\Core\Pagination\AbstractPaginator;
-use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 
 class SearchResultArrayPaginator extends AbstractPaginator
 {

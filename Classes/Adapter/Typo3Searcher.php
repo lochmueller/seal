@@ -33,8 +33,8 @@ class Typo3Searcher implements SearcherInterface
             }
         }
 
+        // @todo handle Site
 
-        #DebuggerUtility::var_dump($search);
 
         return new Result(
             $this->hitsToDocuments($search->index, [['title' => 'test']]),

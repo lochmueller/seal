@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\EventListener;
 
-use Lochmueller\Seal\Indexing\Cache\CacheIndexing;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use TYPO3\CMS\Core\Attribute\AsEventListener;

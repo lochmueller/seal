@@ -9,12 +9,8 @@ use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
-use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class SearchController extends ActionController
 {
