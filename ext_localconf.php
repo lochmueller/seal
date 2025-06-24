@@ -8,7 +8,7 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 ExtensionUtility::configurePlugin(
     'Seal',
     'Search',
-    [SearchController::class => 'list'],
-    [SearchController::class => 'search'],
+    [SearchController::class => 'search,list'],
+    [SearchController::class => 'search,list'],
     ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
 );

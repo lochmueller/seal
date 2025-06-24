@@ -7,6 +7,7 @@ namespace Lochmueller\Seal\EventListener\ResolveAdapter;
 use CmsIg\Seal\Adapter\Loupe\LoupeAdapter;
 use CmsIg\Seal\Adapter\Loupe\LoupeHelper;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
+use Lochmueller\Seal\Exception\AdapterDependenciesNotFoundException;
 use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Loupe\Loupe\LoupeFactory;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
@@ -30,7 +31,7 @@ class LoupeResolveAdapterEventListener
         }
 
         if (!class_exists(LoupeAdapter::class)) {
-            throw new AdapterNotFoundException(package: 'cmsig/seal-loupe-adapter');
+            throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-loupe-adapter');
         }
         $directory = $searchDsnDto->path ?? 'varPath';
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Controller;
 
+use CmsIg\Seal\Search\Condition\AndCondition;
 use CmsIg\Seal\Search\Condition\SearchCondition;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Schema\SchemaBuilder;
@@ -16,24 +17,34 @@ class SearchController extends ActionController
 {
     public function __construct(
         private Seal $seal,
-    ) {}
+    )
+    {
+    }
 
     public function listAction(): ResponseInterface
     {
         $engine = $this->seal->buildEngineBySite($GLOBALS['TYPO3_REQUEST']->getAttribute('site'));
 
+        $currentPage = $this->request->hasArgument('currentPageNumber')
+            ? (int)$this->request->getArgument('currentPageNumber')
+            : 1;
+        $pageSize = 1;
+
+        $filter = [];
+        $filter[] = new SearchCondition('Lorem');
+
+        // @todo Add more here
+        // GEO
+        // Tags
+
         $result = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
-            ->addFilter(new SearchCondition('Test'))
+            ->addFilter(new AndCondition(...$filter))
+            ->limit($pageSize)
+            ->offset(($currentPage - 1) * $pageSize)
+            ->highlight(['title'])
             ->getResult();
 
-
-        $currentPage = $this->request->hasArgument('currentPageNumber')
-            ? (int) $this->request->getArgument('currentPageNumber')
-            : 1;
-
-        $itemsPerPage = 2;
-
-        $paginator = new SearchResultArrayPaginator($result, $currentPage, $itemsPerPage);
+        $paginator = new SearchResultArrayPaginator($result, $currentPage, $pageSize);
 
         $this->view->assignMultiple(
             [
@@ -41,7 +52,6 @@ class SearchController extends ActionController
                 'paginator' => $paginator,
             ],
         );
-
 
         return $this->htmlResponse();
     }

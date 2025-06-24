@@ -15,7 +15,7 @@ class SearchResultArrayPaginator extends AbstractPaginator
     public function __construct(
         protected Result $result,
         int              $currentPageNumber = 1,
-        int              $itemsPerPage = 10,
+        int              $itemsPerPage = 1,
     ) {
         $this->setCurrentPageNumber($currentPageNumber);
         $this->myItemsPerPage = $itemsPerPage;

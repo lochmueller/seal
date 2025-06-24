@@ -6,4 +6,7 @@ namespace Lochmueller\Seal\Indexing\Database;
 
 use Lochmueller\Seal\Indexing\IndexingInterface;
 
-class DatabaseIndexing implements IndexingInterface {}
+class DatabaseIndexing implements IndexingInterface {
+
+
+}

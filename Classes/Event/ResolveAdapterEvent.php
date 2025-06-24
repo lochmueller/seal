@@ -8,7 +8,7 @@ use CmsIg\Seal\Adapter\AdapterInterface;
 use Lochmueller\Seal\Dto\SearchDsnDto;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
-class ResolveAdapterEvent
+final class ResolveAdapterEvent
 {
     public function __construct(public SearchDsnDto $searchDsn, public SiteInterface $site, public ?AdapterInterface $adapter = null) {}
 

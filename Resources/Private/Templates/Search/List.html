@@ -1,6 +1,11 @@
-Test
 
 
+<f:for each="{paginator.paginatedItems}" as="item">
+    <h2><f:format.raw>{item._formatted.title}</f:format.raw></h2>
+
+    <p>{item.content}</p>
+    <!-- @todo get abstract -->
+</f:for>
 
 
 <ul class="pagination">
@@ -15,7 +20,3 @@ Test
         </li>
     </f:for>
 </ul>
-
-<f:for each="{paginator.paginatedItems}" as="item">
-    <f:debug>{item}</f:debug>
-</f:for>

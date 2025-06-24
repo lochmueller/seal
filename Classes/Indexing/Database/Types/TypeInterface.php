@@ -4,4 +4,9 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Indexing\Database\Types;
 
-interface TypeInterface {}
+interface TypeInterface
+{
+
+
+    public function getItems(): iterable;
+}

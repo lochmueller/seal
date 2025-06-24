@@ -6,6 +6,7 @@ namespace Lochmueller\Seal\EventListener\ResolveAdapter;
 
 use CmsIg\Seal\Adapter\Typesense\TypesenseAdapter;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
+use Lochmueller\Seal\Exception\AdapterDependenciesNotFoundException;
 use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Typesense\Client;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
@@ -24,7 +25,7 @@ class TypesenseResolveAdapterEventListener
         }
 
         if (!class_exists(TypesenseAdapter::class)) {
-            throw new AdapterNotFoundException(package: 'cmsig/seal-typesense-adapter');
+            throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-typesense-adapter');
         }
 
         $client = new Client(

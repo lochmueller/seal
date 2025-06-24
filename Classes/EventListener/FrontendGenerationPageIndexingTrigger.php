@@ -17,7 +17,9 @@ class FrontendGenerationPageIndexingTrigger
         private Seal                     $seal,
         private Context                  $context,
         private PageTitleProviderManager $pageTitleProviderManager,
-    ) {}
+    )
+    {
+    }
 
     #[AsEventListener('seal-cache-indexer')]
     public function indexPageContent(AfterCacheableContentIsGeneratedEvent $event): void
@@ -42,20 +44,14 @@ class FrontendGenerationPageIndexingTrigger
             return;
         }
 
-
         $page = [
-            'id' => (int) $pageInformation->getId(),
-            'language' => (int) $languageAspect->getId(),
-
-            #'gr_list' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
-
+            'id' => (int)$pageInformation->getId(),
+            'language' => (int)$languageAspect->getId(),
+            'site' => $site->getIdentifier(),
+            'access' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
             'title' => $this->pageTitleProviderManager->getTitle($request),
             'content' => strip_tags($tsfe->content),
-
-            #'crdate' => $pageRecord['crdate'],
-            #'mtime' => $pageRecord['SYS_LASTCHANGED'],
         ];
-
 
         $this->seal->buildEngineBySite($site)->saveDocument(SchemaBuilder::DEFAULT_INDEX, $page);
     }
