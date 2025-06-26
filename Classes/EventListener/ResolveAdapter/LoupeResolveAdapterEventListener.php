@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\EventListener\ResolveAdapter;
 
-use CmsIg\Seal\Adapter\Loupe\LoupeAdapter;
-use CmsIg\Seal\Adapter\Loupe\LoupeHelper;
+use CmsIg\Seal\Adapter\Loupe\LoupeAdapterFactory;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
 use Lochmueller\Seal\Exception\AdapterDependenciesNotFoundException;
-use Lochmueller\Seal\Exception\AdapterNotFoundException;
-use Loupe\Loupe\LoupeFactory;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Core\Environment;
 
 /**
- * Example: loupe://localhost/varPath/folderName
+ * Example: loupe://varPath/folderName
  */
 class LoupeResolveAdapterEventListener
 {
@@ -30,23 +27,18 @@ class LoupeResolveAdapterEventListener
             return;
         }
 
-        if (!class_exists(LoupeAdapter::class)) {
+        if (!class_exists(LoupeAdapterFactory::class)) {
             throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-loupe-adapter');
         }
-        $directory = $searchDsnDto->path ?? 'varPath';
+
+        $directory = $event->searchDsn->host . ($event->searchDsn->path ?? '');
 
         foreach ($this->environment->toArray() as $key => $value) {
             if (str_starts_with($directory, $key)) {
                 $directory = str_replace($key, $value, $directory);
             }
-
         }
 
-        $event->adapter = new LoupeAdapter(
-            new LoupeHelper(
-                new LoupeFactory(),
-                $directory,
-            ),
-        );
+        $event->adapter = (new LoupeAdapterFactory())->createAdapter(['host' => $directory]);
     }
 }

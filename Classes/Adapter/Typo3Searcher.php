@@ -14,6 +14,7 @@ use CmsIg\Seal\Search\Search;
 class Typo3Searcher implements SearcherInterface
 {
     private readonly Marshaller $marshaller;
+
     public function __construct(private Typo3AdapterHelper $adapterHelper)
     {
         $this->marshaller = new Marshaller();
@@ -54,5 +55,11 @@ class Typo3Searcher implements SearcherInterface
         foreach ($hits as $hit) {
             yield $this->marshaller->unmarshall($index->fields, $hit);
         }
+    }
+
+    public function count(Index $index): int
+    {
+        $tableName = $this->adapterHelper->getTableName($index);
+        return $this->adapterHelper->getConnection()->count('*', $tableName, []);
     }
 }

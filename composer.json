@@ -3,6 +3,13 @@
   "type": "typo3-cms-extension",
   "description": "SEAL - Search Engine Abstraction Layer",
   "license": "GPL-2.0-or-later",
+  "keywords": [
+    "typo3",
+    "cmsig",
+    "seal",
+    "seal-adapter",
+    "search-client"
+  ],
   "autoload": {
     "psr-4": {
       "Lochmueller\\Seal\\": "Classes/"
@@ -12,7 +19,7 @@
     "php": "^8.3",
     "typo3/cms-core": "^13.4",
     "typo3/cms-extbase": "^13.4",
-    "cmsig/seal": "^0.9"
+    "cmsig/seal": "^0.10"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.75"

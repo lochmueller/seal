@@ -17,9 +17,7 @@ class FrontendGenerationPageIndexingTrigger
         private Seal                     $seal,
         private Context                  $context,
         private PageTitleProviderManager $pageTitleProviderManager,
-    )
-    {
-    }
+    ) {}
 
     #[AsEventListener('seal-cache-indexer')]
     public function indexPageContent(AfterCacheableContentIsGeneratedEvent $event): void
@@ -45,8 +43,8 @@ class FrontendGenerationPageIndexingTrigger
         }
 
         $page = [
-            'id' => (int)$pageInformation->getId(),
-            'language' => (int)$languageAspect->getId(),
+            'id' => (int) $pageInformation->getId(),
+            'language' => (int) $languageAspect->getId(),
             'site' => $site->getIdentifier(),
             'access' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
             'title' => $this->pageTitleProviderManager->getTitle($request),

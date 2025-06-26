@@ -9,13 +9,12 @@ use TYPO3\CMS\Core\Pagination\AbstractPaginator;
 
 class SearchResultArrayPaginator extends AbstractPaginator
 {
-    private iterable $paginatedItems = [];
-    private int $myItemsPerPage  = 10;
+    private int $myItemsPerPage;
 
     public function __construct(
         protected Result $result,
         int              $currentPageNumber = 1,
-        int              $itemsPerPage = 1,
+        int              $itemsPerPage = 10,
     ) {
         $this->setCurrentPageNumber($currentPageNumber);
         $this->myItemsPerPage = $itemsPerPage;
@@ -37,7 +36,7 @@ class SearchResultArrayPaginator extends AbstractPaginator
 
     protected function getAmountOfItemsOnCurrentPage(): int
     {
-        return $this->myItemsPerPage ; // @todo handle
+        return $this->myItemsPerPage; // @todo handle
     }
 
     protected function updatePaginatedItems(int $itemsPerPage, int $offset): void

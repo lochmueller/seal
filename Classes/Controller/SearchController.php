@@ -17,21 +17,19 @@ class SearchController extends ActionController
 {
     public function __construct(
         private Seal $seal,
-    )
-    {
-    }
+    ) {}
 
     public function listAction(): ResponseInterface
     {
         $engine = $this->seal->buildEngineBySite($GLOBALS['TYPO3_REQUEST']->getAttribute('site'));
 
         $currentPage = $this->request->hasArgument('currentPageNumber')
-            ? (int)$this->request->getArgument('currentPageNumber')
+            ? (int) $this->request->getArgument('currentPageNumber')
             : 1;
         $pageSize = 1;
 
         $filter = [];
-        $filter[] = new SearchCondition('Lorem');
+        $filter[] = new SearchCondition('Lore');
 
         // @todo Add more here
         // GEO

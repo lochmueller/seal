@@ -26,9 +26,7 @@ class SchemaCommand extends Command implements LoggerAwareInterface
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-    }
+    protected function configure(): void {}
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
