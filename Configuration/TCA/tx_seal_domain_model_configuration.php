@@ -2,7 +2,7 @@
 
 return [
     'ctrl' => [
-        'title' => 'Configuration',  # @todo LLL
+        'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_configuration',
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -10,12 +10,11 @@ return [
         'enablecolumns' => [
             'fe_group' => 'fe_group',
         ],
-        'rootLevel' => '1',
     ],
     'columns' => [
         'title' => [
             'exclude' => 0,
-            'label' => 'Title', # @todo LLL
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_configuration.title',
             'config' => [
                 'type' => 'input',
                 'size' => '30',

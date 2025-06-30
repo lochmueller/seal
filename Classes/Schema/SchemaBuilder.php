@@ -33,9 +33,10 @@ class SchemaBuilder
             'language' => new Field\IntegerField('language'), // Language UID. Example: 129
             'site' => new Field\TextField('site', searchable: false), // Site identifier. Example: portal
             'title' => new Field\TextField('title', sortable: true), // Title. Example: Homepage - My Company
-            'tags' => new Field\TextField('tags', multiple: true, filterable: true), // @todo handle format // default tags are. "page", "file", "plugin", "tx_news"
+            'tags' => new Field\TextField('tags', multiple: true, filterable: true), // Tags. Defaults are "Page" "File"
             'content' => new Field\TextField('content'), // Content. Example: I am a long string example
-            'extension' => new Field\TextField('extension'), // File extension. Example: html, pdf, png
+            'preview' => new Field\TextField('preview', searchable: false), // Media preview.
+            'extension' => new Field\TextField('extension'), // File extension in case of file. Otherwise empty. Example: html, pdf, png
         ]);
     }
 }

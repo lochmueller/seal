@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2013-09-19T09:11:39Z"
+          product-name="seal">
+        <header/>
+        <body>
+            <trans-unit id="plugin.label">
+                <source>SEAL Search</source>
+            </trans-unit>
+            <trans-unit id="plugin.description">
+                <source>SEAL Search plugin with advanced index and filter features.</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_configuration">
+                <source>Configuration</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_configuration.title">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter">
+                <source>Filter</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.title">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type">
+                <source>Type</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type.searchCondition">
+                <source>Search Condition (Search word) - once in Filter configuration</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type.tagCondition">
+                <source>Tag condition</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type.geoDistanceCondition">
+                <source>GEO distance condition</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page">
+                <source>Index Page</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page.site">
+                <source>Site</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page.id">
+                <source>ID</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page.language">
+                <source>Language</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page.title">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page.tags">
+                <source>Tags</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page.content">
+                <source>Content</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_page.preview">
+                <source>Preview</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

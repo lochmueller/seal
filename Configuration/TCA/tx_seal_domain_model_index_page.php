@@ -2,7 +2,7 @@
 
 return [
     'ctrl' => [
-        'title' => 'Index',  # @todo LLL
+        'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page',
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -15,7 +15,7 @@ return [
     'columns' => [
         'id' => [
             'exclude' => 0,
-            'label' => 'ID', # @todo LLL
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.id',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -23,7 +23,15 @@ return [
         ],
         'language' => [
             'exclude' => 0,
-            'label' => 'Language', # @todo LLL
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.language',
+            'config' => [
+                'type' => 'input',
+                'size' => '30',
+            ],
+        ],
+        'site' => [
+            'exclude' => 0,
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.site',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -31,7 +39,7 @@ return [
         ],
         'title' => [
             'exclude' => 0,
-            'label' => 'Title', # @todo LLL
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.title',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -39,16 +47,24 @@ return [
         ],
         'tags' => [
             'exclude' => 0,
-            'label' => 'Tags', # @todo LLL
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.tags',
             'config' => [
                 'type' => 'text',
             ],
         ],
         'content' => [
             'exclude' => 0,
-            'label' => 'Content', # @todo LLL
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.content',
             'config' => [
                 'type' => 'text',
+            ],
+        ],
+        'preview' => [
+            'exclude' => 0,
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.preview',
+            'config' => [
+                'type' => 'input',
+                'size' => '30',
             ],
         ],
     ],
