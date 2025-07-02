@@ -1,10 +1,21 @@
 # EXT:seal
 
-@todo description
+SEAL Search - Flexible integration of the Search Engine Abstraction Layer project.
+
+## Installation
+
+1. Run `composer require lochmueller/seal`
+2. Install optional adapters from packagist
+3. Configure the search adapter via site settings
+4. Load the SiteSet of the extension
+5. 
+
 
 ## Extension workflow
 
 @todo Workflow beschreiben
+
+
 
 ## Extension structure
 
@@ -19,6 +30,10 @@
 - Indexing/Database - Index process based on database (like EXT:ke_search)
 - Indexing/Web - Index process based on web requests (like EXT:solr)
 - Schema - Management of the Schema structure for the current instance
+
+# Ideas
+
+- Log Adapter wrapper
 
 # Credits
 

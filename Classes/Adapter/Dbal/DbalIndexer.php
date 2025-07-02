@@ -2,18 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Lochmueller\Seal\Adapter;
+namespace Lochmueller\Seal\Adapter\Dbal;
 
 use CmsIg\Seal\Adapter\IndexerInterface;
 use CmsIg\Seal\Marshaller\Marshaller;
 use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Task\TaskInterface;
+use Lochmueller\Seal\Adapter\AdapterHelper;
 
-class Typo3Indexer implements IndexerInterface
+/**
+ * @todo implement
+ */
+class DbalIndexer implements IndexerInterface
 {
     private readonly Marshaller $marshaller;
 
-    public function __construct(private Typo3AdapterHelper $adapterHelper)
+    public function __construct(private AdapterHelper $adapterHelper)
     {
         $this->marshaller = new Marshaller();
     }

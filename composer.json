@@ -1,7 +1,7 @@
 {
   "name": "lochmueller/seal",
   "type": "typo3-cms-extension",
-  "description": "SEAL - Search Engine Abstraction Layer",
+  "description": "SEAL Search - Flexible integration of the Search Engine Abstraction Layer project",
   "license": "GPL-2.0-or-later",
   "keywords": [
     "typo3",

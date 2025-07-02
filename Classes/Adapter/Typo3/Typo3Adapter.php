@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lochmueller\Seal\Adapter;
+namespace Lochmueller\Seal\Adapter\Typo3;
 
 use CmsIg\Seal\Adapter\AdapterInterface;
 use CmsIg\Seal\Adapter\IndexerInterface;

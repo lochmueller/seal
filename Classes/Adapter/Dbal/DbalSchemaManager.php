@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Lochmueller\Seal\Adapter;
+namespace Lochmueller\Seal\Adapter\Dbal;
 
 use CmsIg\Seal\Adapter\SchemaManagerInterface;
 use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Task\TaskInterface;
+use Lochmueller\Seal\Adapter\AdapterHelper;
 
-class Typo3SchemaManager implements SchemaManagerInterface
+class DbalSchemaManager implements SchemaManagerInterface
 {
-    public function __construct(private Typo3AdapterHelper $adapterHelper) {}
+    public function __construct(private AdapterHelper $adapterHelper) {}
 
     public function existIndex(Index $index): bool
     {

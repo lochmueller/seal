@@ -12,6 +12,7 @@ use TYPO3\CMS\Core\Core\Environment;
 
 /**
  * Example: loupe://varPath/folderName
+ * @todo move to Interface and offical Factory
  */
 class LoupeResolveAdapterEventListener
 {

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Lochmueller\Seal\Adapter;
+namespace Lochmueller\Seal\Adapter\Dbal;
 
 use CmsIg\Seal\Adapter\AdapterFactoryInterface;
 use CmsIg\Seal\Adapter\AdapterInterface;
 
-class Typo3AdapterFactory implements AdapterFactoryInterface
+class DbalAdapterFactory implements AdapterFactoryInterface
 {
     public function createAdapter(array $dsn): AdapterInterface
     {
@@ -16,6 +16,6 @@ class Typo3AdapterFactory implements AdapterFactoryInterface
 
     public static function getName(): string
     {
-        return 'typo3';
+        return 'dbal';
     }
 }

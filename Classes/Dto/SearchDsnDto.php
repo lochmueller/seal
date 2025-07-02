@@ -28,4 +28,10 @@ class SearchDsnDto
         parse_str($parts['query'] ?? '', $this->options);
     }
 
+    public function __toArray(): array
+    {
+        return [];
+    }
+
+
 }

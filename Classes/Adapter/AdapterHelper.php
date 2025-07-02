@@ -9,7 +9,7 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Typo3AdapterHelper
+class AdapterHelper
 {
     public function getConnection(): Connection
     {

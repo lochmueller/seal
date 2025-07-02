@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lochmueller\Seal\Adapter;
+namespace Lochmueller\Seal\Adapter\Dbal;
 
 use CmsIg\Seal\Adapter\SearcherInterface;
 use CmsIg\Seal\Marshaller\Marshaller;
@@ -10,12 +10,13 @@ use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Search\Condition\SearchCondition;
 use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
+use Lochmueller\Seal\Adapter\AdapterHelper;
 
-class Typo3Searcher implements SearcherInterface
+class DbalSearcher implements SearcherInterface
 {
     private readonly Marshaller $marshaller;
 
-    public function __construct(private Typo3AdapterHelper $adapterHelper)
+    public function __construct(private AdapterHelper $adapterHelper)
     {
         $this->marshaller = new Marshaller();
     }

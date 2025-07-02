@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Attribute\AsEventListener;
 
 /**
  * Example: typesense://HOST:PORT/?protocol=http&api_key=xxxxxx
+ * @todo move to Interface and offical Factory
  */
 class TypesenseResolveAdapterEventListener
 {
