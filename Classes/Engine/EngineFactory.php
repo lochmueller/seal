@@ -29,12 +29,10 @@ class EngineFactory
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
         $siteConfiguration = $site->getConfiguration();
-        $dsn = new SearchDsnDto($siteConfiguration['sealSearchDsn'] ?? 'typo3://localhost');
+        $dsn = new SearchDsnDto($siteConfiguration['sealSearchDsn'] ?? 'typo3://');
         $adapter = null;
 
-
         foreach ($this->adapterFactories as $adapterFactory) {
-
             /** @var $adapterFactory AdapterFactoryInterface */
             if ($dsn->type === $adapterFactory::getName()) {
                 $adapter = $adapterFactory->createAdapter((array) $dsn);

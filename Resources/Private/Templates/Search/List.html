@@ -1,12 +1,6 @@
-
-
 <f:for each="{paginator.paginatedItems}" as="item">
-    <h2><f:format.raw>{item._formatted.title}</f:format.raw></h2>
-
-    <p>{item.content}</p>
-    <!-- @todo get abstract -->
+    <f:render partial="Result/Item" arguments="{item: item}"/>
 </f:for>
-
 
 <ul class="pagination">
     <f:for each="{pagination.allPageNumbers}" as="page">

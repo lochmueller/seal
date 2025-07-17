@@ -20,6 +20,13 @@ class SearchDsnDto
     protected function extractDsn(): void
     {
         $parts = parse_url($this->searchDsn);
+        if ($parts === false) {
+            if (preg_match('/^([a-z0-9]*):\/\/.*/', $this->searchDsn, $matches)) {
+                $parts = [
+                    'scheme' => $matches[1],
+                ];
+            }
+        }
 
         $this->type = $parts['scheme'] ?? null;
         $this->host = $parts['host'] ?? null;

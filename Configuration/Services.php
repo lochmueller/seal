@@ -9,6 +9,7 @@ use CmsIg\Seal\Adapter\RediSearch\RediSearchAdapterFactory;
 use CmsIg\Seal\Adapter\Typesense\TypesenseAdapterFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 

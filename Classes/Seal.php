@@ -14,7 +14,12 @@ class Seal
 
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
-        return $this->engineFactory->buildEngineBySite($site);
+        static $requestCache = [];
+        if (isset($requestCache[$site->getIdentifier()])) {
+            return $requestCache[$site->getIdentifier()];
+        }
+        $requestCache[$site->getIdentifier()] = $this->engineFactory->buildEngineBySite($site);
+        return $requestCache[$site->getIdentifier()];
     }
 
 

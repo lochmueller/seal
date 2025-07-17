@@ -11,7 +11,7 @@ use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Core\Environment;
 
 /**
- * Example: loupe://varPath/folderName
+ * Example: loupe://var/indices/
  * @todo move to Interface and offical Factory
  */
 class LoupeResolveAdapterEventListener
@@ -32,14 +32,8 @@ class LoupeResolveAdapterEventListener
             throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-loupe-adapter');
         }
 
-        $directory = $event->searchDsn->host . ($event->searchDsn->path ?? '');
 
-        foreach ($this->environment->toArray() as $key => $value) {
-            if (str_starts_with($directory, $key)) {
-                $directory = str_replace($key, $value, $directory);
-            }
-        }
-
+        $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn->host . ($event->searchDsn->path ?? '');
         $event->adapter = (new LoupeAdapterFactory())->createAdapter(['host' => $directory]);
     }
 }

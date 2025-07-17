@@ -6,12 +6,12 @@ namespace Lochmueller\Seal\Adapter\Typo3;
 
 use CmsIg\Seal\Adapter\SchemaManagerInterface;
 use CmsIg\Seal\Schema\Index;
+use CmsIg\Seal\Task\SyncTask;
 use CmsIg\Seal\Task\TaskInterface;
-use Lochmueller\Seal\Adapter\AdapterHelper;
 
 class Typo3SchemaManager implements SchemaManagerInterface
 {
-    public function __construct(private AdapterHelper $adapterHelper) {}
+    public function __construct(private Typo3AdapterHelper $adapterHelper) {}
 
     public function existIndex(Index $index): bool
     {
@@ -25,13 +25,19 @@ class Typo3SchemaManager implements SchemaManagerInterface
         }
 
         $this->adapterHelper->getConnection()->truncate($this->adapterHelper->getTableName($index));
-        return null;
+
+        return new SyncTask(null);
     }
 
     public function createIndex(Index $index, array $options = []): TaskInterface|null
     {
+        if (!$this->existIndex($index)) {
+            throw new \Exception('Please create the database structure with TYPO3 TCA management and ext_tables.sql handling for table: ' . $this->adapterHelper->getTableName($index), 1238123);
+        }
+
         // Nothing to do...
         // All index tables should exist via DB compare
-        return null;
+
+        return new SyncTask(null);
     }
 }

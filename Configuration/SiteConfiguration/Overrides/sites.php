@@ -2,11 +2,11 @@
 
 $GLOBALS['SiteConfiguration']['site']['columns']['sealSearchDsn'] = [
     'label' => 'Search DSN',
-    'description' => 'Configure the search adapter via DSN. Examples are "typo3://localhost" or "loupe://varPath". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN.',
+    'description' => 'Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN.',
     'config' => [
         'type' => 'input',
         'eval' => 'trim',
-        'default' => 'typo3://localhost',
+        'default' => 'typo3://',
     ],
 ];
 

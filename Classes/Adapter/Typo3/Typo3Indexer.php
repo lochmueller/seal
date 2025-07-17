@@ -7,14 +7,14 @@ namespace Lochmueller\Seal\Adapter\Typo3;
 use CmsIg\Seal\Adapter\IndexerInterface;
 use CmsIg\Seal\Marshaller\Marshaller;
 use CmsIg\Seal\Schema\Index;
+use CmsIg\Seal\Task\SyncTask;
 use CmsIg\Seal\Task\TaskInterface;
-use Lochmueller\Seal\Adapter\AdapterHelper;
 
 class Typo3Indexer implements IndexerInterface
 {
     private readonly Marshaller $marshaller;
 
-    public function __construct(private AdapterHelper $adapterHelper)
+    public function __construct(private Typo3AdapterHelper $adapterHelper)
     {
         $this->marshaller = new Marshaller();
     }
@@ -23,13 +23,15 @@ class Typo3Indexer implements IndexerInterface
     {
         $data = $this->marshaller->marshall($index->fields, $document);
         $this->adapterHelper->getConnection()->insert($this->adapterHelper->getTableName($index), $data);
-        return null;
+
+        return new SyncTask(null);
     }
 
     public function delete(Index $index, string $identifier, array $options = []): TaskInterface|null
     {
         $this->adapterHelper->getConnection()->delete($this->adapterHelper->getTableName($index), ['id' => $identifier]);
-        return null;
+
+        return new SyncTask(null);
     }
 
     public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): TaskInterface|null
@@ -53,5 +55,7 @@ class Typo3Indexer implements IndexerInterface
         if (!empty($bulk)) {
             $connection->bulkInsert($this->adapterHelper->getTableName($index), $bulk);
         }
+
+        return new SyncTask(null);
     }
 }
