@@ -67,6 +67,13 @@ return [
                 'size' => '30',
             ],
         ],
+        'uri' => [
+            'exclude' => 0,
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.uri',
+            'config' => [
+                'type' => 'input',
+            ],
+        ],
     ],
     'types' => [
         '0' => ['showitem' => 'title'],

@@ -6,22 +6,33 @@ namespace Lochmueller\Seal\Indexing\Database;
 
 use Lochmueller\Seal\Indexing\Database\Types\Page;
 use Lochmueller\Seal\Indexing\IndexingInterface;
+use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class DatabaseIndexing implements IndexingInterface
 {
-    public function __construct(protected PageTraversing $pageTraversing)
-    {
-    }
+    public function __construct(
+        protected PageTraversing $pageTraversing,
+    ) {}
 
     public function indexDatabase(SiteInterface $site): void
     {
+
+        $indexConfiguration = Yaml::parse($site->getConfiguration()['sealIndexConfiguration'] ?? '');
+
+        DebuggerUtility::var_dump($indexConfiguration);
+        die();
+
+
         foreach ($this->loadTypes($site) as $type) {
             foreach ($type->getItems() as $item) {
 
             }
 
         }
+
+        // Yaml::parse()
 
 
     }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Lochmueller\Seal\Indexing\Database\Types;
+namespace Lochmueller\Seal\Indexing\Database\Extender;
 
-class Address extends AbstractType
+class Address extends AbstractExtender
 {
     public function getItems(): iterable
     {

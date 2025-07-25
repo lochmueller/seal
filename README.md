@@ -13,6 +13,18 @@ SEAL Search - Flexible integration of the Search Engine Abstraction ([SEAL](http
 6. Configure individuell search options
 
 
+## Configuration
+
+Base in the index type you have to create scheduler tasks. "Cache indexing" do not need any configuration. The "Database indexing" need the "seal:index" scheduler task with the right site seletced. The indx process is running in the excution of the task. The "Web indexing" need als the "seal:index" task, but this task only fill ob the message bus for the web selection. So you need "seal:index" and also "message:consume" of the core.
+
+### Database & Web index configuration
+
+```yaml
+test:
+  hallo: 
+```
+
+
 ## Extension structure
 
 - Adapter - The seal TYPO3 Adapter for local database
@@ -27,6 +39,7 @@ SEAL Search - Flexible integration of the Search Engine Abstraction ([SEAL](http
   - Cache - Index process based on cache (like EXT:indexed_search)
   - Database - Index process based on database (like EXT:ke_search)
   - Web - Index process based on web requests (like EXT:solr)
+- Queue - Message and handler for the async handling message queue in Web indexing process
 - Middleware - Functions based on the PSR Middleware stack like autocomplete
 - Pagination - Fluid Pagination based on Seal Generator
 - Schema - Management of the Schema structure for the current instance

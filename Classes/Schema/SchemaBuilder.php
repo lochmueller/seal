@@ -30,12 +30,13 @@ class SchemaBuilder
     {
         return new Index(SchemaBuilder::DEFAULT_INDEX, [
             'id' => new Field\IdentifierField('id'), // Page ID or PageID incl. suffix and record ID. Example: 128 or 291-tx_news-12839
-            'language' => new Field\IntegerField('language'), // Language UID. Example: 129
+            'language' => new Field\IntegerField('language', searchable: false), // Language UID. Example: 129
             'site' => new Field\TextField('site', searchable: false), // Site identifier. Example: portal
             'title' => new Field\TextField('title', sortable: true), // Title. Example: Homepage - My Company
             'tags' => new Field\TextField('tags', multiple: true, filterable: true), // Tags. Defaults are "Page" "File"
             'content' => new Field\TextField('content'), // Content. Example: I am a long string example
             'preview' => new Field\TextField('preview', searchable: false), // Media preview.
+            'uri' => new Field\TextField('uri', searchable: false), // URI. @todo check if addionalAguments are more usefull
             'extension' => new Field\TextField('extension'), // File extension in case of file. Otherwise empty. Example: html, pdf, png
         ]);
     }

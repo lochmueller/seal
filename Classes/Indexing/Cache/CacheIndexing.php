@@ -9,6 +9,7 @@ use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\PageTitle\PageTitleProviderManager;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Frontend\Event\AfterCacheableContentIsGeneratedEvent;
 
 class CacheIndexing implements IndexingInterface
@@ -26,10 +27,16 @@ class CacheIndexing implements IndexingInterface
         }
 
         $request = $event->getRequest();
+        $tsfe = $request->getAttribute('frontend.controller');
+        /** @var Site $site */
+        $site = $request->getAttribute('site');
+        $indexType = $site->getConfiguration()['sealIndexType'] ?? '';
+        if ($indexType !== 'cache') {
+            return;
+        }
+
         $pageInformation = $request->getAttribute('frontend.page.information');
         $pageRecord = $pageInformation->getPageRecord();
-        $tsfe = $request->getAttribute('frontend.controller');
-        $site = $request->getAttribute('site');
 
         if ($pageRecord['no_search'] ?? false) {
             return;
@@ -48,6 +55,8 @@ class CacheIndexing implements IndexingInterface
             'access' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
             'title' => $this->pageTitleProviderManager->getTitle($request),
             'content' => strip_tags($tsfe->content),
+            'preview' => '',
+            'uri' => 'https://www.google.de', // @todo perhaps only URI params (check URI building in frontend process)
         ];
 
         $this->seal->buildEngineBySite($site)->saveDocument(SchemaBuilder::DEFAULT_INDEX, $page);

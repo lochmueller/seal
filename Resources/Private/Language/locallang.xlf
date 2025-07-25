@@ -67,7 +67,9 @@
             <trans-unit id="searchword.help">
                 <source>Searchword for the fulltext search.</source>
             </trans-unit>
-
+            <trans-unit id="tx_seal_domain_model_index_page.uri_params">
+                <source>URI</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
