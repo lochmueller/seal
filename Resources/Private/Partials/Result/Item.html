@@ -1,7 +1,33 @@
-<h2><f:format.raw>{item.title}</f:format.raw></h2>
+<div class="card mb-3" style="max-width: 540px;">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <!-- @todo media -->
+            <img src="..." class="img-fluid rounded-start" alt="...">
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h3 class="card-title"><f:format.raw>{item.title}</f:format.raw></h3>
 
-Render Result item
+                <f:comment>
+                    <f:debug>{item}</f:debug>
+                </f:comment>
 
-<f:comment><f:debug>{item}</f:debug></f:comment>
 
-<p>{item.content}</p>
+                <p class="card-text">
+                    @todo render Result item extract
+
+                    {item.content}
+
+                    This is a wider card with supporting text below as a natural lead-in to additional
+                    content. This content is a little bit longer.
+                </p>
+
+                <!-- @todo meta information -->
+                <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+
+                <!-- @todo add link -->
+                <a href="#" class="btn btn-primary">target</a>
+            </div>
+        </div>
+    </div>
+</div>

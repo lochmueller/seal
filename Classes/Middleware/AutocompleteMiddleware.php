@@ -23,7 +23,6 @@ class AutocompleteMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-
         if (!str_ends_with($request->getUri()->getPath(), '/seal/autocomplete')) {
             return $handler->handle($request);
         }

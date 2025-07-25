@@ -20,6 +20,8 @@ $GLOBALS['SiteConfiguration']['site']['columns']['sealAutocompleteMinCharacters'
     ],
 ];
 
+// @todo indexing configuration
+
 $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] = str_replace(
     ', languages,',
     ', languages, --div--;SEAL / Search, sealSearchDsn, sealAutocompleteMinCharacters,',

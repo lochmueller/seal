@@ -1,16 +1,4 @@
 <f:for each="{paginator.paginatedItems}" as="item">
     <f:render partial="Result/Item" arguments="{item: item}"/>
 </f:for>
-
-<ul class="pagination">
-    <f:for each="{pagination.allPageNumbers}" as="page">
-        <li class="page-item">
-            <f:link.action
-                    arguments="{currentPageNumber:page}"
-                    class="page-link {f:if(condition:'{currentPageNumber}=={page}',then:'active')}"
-            >
-                {page}
-            </f:link.action>
-        </li>
-    </f:for>
-</ul>
+<f:render partial="Result/Pagination" arguments="{_all}"/>

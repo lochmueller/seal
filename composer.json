@@ -8,7 +8,8 @@
     "cmsig",
     "seal",
     "seal-adapter",
-    "search-client"
+    "search-client",
+    "search"
   ],
   "autoload": {
     "psr-4": {
@@ -22,7 +23,7 @@
     "cmsig/seal": "^0.10"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.75"
+    "friendsofphp/php-cs-fixer": "^3.84"
   },
   "extra": {
     "typo3/cms": {

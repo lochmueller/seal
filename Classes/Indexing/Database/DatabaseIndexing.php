@@ -10,10 +10,12 @@ use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 class DatabaseIndexing implements IndexingInterface
 {
+    public function __construct(protected PageTraversing $pageTraversing)
+    {
+    }
+
     public function indexDatabase(SiteInterface $site): void
     {
-
-
         foreach ($this->loadTypes($site) as $type) {
             foreach ($type->getItems() as $item) {
 

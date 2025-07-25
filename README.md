@@ -1,40 +1,37 @@
 # EXT:seal
 
-SEAL Search - Flexible integration of the Search Engine Abstraction Layer project.
+SEAL Search - Flexible integration of the Search Engine Abstraction ([SEAL](https://php-cmsig.github.io/search/index.html)) Layer project into TYPO3. Different index configuration and multiple possibilities. Use it with TYPO3 or for example with Meilisearch, Solr, Loupe, Typesense - without changing the integration. Have fun.
+
 
 ## Installation
 
 1. Run `composer require lochmueller/seal`
-2. Install optional adapters from packagist
-3. Configure the search adapter via site settings
+2. *Optional: Install the right adapter, if you want to use a specific engine*
+3. Configure the search adapter via site configuration
 4. Load the SiteSet of the extension
-5. 
-
-
-## Extension workflow
-
-@todo Workflow beschreiben
-
+5. *Optional: Create a scheduler tasks for the index process*
+6. Configure individuell search options
 
 
 ## Extension structure
 
 - Adapter - The seal TYPO3 Adapter for local database
-- Command - Collection of CLI tools
+- Command - Collection of CLI tools for indexing and schema building
 - Controller - All frontend plugins
+- Dto - Data transfer options for the application
+- Engine - Factory for engine create process
 - Event - All events of EXT:seal
 - EventListener - Usage of external and internal events
 - Exception - Internal exceptions
 - Indexing - all related to different index processes
-- Indexing/Cache - Index process based on cache (like EXT:indexed_search)
-- Indexing/Database - Index process based on database (like EXT:ke_search)
-- Indexing/Web - Index process based on web requests (like EXT:solr)
+  - Cache - Index process based on cache (like EXT:indexed_search)
+  - Database - Index process based on database (like EXT:ke_search)
+  - Web - Index process based on web requests (like EXT:solr)
+- Middleware - Functions based on the PSR Middleware stack like autocomplete
+- Pagination - Fluid Pagination based on Seal Generator
 - Schema - Management of the Schema structure for the current instance
 
-# Ideas
-
-- Log Adapter wrapper
 
 # Credits
 
-Thanks https://php-cmsig.github.io/search/index.html for the nice idea!
+Thanks [SEAL](https://php-cmsig.github.io/search/index.html) for the nice idea and TYPO3 Association for the sponsoring of the extension.

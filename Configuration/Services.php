@@ -26,7 +26,6 @@ return function (ContainerConfigurator $container) {
 
     foreach ($checkedFactories as $factory) {
         if (class_exists($factory)) {
-
             $services
                 ->set($factory)
                 ->autowire()
@@ -34,5 +33,4 @@ return function (ContainerConfigurator $container) {
                 ->tag('seal.adapter_factory');
         }
     }
-
 };
