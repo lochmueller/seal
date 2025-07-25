@@ -40,7 +40,7 @@ $GLOBALS['SiteConfiguration']['site']['columns']['sealIndexType'] = [
                 'value' => 'database',
             ],
             [
-                'label' => 'Web indexing (like EXT:solr) - Keep in mind: Create the "seal:index" scheduler command and "messenger:consume" command.',
+                'label' => 'Web indexing (like EXT:solr) - Keep in mind: Create the "seal:index" scheduler command and "messenger:consume" with receivers->doctrine command.',
                 'value' => 'web',
             ],
         ],

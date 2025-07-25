@@ -69,7 +69,7 @@ class Typo3Searcher implements SearcherInterface
 
 
         return new Result(
-            $this->hitsToDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
+            $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
             1,
         );
 
@@ -81,7 +81,7 @@ class Typo3Searcher implements SearcherInterface
      *
      * @return \Generator<int, array<string, mixed>>
      */
-    private function hitsToDocuments(Index $index, iterable $hits): \Generator
+    private function hitsDocuments(Index $index, iterable $hits): \Generator
     {
         foreach ($hits as $hit) {
             yield $this->marshaller->unmarshall($index->fields, $hit);

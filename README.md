@@ -21,7 +21,7 @@ Base in the index type you have to create scheduler tasks. "Cache indexing" do n
 
 ```yaml
 test:
-  hallo: 
+  hallo:  @todo
 ```
 
 
@@ -47,4 +47,4 @@ test:
 
 # Credits
 
-Thanks [SEAL](https://php-cmsig.github.io/search/index.html) for the nice idea and TYPO3 Association for the sponsoring of the extension.
+Thanks [SEAL](https://php-cmsig.github.io/search/index.html) for the nice idea and TYPO3 Association & TYPO3 Community for the sponsoring of the extension.
