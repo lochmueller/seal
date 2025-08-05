@@ -6,10 +6,14 @@ namespace Lochmueller\Seal\Dto;
 
 class SearchDsnDto
 {
-    public ?string $type = null;
+    public ?string $scheme = null;
     public ?string $host = null;
     public ?string $port = null;
     public ?string $path = null;
+    public ?string $user = null;
+    public ?string $pass = null;
+    public ?string $query = null;
+    public ?string $fragment = null;
     public array $options = [];
 
     public function __construct(protected string $searchDsn)
@@ -28,17 +32,11 @@ class SearchDsnDto
             }
         }
 
-        $this->type = $parts['scheme'] ?? null;
+        $this->scheme = $parts['scheme'] ?? null;
         $this->host = $parts['host'] ?? null;
         $this->port = $parts['port'] ?? null;
         $this->path = $parts['path'] ?? null;
         parse_str($parts['query'] ?? '', $this->options);
     }
-
-    public function __toArray(): array
-    {
-        return [];
-    }
-
 
 }

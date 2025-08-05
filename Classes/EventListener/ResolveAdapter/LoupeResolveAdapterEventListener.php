@@ -24,7 +24,7 @@ class LoupeResolveAdapterEventListener
     public function indexPageContent(ResolveAdapterEvent $event): void
     {
 
-        if ($event->searchDsn->type !== 'loupe') {
+        if ($event->searchDsn->scheme !== 'loupe') {
             return;
         }
 
@@ -33,6 +33,7 @@ class LoupeResolveAdapterEventListener
         }
 
 
+        // @todo add the project Path in front of the default configuration
         $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn->host . ($event->searchDsn->path ?? '');
         $event->adapter = (new LoupeAdapterFactory())->createAdapter(['host' => $directory]);
     }

@@ -1,10 +1,10 @@
 <?php
 
-use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
+use TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider;
 
 return [
     'ext-seal-icon' => [
-        'provider' => SvgIconProvider::class,
+        'provider' => BitmapIconProvider::class,
         'source' => 'EXT:seal/Resources/Public/Icons/Extension.png',
     ],
 ];

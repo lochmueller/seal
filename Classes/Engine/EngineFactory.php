@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class EngineFactory
 {
@@ -24,7 +25,9 @@ class EngineFactory
         protected SchemaBuilder            $schemaBuilder,
         #[AutowireIterator('seal.adapter_factory')]
         protected iterable                 $adapterFactories,
-    ) {}
+    )
+    {
+    }
 
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
@@ -34,8 +37,8 @@ class EngineFactory
 
         foreach ($this->adapterFactories as $adapterFactory) {
             /** @var $adapterFactory AdapterFactoryInterface */
-            if ($dsn->type === $adapterFactory::getName()) {
-                $adapter = $adapterFactory->createAdapter((array) $dsn);
+            if ($dsn->scheme === $adapterFactory::getName()) {
+                $adapter = $adapterFactory->createAdapter((array)$dsn);
             }
         }
 
@@ -45,6 +48,7 @@ class EngineFactory
         if ($resolveAdapterEvent->adapter === null) {
             throw new AdapterNotFoundException('No valid adapter found for site "' . $site->getIdentifier() . '"', 23482934);
         }
+        
         return new Engine(
             $resolveAdapterEvent->adapter,
             $this->schemaBuilder->getSchema(),
