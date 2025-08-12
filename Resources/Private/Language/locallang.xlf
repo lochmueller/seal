@@ -4,6 +4,21 @@
           product-name="seal">
         <header/>
         <body>
+            <trans-unit id="seal">
+                <source>SEAL (Search Engine Abstraction Layer)</source>
+            </trans-unit>
+            <trans-unit id="site.sealAutocompleteMinCharacters">
+                <source>Autocomplete min chars</source>
+            </trans-unit>
+            <trans-unit id="site.sealAutocompleteMinCharacters.description">
+                <source>Minimum chars for the auto complete endpoint of this site. Default value is 3.</source>
+            </trans-unit>
+            <trans-unit id="site.sealSearchDsn">
+                <source>Search Adapter DSN</source>
+            </trans-unit>
+            <trans-unit id="site.sealSearchDsn.description">
+                <source>Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN.</source>
+            </trans-unit>
             <trans-unit id="plugin.label">
                 <source>SEAL Search</source>
             </trans-unit>

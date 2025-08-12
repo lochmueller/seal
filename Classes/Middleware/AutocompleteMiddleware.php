@@ -45,12 +45,10 @@ class AutocompleteMiddleware implements MiddlewareInterface
 
         $engine = $this->seal->buildEngineBySite($site);
 
-
         $filter = [];
         $filter[] = new SearchCondition($searchWord);
-        // @todo search in the right way
-        #$filter[] = new EqualCondition('site', $site->getIdentifier());
-        #$filter[] = new EqualCondition('language', $language->getLanguageId());
+        $filter[] = new EqualCondition('site', $site->getIdentifier());
+        $filter[] = new EqualCondition('language', (string) ($language?->getLanguageId() ?? 0));
 
         $result = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
             ->addFilter(new AndCondition(...$filter))

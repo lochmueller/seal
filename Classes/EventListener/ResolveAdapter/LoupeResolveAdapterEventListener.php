@@ -12,7 +12,6 @@ use TYPO3\CMS\Core\Core\Environment;
 
 /**
  * Example: loupe://var/indices/
- * @todo move to Interface and offical Factory
  */
 class LoupeResolveAdapterEventListener
 {
@@ -23,8 +22,7 @@ class LoupeResolveAdapterEventListener
     #[AsEventListener('seal-adapter-loupe')]
     public function indexPageContent(ResolveAdapterEvent $event): void
     {
-
-        if ($event->searchDsn->scheme !== 'loupe') {
+        if (!str_starts_with($event->searchDsn['scheme'], 'loupe')) {
             return;
         }
 
@@ -32,9 +30,8 @@ class LoupeResolveAdapterEventListener
             throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-loupe-adapter');
         }
 
-
-        // @todo add the project Path in front of the default configuration
-        $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn->host . ($event->searchDsn->path ?? '');
+        // @todo add migration for Search DNS
+        $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn['host'] . ($event->searchDsn['path'] ?? '');
         $event->adapter = (new LoupeAdapterFactory())->createAdapter(['host' => $directory]);
     }
 }

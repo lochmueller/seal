@@ -7,7 +7,6 @@ namespace Lochmueller\Seal\Engine;
 use CmsIg\Seal\Adapter\AdapterFactoryInterface;
 use CmsIg\Seal\Engine;
 use CmsIg\Seal\EngineInterface;
-use Lochmueller\Seal\Dto\SearchDsnDto;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
 use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Lochmueller\Seal\Schema\SchemaBuilder;
@@ -15,7 +14,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class EngineFactory
 {
@@ -25,20 +23,18 @@ class EngineFactory
         protected SchemaBuilder            $schemaBuilder,
         #[AutowireIterator('seal.adapter_factory')]
         protected iterable                 $adapterFactories,
-    )
-    {
-    }
+    ) {}
 
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
         $siteConfiguration = $site->getConfiguration();
-        $dsn = new SearchDsnDto($siteConfiguration['sealSearchDsn'] ?? 'typo3://');
+        $dsn = $this->parseDsn($siteConfiguration['sealSearchDsn'] ?? 'typo3://');
         $adapter = null;
 
         foreach ($this->adapterFactories as $adapterFactory) {
             /** @var $adapterFactory AdapterFactoryInterface */
-            if ($dsn->scheme === $adapterFactory::getName()) {
-                $adapter = $adapterFactory->createAdapter((array)$dsn);
+            if ($dsn['scheme'] === $adapterFactory::getName()) {
+                $adapter = $adapterFactory->createAdapter((array) $dsn);
             }
         }
 
@@ -48,10 +44,28 @@ class EngineFactory
         if ($resolveAdapterEvent->adapter === null) {
             throw new AdapterNotFoundException('No valid adapter found for site "' . $site->getIdentifier() . '"', 23482934);
         }
-        
+
         return new Engine(
             $resolveAdapterEvent->adapter,
             $this->schemaBuilder->getSchema(),
         );
+    }
+
+    protected function parseDsn(string $dsn): array
+    {
+        $parts = parse_url($dsn);
+        if ($parts === false) {
+            if (preg_match('/^([a-z0-9]*):\/\/.*/', $dsn, $matches)) {
+                $parts = [
+                    'scheme' => $matches[1],
+                ];
+            }
+        }
+
+        $parts['scheme'] = $parts['scheme'] ?? null;
+        $parts['host'] = $parts['host'] ?? null;
+        $parts['port'] = $parts['port'] ?? null;
+        $parts['path'] = $parts['path'] ?? null;
+        return $parts;
     }
 }

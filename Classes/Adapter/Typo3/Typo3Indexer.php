@@ -36,7 +36,6 @@ class Typo3Indexer implements IndexerInterface
 
     public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): TaskInterface|null
     {
-        // @todo optimize
         $connection = $this->adapterHelper->getConnection();
 
         foreach ($deleteDocumentIdentifiers as $deleteDocumentIdentifier) {

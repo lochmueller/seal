@@ -29,7 +29,7 @@ class SearchController extends ActionController
         $pageSize = 1;
 
         $filter = [];
-        $filter[] = new SearchCondition('Lore');
+        $filter[] = new SearchCondition('with');
 
         // @todo Add more here
         // GEO
