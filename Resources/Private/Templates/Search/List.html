@@ -1,3 +1,5 @@
+<f:render partial="Form" arguments="{_all}" />
+<h1>Ergebnisse</h1>
 <f:for each="{paginator.paginatedItems}" as="item">
     <f:render partial="Result/Item" arguments="{item: item}"/>
 </f:for>

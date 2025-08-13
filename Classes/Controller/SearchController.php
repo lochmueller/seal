@@ -12,6 +12,7 @@ use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class SearchController extends ActionController
 {
@@ -26,10 +27,12 @@ class SearchController extends ActionController
         $currentPage = $this->request->hasArgument('currentPageNumber')
             ? (int) $this->request->getArgument('currentPageNumber')
             : 1;
-        $pageSize = 1;
+
+        $search = $this->request->getParsedBody()['tx_seal_search']['search'] ?? '';
+        $pageSize = 5;
 
         $filter = [];
-        $filter[] = new SearchCondition('with');
+        $filter[] = new SearchCondition($search);
 
         // @todo Add more here
         // GEO
@@ -41,6 +44,7 @@ class SearchController extends ActionController
             ->offset(($currentPage - 1) * $pageSize)
             ->highlight(['title'])
             ->getResult();
+
 
         $paginator = new SearchResultArrayPaginator($result, $currentPage, $pageSize);
 

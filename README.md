@@ -10,9 +10,9 @@ without changing the integration. Have fun.
 1. Run `composer require lochmueller/seal`
 2. *Optional: Install the right adapter, if you want to use a specific engine*
 3. Configure the search adapter via site configuration
-4. Load the SiteSet of the extensionxw
+4. Load the SiteSet of the extension
 5. Install and configure the EXT:index extension
-6. Configure individuell search options
+6. Configure individual search options
 
 ## Configuration
 
@@ -35,3 +35,8 @@ Please configure the EXT:index extension to control the index process.
 
 Thanks [SEAL](https://php-cmsig.github.io/search/index.html) for the nice idea and TYPO3 Association & TYPO3 Community
 for the sponsoring of the extension.
+
+
+# Ideas
+
+- Index Date in schema aufnehmen.

@@ -12,12 +12,12 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 
-readonly class IndexEventListener implements LoggerAwareInterface
+class IndexEventListener implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
     public function __construct(
-        private Seal $seal,
+        private readonly Seal $seal,
     ) {}
 
     #[AsEventListener('seal-index')]
@@ -28,11 +28,14 @@ readonly class IndexEventListener implements LoggerAwareInterface
 
             $id = $event instanceof IndexPageEvent ? 'p-' . $event->pageUid : 'd-' . md5($event->fileIdentifier);
 
+
+            $content = preg_replace('/\\s+/', ' ', strip_tags($event->content));;
+
             $document = [
                 'id' => $id,
                 'site' => $event->site->getIdentifier(),
                 'title' => $event->title,
-                'content' => strip_tags($event->content),
+                'content' => $content,
                 'language' => isset($event->language) ? (string) $event->language : '0',
 
                 #'access' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
