@@ -38,6 +38,7 @@ class SchemaBuilder
             'preview' => new Field\TextField('preview', searchable: false), // Media preview.
             'uri' => new Field\TextField('uri', searchable: false), // URI. @todo check if addionalAguments are more usefull
             'extension' => new Field\TextField('extension'), // File extension in case of file. Otherwise empty. Example: html, pdf, png
+            'index_date' => new Field\DateTimeField('index_date'), // The date time of the index insert/update
         ]);
     }
 }

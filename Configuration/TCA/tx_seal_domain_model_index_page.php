@@ -21,6 +21,14 @@ return [
                 'size' => '30',
             ],
         ],
+        'index_date' => [
+            'exclude' => 0,
+            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.index_date',
+            'config' => [
+                'type' => 'datetime',
+                'format' => 'datetime',
+            ],
+        ],
         'language' => [
             'exclude' => 0,
             'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_page.language',
@@ -76,7 +84,7 @@ return [
         ],
     ],
     'types' => [
-        '0' => ['showitem' => 'title'],
+        '0' => ['showitem' => 'id,title,content,language,site,preview,uri'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],

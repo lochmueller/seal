@@ -26,6 +26,19 @@
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.84"
   },
+  "suggest": {
+    "cmsig/seal-memory-adapter": "An adapter to support to write into memory for cmsig/seal search abstraction.",
+    "cmsig/seal-loupe-adapter": "An adapter to support loupe in cmsig/seal search abstraction.",
+    "cmsig/seal-redisearch-adapter": "An adapter to support RediSearch in cmsig/seal search abstraction.",
+    "cmsig/seal-meilisearch-adapter": "An adapter to support meilisearch in cmsig/seal search abstraction.",
+    "cmsig/seal-elasticsearch-adapter": "An adapter to support elasticsearch in cmsig/seal search abstraction.",
+    "cmsig/seal-typesense-adapter": "An adapter to support typesense in cmsig/seal search abstraction.",
+    "cmsig/seal-opensearch-adapter": "An adapter to support opensearch in cmsig/seal search abstraction.",
+    "cmsig/seal-algolia-adapter": "An adapter to support algolia in cmsig/seal search abstraction.",
+    "cmsig/seal-solr-adapter": "An adapter to support apache solr in cmsig/seal search abstraction.",
+    "cmsig/seal-read-write-adapter": "An adapter to support to split read and write operations for the cmsig/seal package.",
+    "cmsig/seal-multi-adapter": "An adapter to support to write into multiple other adapters cmsig/seal package."
+  },
   "extra": {
     "typo3/cms": {
       "extension-key": "seal",

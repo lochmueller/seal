@@ -21,6 +21,7 @@ class Typo3Indexer implements IndexerInterface
 
     public function save(Index $index, array $document, array $options = []): TaskInterface|null
     {
+        $this->delete($index, $document['id'])->wait();
         $data = $this->marshaller->marshall($index->fields, $document);
         $this->adapterHelper->getConnection()->insert($this->adapterHelper->getTableName($index), $data);
 

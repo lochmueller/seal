@@ -37,7 +37,7 @@ class IndexEventListener implements LoggerAwareInterface
                 'title' => $event->title,
                 'content' => $content,
                 'language' => isset($event->language) ? (string) $event->language : '0',
-
+                'index_date' => new \DateTime(),
                 #'access' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
                 #'preview' => '',
                 #'uri' => 'https://www.google.de', // @todo perhaps only URI params (check URI building in frontend process)
