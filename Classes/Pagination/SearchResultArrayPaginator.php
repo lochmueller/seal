@@ -16,6 +16,7 @@ class SearchResultArrayPaginator extends AbstractPaginator
         int              $currentPageNumber = 1,
         int              $itemsPerPage = 10,
     ) {
+        // @todo check
         $this->setCurrentPageNumber($currentPageNumber);
         $this->myItemsPerPage = $itemsPerPage;
         $this->setItemsPerPage($itemsPerPage);

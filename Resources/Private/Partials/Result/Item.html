@@ -1,32 +1,23 @@
 <div class="card">
     <div class="row g-0">
         <div class="col-md-4">
-            <!-- @todo media -->
-            <img src="..." class="img-fluid rounded-start" alt="...">
+            <f:if condition="{item.preview}">
+                <img src="{item.preview}" alt="{item.title}" class="img-fluid rounded-start" />
+            </f:if>
         </div>
         <div class="col-md-8">
             <div class="card-body">
                 <h3 class="card-title"><f:format.raw>{item.title}</f:format.raw></h3>
-
-                <f:comment>
-                    <f:debug>{item}</f:debug>
-                </f:comment>
-
-
                 <p class="card-text">
-                    @todo render Result item extract
-
                     {item.content}
-
-                    This is a wider card with supporting text below as a natural lead-in to additional
-                    content. This content is a little bit longer.
                 </p>
-
-                <!-- @todo meta information -->
-                <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-
-                <!-- @todo add link -->
-                <a href="#" class="btn btn-primary">target</a>
+                <f:if condition="{item.index_date}">
+                    <p class="card-text"><small class="text-body-secondary">
+                        Indexed at
+                        <f:format.date date="{item.index_date}" format="d.m.Y H:i"></f:format.date>
+                    </small></p>
+                </f:if>
+                <a href="{item.uri}" class="btn btn-secondary">open</a>
             </div>
         </div>
     </div>

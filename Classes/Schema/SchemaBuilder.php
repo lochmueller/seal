@@ -12,7 +12,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class SchemaBuilder
 {
-    public const DEFAULT_INDEX = 'page';
+    public const DEFAULT_INDEX = 'default';
 
     public function __construct(protected EventDispatcherInterface $eventDispatcher) {}
 
@@ -36,9 +36,11 @@ class SchemaBuilder
             'tags' => new Field\TextField('tags', multiple: true, filterable: true), // Tags. Defaults are "Page" "File"
             'content' => new Field\TextField('content'), // Content. Example: I am a long string example
             'preview' => new Field\TextField('preview', searchable: false), // Media preview.
-            'uri' => new Field\TextField('uri', searchable: false), // URI. @todo check if addionalAguments are more usefull
+            'uri' => new Field\TextField('uri', searchable: false), // URI.
             'extension' => new Field\TextField('extension'), // File extension in case of file. Otherwise empty. Example: html, pdf, png
             'index_date' => new Field\DateTimeField('index_date'), // The date time of the index insert/update
+            // @todo add tags
+            #'tags' => new Field\TextField('tags', multiple: true, filterable: true),
         ]);
     }
 }

@@ -4,20 +4,26 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Controller;
 
-use CmsIg\Seal\Search\Condition\AndCondition;
-use CmsIg\Seal\Search\Condition\SearchCondition;
+use Lochmueller\Seal\Configuration\Configuration;
+use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
+use CmsIg\Seal\Search\Condition\Condition;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
+use GeorgRinger\NumberedPagination\NumberedPagination;
+use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class SearchController extends ActionController
 {
     public function __construct(
-        private Seal $seal,
+        private Seal                  $seal,
+        protected ConfigurationLoader $configurationLoader,
     ) {}
 
     public function listAction(): ResponseInterface
@@ -29,29 +35,41 @@ class SearchController extends ActionController
             : 1;
 
         $search = $this->request->getParsedBody()['tx_seal_search']['search'] ?? '';
-        $pageSize = 5;
+
+        /** @var Site $site */
+        $site = $this->request->getAttribute('site');
+        /** @var SiteLanguage $language */
+        $language = $this->request->getAttribute('language');
+
+        $config = $this->configurationLoader->loadBySite($site);
+
+        $config = new Configuration(itemsPerPage: 1, autocompleteMinCharacters: 1);
 
         $filter = [];
-        $filter[] = new SearchCondition($search);
+        $filter[] = Condition::search($search);
+        $filter[] = Condition::equal('site', $site->getIdentifier());
+        $filter[] = Condition::equal('language', (string) $language->getLanguageId());
 
         // @todo Add more here
         // GEO
         // Tags
 
         $result = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
-            ->addFilter(new AndCondition(...$filter))
-            ->limit($pageSize)
-            ->offset(($currentPage - 1) * $pageSize)
+            ->addFilter(Condition::and(...$filter))
+            ->limit($config->itemsPerPage)
+            ->offset(($currentPage - 1) * $config->itemsPerPage)
             ->highlight(['title'])
             ->getResult();
 
 
-        $paginator = new SearchResultArrayPaginator($result, $currentPage, $pageSize);
+        $paginator = new SearchResultArrayPaginator($result, $currentPage, $config->itemsPerPage);
 
         $this->view->assignMultiple(
             [
-                'pagination' => new SimplePagination($paginator),
+                // @todo configure Pagination class
+                'pagination' => $this->getPagination(SimplePagination::class, 6, $paginator),
                 'paginator' => $paginator,
+                'currentPageNumber' => $currentPage,
             ],
         );
 
@@ -65,6 +83,18 @@ class SearchController extends ActionController
         ]);
 
         return $this->htmlResponse();
+    }
+
+    protected function getPagination($paginationClass, int $maximumNumberOfLinks, $paginator)
+    {
+        if (class_exists(NumberedPagination::class) && $paginationClass === NumberedPagination::class && $maximumNumberOfLinks) {
+            return GeneralUtility::makeInstance(NumberedPagination::class, $paginator, $maximumNumberOfLinks);
+        } elseif (class_exists(SlidingWindowPagination::class) && $paginationClass === SlidingWindowPagination::class && $maximumNumberOfLinks) {
+            return GeneralUtility::makeInstance(SlidingWindowPagination::class, $paginator, $maximumNumberOfLinks);
+        } elseif (class_exists($paginationClass)) {
+            return GeneralUtility::makeInstance($paginationClass, $paginator);
+        }
+        return GeneralUtility::makeInstance(SimplePagination::class, $paginator);
     }
 
 }

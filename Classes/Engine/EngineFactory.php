@@ -34,7 +34,7 @@ class EngineFactory
         foreach ($this->adapterFactories as $adapterFactory) {
             /** @var $adapterFactory AdapterFactoryInterface */
             if ($dsn['scheme'] === $adapterFactory::getName()) {
-                $adapter = $adapterFactory->createAdapter((array) $dsn);
+                $adapter = $adapterFactory->createAdapter($dsn);
             }
         }
 
@@ -66,6 +66,12 @@ class EngineFactory
         $parts['host'] = $parts['host'] ?? null;
         $parts['port'] = $parts['port'] ?? null;
         $parts['path'] = $parts['path'] ?? null;
+        $parts['path'] = $parts['path'] ?? null;
+
+        // Query as array (check Factory interface)
+        parse_str($parts['query'] ?? '', $queryArray);
+        $parts['query'] = $queryArray;
+
         return $parts;
     }
 }

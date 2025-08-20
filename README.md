@@ -35,8 +35,3 @@ Please configure the EXT:index extension to control the index process.
 
 Thanks [SEAL](https://php-cmsig.github.io/search/index.html) for the nice idea and TYPO3 Association & TYPO3 Community
 for the sponsoring of the extension.
-
-
-# Ideas
-
-- Index Date in schema aufnehmen.

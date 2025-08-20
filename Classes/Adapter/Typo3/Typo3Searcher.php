@@ -25,8 +25,7 @@ class Typo3Searcher implements SearcherInterface
     public function search(Search $search): Result
     {
         $queryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
-        $queryBuilder->select('*')
-            ->from($this->adapterHelper->getTableName($search->index));
+        $queryBuilder->from($this->adapterHelper->getTableName($search->index));
 
         $filters = $this->recursiveResolveFilterConditions($search->index, $search->filters, true, $queryBuilder->expr());
 
@@ -34,6 +33,13 @@ class Typo3Searcher implements SearcherInterface
             $queryBuilder->where($filters);
         }
 
+        #if ($search->distinct) {
+        #            $queryBuilder->distinct();
+        #        }
+
+        $count = (int) $queryBuilder->count('*')->executeQuery()->fetchAssociative()['COUNT(*)'];
+
+        $queryBuilder->select('*');
         if (0 !== $search->offset) {
             $queryBuilder->setFirstResult($search->offset);
         }
@@ -42,35 +48,14 @@ class Typo3Searcher implements SearcherInterface
             $queryBuilder->setMaxResults($search->limit);
         }
 
-        if ($search->distinct) {
-            #$searchParameters = $searchParameters->withDistinct($search->distinct);
-        }
-
-        if ([] !== $search->highlightFields) {
-            #$searchParameters = $searchParameters->withAttributesToHighlight(
-            #    $search->highlightFields,
-            #    $search->highlightPreTag,
-            #    $search->highlightPostTag,
-            #);
-        }
-
-
-        $sorts = [];
         foreach ($search->sortBys as $field => $direction) {
-            #$sorts[] = $this->loupeHelper->formatField($field) . ':' . $direction;
+            $queryBuilder->addOrderBy($field, $direction);
         }
-
-        if ([] !== $sorts) {
-            #$searchParameters = $searchParameters->withSort($sorts);
-        }
-
-
-        // @todo handle Site
 
 
         return new Result(
             $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
-            1,
+            $count,
         );
 
     }
@@ -101,8 +86,6 @@ class Typo3Searcher implements SearcherInterface
     private function recursiveResolveFilterConditions(Index $index, array $conditions, bool $conjunctive, ExpressionBuilder $expressionBuilder): string
     {
         // @todo migrate to expression build
-
-        // $index->searchableFields @todo for like query
 
         $filters = [];
 

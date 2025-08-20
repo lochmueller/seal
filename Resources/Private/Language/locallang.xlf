@@ -13,6 +13,13 @@
             <trans-unit id="site.sealAutocompleteMinCharacters.description">
                 <source>Minimum chars for the auto complete endpoint of this site. Default value is 3.</source>
             </trans-unit>
+            <trans-unit id="site.sealItemsPerPage">
+                <source>Items per page</source>
+            </trans-unit>
+            <trans-unit id="site.sealItemsPerPage.description">
+                <source>The amount of items per page in the result list. Default value is 10.</source>
+            </trans-unit>
+
             <trans-unit id="site.sealSearchDsn">
                 <source>Search Adapter DSN</source>
             </trans-unit>
@@ -49,29 +56,35 @@
             <trans-unit id="tx_seal_domain_model_filter.type.geoDistanceCondition">
                 <source>GEO distance condition</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page">
-                <source>Index Page</source>
+            <trans-unit id="tx_seal_domain_model_index_default">
+                <source>Index Default</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.site">
+            <trans-unit id="tx_seal_domain_model_index_default.site">
                 <source>Site</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.id">
+            <trans-unit id="tx_seal_domain_model_index_default.id">
                 <source>ID</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.language">
+            <trans-unit id="tx_seal_domain_model_index_default.language">
                 <source>Language</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.title">
+            <trans-unit id="tx_seal_domain_model_index_default.title">
                 <source>Title</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.tags">
+            <trans-unit id="tx_seal_domain_model_index_default.tags">
                 <source>Tags</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.content">
+            <trans-unit id="tx_seal_domain_model_index_default.content">
                 <source>Content</source>
             </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.preview">
+            <trans-unit id="tx_seal_domain_model_index_default.preview">
                 <source>Preview</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.uri">
+                <source>URI</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.index_date">
+                <source>Index date</source>
             </trans-unit>
             <trans-unit id="search.page.navigation">
                 <source>Search page navigation</source>
@@ -81,9 +94,6 @@
             </trans-unit>
             <trans-unit id="searchword.help">
                 <source>Searchword for the fulltext search.</source>
-            </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_page.uri_params">
-                <source>URI</source>
             </trans-unit>
         </body>
     </file>

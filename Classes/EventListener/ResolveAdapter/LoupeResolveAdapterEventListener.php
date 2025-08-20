@@ -30,7 +30,6 @@ class LoupeResolveAdapterEventListener
             throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-loupe-adapter');
         }
 
-        // @todo add migration for Search DNS
         $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn['host'] . ($event->searchDsn['path'] ?? '');
         $event->adapter = (new LoupeAdapterFactory())->createAdapter(['host' => $directory]);
     }
