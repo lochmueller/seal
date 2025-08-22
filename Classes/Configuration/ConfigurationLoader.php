@@ -12,6 +12,4 @@ class ConfigurationLoader
     {
         return Configuration::createByArray((array) $site->getConfiguration());
     }
-
-
 }

@@ -7,6 +7,7 @@ namespace Lochmueller\Seal\Configuration;
 class Configuration
 {
     public function __construct(
+        public readonly string $searchDsn,
         public readonly int $autocompleteMinCharacters,
         public readonly int $itemsPerPage,
     ) {}
@@ -14,6 +15,7 @@ class Configuration
     public static function createByArray(array $configuration): Configuration
     {
         return new self(
+            searchDsn: (string) ($configuration['sealSearchDsn'] ?? 'typo3://'),
             autocompleteMinCharacters: (int) ($configuration['sealAutocompleteMinCharacters'] ?? 3),
             itemsPerPage: (int) ($configuration['sealItemsPerPage'] ?? 10),
         );

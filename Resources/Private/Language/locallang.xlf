@@ -47,6 +47,12 @@
             <trans-unit id="tx_seal_domain_model_filter.type">
                 <source>Type</source>
             </trans-unit>
+            <trans-unit id="results">
+                <source>%s results</source>
+            </trans-unit>
+            <trans-unit id="results.no">
+                <source>No results with your current search.</source>
+            </trans-unit>
             <trans-unit id="tx_seal_domain_model_filter.type.searchCondition">
                 <source>Search Condition (Search word) - once in Filter configuration</source>
             </trans-unit>
@@ -70,6 +76,12 @@
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default.title">
                 <source>Title</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.extension">
+                <source>Extension</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.size">
+                <source>Size</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default.tags">
                 <source>Tags</source>

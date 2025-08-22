@@ -9,14 +9,13 @@ use TYPO3\CMS\Core\Pagination\AbstractPaginator;
 
 class SearchResultArrayPaginator extends AbstractPaginator
 {
-    private int $myItemsPerPage;
+    public int $myItemsPerPage;
 
     public function __construct(
         protected Result $result,
         int              $currentPageNumber = 1,
         int              $itemsPerPage = 10,
     ) {
-        // @todo check
         $this->setCurrentPageNumber($currentPageNumber);
         $this->myItemsPerPage = $itemsPerPage;
         $this->setItemsPerPage($itemsPerPage);
@@ -30,7 +29,7 @@ class SearchResultArrayPaginator extends AbstractPaginator
     }
 
 
-    protected function getTotalAmountOfItems(): int
+    public function getTotalAmountOfItems(): int
     {
         return $this->result->total();
     }

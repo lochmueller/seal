@@ -83,6 +83,20 @@ return [
                 'type' => 'input',
             ],
         ],
+        'extension' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.extension',
+            'config' => [
+                'type' => 'input',
+            ],
+        ],
+        'size' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.size',
+            'config' => [
+                'type' => 'input',
+            ],
+        ],
     ],
     'types' => [
         '0' => ['showitem' => 'id,title,content,language,site,preview,uri,index_date'],

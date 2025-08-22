@@ -38,6 +38,7 @@ class SchemaBuilder
             'preview' => new Field\TextField('preview', searchable: false), // Media preview.
             'uri' => new Field\TextField('uri', searchable: false), // URI.
             'extension' => new Field\TextField('extension'), // File extension in case of file. Otherwise empty. Example: html, pdf, png
+            'size' => new Field\IntegerField('size', searchable: false), // File size in byte in case of file. Otherwise 0. Example: 123789
             'index_date' => new Field\DateTimeField('index_date'), // The date time of the index insert/update
             // @todo add tags
             #'tags' => new Field\TextField('tags', multiple: true, filterable: true),

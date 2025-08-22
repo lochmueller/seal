@@ -1,1 +1,16 @@
-<f:render partial="Form" arguments="{_all}" />
+<f:render partial="Form" arguments="{_all}"/>
+
+<f:if condition="{paginator.totalAmountOfItems}">
+    <f:then>
+        <h1>
+            <f:translate key="results" arguments="{0: paginator.totalAmountOfItems}"/>
+        </h1>
+        <f:for each="{paginator.paginatedItems}" as="item">
+            <f:render partial="Result/Item" arguments="{item: item}"/>
+        </f:for>
+        <f:render partial="Result/Pagination" arguments="{_all}"/>
+    </f:then>
+    <f:else>
+        <f:translate key="results.no"/>
+    </f:else>
+</f:if>

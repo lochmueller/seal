@@ -26,7 +26,7 @@ class SearchController extends ActionController
         protected ConfigurationLoader $configurationLoader,
     ) {}
 
-    public function listAction(): ResponseInterface
+    public function searchAction(): ResponseInterface
     {
         $engine = $this->seal->buildEngineBySite($GLOBALS['TYPO3_REQUEST']->getAttribute('site'));
 
@@ -43,7 +43,7 @@ class SearchController extends ActionController
 
         $config = $this->configurationLoader->loadBySite($site);
 
-        $config = new Configuration(itemsPerPage: 1, autocompleteMinCharacters: 1);
+        $config = new Configuration(searchDsn:'typo3://',itemsPerPage: 1, autocompleteMinCharacters: 1);
 
         $filter = [];
         $filter[] = Condition::search($search);
@@ -72,15 +72,6 @@ class SearchController extends ActionController
                 'currentPageNumber' => $currentPage,
             ],
         );
-
-        return $this->htmlResponse();
-    }
-
-    public function searchAction(): ResponseInterface
-    {
-        $this->view->assignMultiple([
-            // @todo
-        ]);
 
         return $this->htmlResponse();
     }

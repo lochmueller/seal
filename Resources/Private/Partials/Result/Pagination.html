@@ -1,10 +1,11 @@
 <f:if condition="{pagination.allPageNumbers -> f:count()} > 1">
     <nav aria-label="{f:translate(key: 'search.page.navigation')}">
-        <ul class="pagination">
+        <ul class="pagination justify-content-center m-3">
             <f:for each="{pagination.allPageNumbers}" as="page">
                 <li class="page-item">
                     <f:link.action
                             arguments="{currentPageNumber:page}"
+                            addQueryString="1"
                             class="page-link {f:if(condition:'{currentPageNumber}=={page}',then:'active')}">
                         {page}
                     </f:link.action>

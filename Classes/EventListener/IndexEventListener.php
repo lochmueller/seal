@@ -34,10 +34,14 @@ class IndexEventListener implements LoggerAwareInterface
 
 
             $preview = '';
+            $size = 0;
+            $extension = '';
             $uri = $event->uri;
             if ($event instanceof IndexFileEvent && isset($event->fileIdentifier)) {
                 try {
                     $file = $this->resourceFactory->getFileObjectFromCombinedIdentifier($event->fileIdentifier);
+                    $size = $file->getSize();
+                    $extension = $file->getExtension();
                     $uri = $event->site->getBase() . $file->getPublicUrl();
                     $shouldRenderPreview = GeneralUtility::inList($GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'], strtolower($file->getExtension()));
 
@@ -65,6 +69,8 @@ class IndexEventListener implements LoggerAwareInterface
                 'content' => preg_replace('/\\s+/', ' ', strip_tags($event->content)),
                 'language' => isset($event->language) ? (string) $event->language : '0',
                 'uri' => $uri,
+                'extension' => $extension,
+                'size' => $size,
                 'index_date' => (new \DateTimeImmutable())->format(DateTimeImmutable::ATOM),
                 #'access' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
                 'preview' => $preview,

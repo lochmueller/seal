@@ -7,6 +7,7 @@ namespace Lochmueller\Seal\Engine;
 use CmsIg\Seal\Adapter\AdapterFactoryInterface;
 use CmsIg\Seal\Engine;
 use CmsIg\Seal\EngineInterface;
+use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
 use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Lochmueller\Seal\Schema\SchemaBuilder;
@@ -20,6 +21,7 @@ class EngineFactory
     public function __construct(
         protected Context                  $context,
         protected EventDispatcherInterface $eventDispatcher,
+        protected ConfigurationLoader $configurationLoader,
         protected SchemaBuilder            $schemaBuilder,
         #[AutowireIterator('seal.adapter_factory')]
         protected iterable                 $adapterFactories,
@@ -27,8 +29,8 @@ class EngineFactory
 
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
-        $siteConfiguration = $site->getConfiguration();
-        $dsn = $this->parseDsn($siteConfiguration['sealSearchDsn'] ?? 'typo3://');
+        $configuration = $this->configurationLoader->loadBySite($site);
+        $dsn = $this->parseDsn($configuration->searchDsn);
         $adapter = null;
 
         foreach ($this->adapterFactories as $adapterFactory) {
