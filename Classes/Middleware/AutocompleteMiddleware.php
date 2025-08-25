@@ -22,7 +22,7 @@ class AutocompleteMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $this->autocompleteHandler->handle($request);
+        return $this->autocompleteHandler->handle($request);
     }
 
 }

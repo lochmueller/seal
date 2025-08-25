@@ -11,6 +11,7 @@ use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
 use CmsIg\Seal\Search\Condition\Condition;
+use TYPO3\CMS\Core\Pagination\PaginationInterface;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
@@ -43,7 +44,7 @@ class SearchController extends ActionController
 
         $config = $this->configurationLoader->loadBySite($site);
 
-        $config = new Configuration(searchDsn:'typo3://',itemsPerPage: 1, autocompleteMinCharacters: 1);
+        // $config = new Configuration(searchDsn:'typo3://',itemsPerPage: 1, autocompleteMinCharacters: 1);
 
         $filter = [];
         $filter[] = Condition::search($search);
@@ -51,7 +52,6 @@ class SearchController extends ActionController
         $filter[] = Condition::equal('language', (string) $language->getLanguageId());
 
         // @todo Add more here
-        // GEO
         // Tags
 
         $result = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
@@ -76,7 +76,7 @@ class SearchController extends ActionController
         return $this->htmlResponse();
     }
 
-    protected function getPagination($paginationClass, int $maximumNumberOfLinks, $paginator)
+    protected function getPagination($paginationClass, int $maximumNumberOfLinks, $paginator): PaginationInterface
     {
         if (class_exists(NumberedPagination::class) && $paginationClass === NumberedPagination::class && $maximumNumberOfLinks) {
             return GeneralUtility::makeInstance(NumberedPagination::class, $paginator, $maximumNumberOfLinks);

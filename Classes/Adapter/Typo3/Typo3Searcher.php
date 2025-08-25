@@ -5,20 +5,23 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\Adapter\Typo3;
 
 use CmsIg\Seal\Adapter\SearcherInterface;
-use CmsIg\Seal\Marshaller\Marshaller;
+use CmsIg\Seal\Marshaller\FlattenMarshaller;
 use CmsIg\Seal\Schema\Index;
+use CmsIg\Seal\Search\Facet\CountFacet;
+use CmsIg\Seal\Search\Facet\MinMaxFacet;
 use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
 use CmsIg\Seal\Search\Condition;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class Typo3Searcher implements SearcherInterface
 {
-    private readonly Marshaller $marshaller;
+    private readonly FlattenMarshaller $marshaller;
 
     public function __construct(private Typo3AdapterHelper $adapterHelper)
     {
-        $this->marshaller = new Marshaller();
+        $this->marshaller = new FlattenMarshaller(fieldSeparator: '_');
     }
 
 
@@ -33,11 +36,7 @@ class Typo3Searcher implements SearcherInterface
             $queryBuilder->where($queryBuilder->expr()->and(...$filters));
         }
 
-        #if ($search->distinct) {
-        #            $queryBuilder->distinct();
-        #        }
-
-        $count = (int)$queryBuilder->count('*')->executeQuery()->fetchAssociative()['COUNT(*)'];
+        $count = (int) $queryBuilder->count('*')->executeQuery()->fetchAssociative()['COUNT(*)'];
 
         $queryBuilder->select('*');
         if (0 !== $search->offset) {
@@ -52,10 +51,10 @@ class Typo3Searcher implements SearcherInterface
             $queryBuilder->addOrderBy($field, $direction);
         }
 
-
         return new Result(
             $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
             $count,
+            $this->formatFacets($search->facets) // @todo add result information
         );
 
     }
@@ -85,8 +84,6 @@ class Typo3Searcher implements SearcherInterface
      */
     private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder): array
     {
-        // @todo migrate to expression build
-
         $filters = [];
         foreach ($conditions as $filter) {
             match (true) {
@@ -113,8 +110,29 @@ class Typo3Searcher implements SearcherInterface
     {
         return match (true) {
             \is_bool($value) => $value ? 'true' : 'false',
-            \is_int($value), \is_float($value) => (string)$value,
+            \is_int($value), \is_float($value) => (string) $value,
             default => $this->adapterHelper->getConnection()->quote($value),
         };
+    }
+    private function formatFacets(array $facets): array
+    {
+        $formatted = [];
+
+
+        foreach ($facets as $facet) {
+
+            /*
+            if ($facet instanceof MinMaxFacet && isset($facetStats[$facet->field])) {
+                $formatted[$facet->field]['min'] = $facetStats[$facet->field]['min'];
+                $formatted[$facet->field]['max'] = $facetStats[$facet->field]['max'];
+                continue;
+            }
+            if ($facet instanceof CountFacet && isset($facetDistribution[$facet->field])) {
+                $formatted[$facet->field]['count'] = $facetDistribution[$facet->field];
+            }
+            */
+        }
+
+        return $formatted;
     }
 }

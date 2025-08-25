@@ -7,20 +7,15 @@ return [
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'type' => 'type',
-        'languageField' => 'sys_language_uid',
-        'transOrigPointerField' => 'l10n_parent',
-        'transOrigDiffSourceField' => 'l10n_diffsource',
-        'translationSource' => 'l10n_source',
         'sortby' => 'sorting',
+        'hideTable' => true,
         'delete' => 'deleted',
         'default_sortby' => 'ORDER BY crdate',
         'enablecolumns' => [
             'disabled' => 'hidden',
-            'starttime' => 'starttime',
-            'endtime' => 'endtime',
-            'fe_group' => 'fe_group',
         ],
     ],
+    // @todo add filter
     'columns' => [
         'title' => [
             'exclude' => 0,
@@ -60,8 +55,5 @@ return [
     ],
     'types' => [
         '0' => ['showitem' => 'title,type'],
-    ],
-    'palettes' => [
-        '1' => ['showitem' => ''],
     ],
 ];

@@ -8,6 +8,7 @@
         <f:for each="{paginator.paginatedItems}" as="item">
             <f:render partial="Result/Item" arguments="{item: item}"/>
         </f:for>
+        <!-- @TODO PAGINATION -->
         <f:render partial="Result/Pagination" arguments="{_all}"/>
     </f:then>
     <f:else>

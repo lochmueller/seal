@@ -2,8 +2,9 @@
 
 return [
     'ctrl' => [
-        'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default',
-        'title' => 'title',
+        'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default',
+        'iconfile' => 'EXT:seal/Resources/Public/Icons/Extension.png',
+        'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'default_sortby' => 'ORDER BY crdate',
@@ -21,6 +22,40 @@ return [
                 'size' => '30',
             ],
         ],
+        // Meta
+        'site' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.site',
+            'config' => [
+                'type' => 'input',
+                'size' => '40',
+            ],
+        ],
+        'language' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.language',
+            'config' => [
+                'type' => 'input',
+                'size' => '30',
+            ],
+        ],
+        'uri' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.uri',
+            'config' => [
+                'type' => 'input',
+            ],
+        ],
+        'indexdate' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.indexdate',
+            'config' => [
+                'type' => 'datetime',
+                'format' => 'datetime',
+                'dbType' => 'datetime',
+            ],
+        ],
+        // Content
         'title' => [
             'exclude' => 0,
             'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.title',
@@ -36,49 +71,20 @@ return [
                 'type' => 'text',
             ],
         ],
-        'index_date' => [
-            'exclude' => 0,
-            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.index_date',
-            'config' => [
-                'type' => 'datetime',
-                'format' => 'datetime',
-                'dbType' => 'datetime',
-            ],
-        ],
-        'language' => [
-            'exclude' => 0,
-            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.language',
-            'config' => [
-                'type' => 'input',
-                'size' => '30',
-            ],
-        ],
-        'site' => [
-            'exclude' => 0,
-            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.site',
-            'config' => [
-                'type' => 'input',
-                'size' => '40',
-            ],
-        ],
         'tags' => [
             'exclude' => 0,
             'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.tags',
             'config' => [
-                'type' => 'text',
+                'type' => 'group',
+                'foreign_table' => 'tx_seal_domain_model_index_default_tag',
+                'allowed' => 'tx_seal_domain_model_index_default_tag',
+                'MM' => 'tx_seal_domain_model_index_default_mm_tag',
             ],
         ],
-        'preview' => [
+        // File
+        'size' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.preview',
-            'config' => [
-                'type' => 'input',
-                'size' => '30',
-            ],
-        ],
-        'uri' => [
-            'exclude' => 0,
-            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.uri',
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.size',
             'config' => [
                 'type' => 'input',
             ],
@@ -90,15 +96,21 @@ return [
                 'type' => 'input',
             ],
         ],
-        'size' => [
+        'preview' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.size',
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.preview',
             'config' => [
                 'type' => 'input',
+                'size' => '30',
             ],
         ],
     ],
     'types' => [
-        '0' => ['showitem' => 'id,title,content,language,site,preview,uri,index_date'],
+        '0' => ['showitem' => '
+            id,
+            --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.meta,site,language,uri,indexdate,
+            --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.content,title,content,tags,
+            --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.file,size,extension,preview'
+        ],
     ],
 ];

@@ -30,18 +30,19 @@ class SchemaBuilder
     {
         return new Index(SchemaBuilder::DEFAULT_INDEX, [
             'id' => new Field\IdentifierField('id'), // Page ID or PageID incl. suffix and record ID. Example: 128 or 291-tx_news-12839
-            'language' => new Field\IntegerField('language', searchable: false), // Language UID. Example: 129
+            // Meta
             'site' => new Field\TextField('site', searchable: false), // Site identifier. Example: portal
-            'title' => new Field\TextField('title', sortable: true), // Title. Example: Homepage - My Company
-            'tags' => new Field\TextField('tags', multiple: true, filterable: true), // Tags. Defaults are "Page" "File"
-            'content' => new Field\TextField('content'), // Content. Example: I am a long string example
-            'preview' => new Field\TextField('preview', searchable: false), // Media preview.
+            'language' => new Field\IntegerField('language', searchable: false), // Language UID. Example: 129
             'uri' => new Field\TextField('uri', searchable: false), // URI.
-            'extension' => new Field\TextField('extension'), // File extension in case of file. Otherwise empty. Example: html, pdf, png
+            'indexdate' => new Field\DateTimeField('indexdate'), // The date time of the index insert/update
+            // Content
+            'title' => new Field\TextField('title', sortable: true), // Title. Example: Homepage - My Company
+            'content' => new Field\TextField('content'), // Content. Example: I am a long string example
+            'tags' => new Field\TextField('tags', multiple: true, filterable: true, facet: true), // Tags. Defaults are "Page" "File"
+            // File
             'size' => new Field\IntegerField('size', searchable: false), // File size in byte in case of file. Otherwise 0. Example: 123789
-            'index_date' => new Field\DateTimeField('index_date'), // The date time of the index insert/update
-            // @todo add tags
-            #'tags' => new Field\TextField('tags', multiple: true, filterable: true),
+            'extension' => new Field\TextField('extension'), // File extension in case of file. Otherwise empty. Example: html, pdf, png
+            'preview' => new Field\TextField('preview', searchable: false), // Media preview.
         ]);
     }
 }

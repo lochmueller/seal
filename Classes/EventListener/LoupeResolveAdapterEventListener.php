@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lochmueller\Seal\EventListener\ResolveAdapter;
+namespace Lochmueller\Seal\EventListener;
 
 use CmsIg\Seal\Adapter\Loupe\LoupeAdapterFactory;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;

@@ -5,25 +5,42 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\Adapter\Typo3;
 
 use CmsIg\Seal\Adapter\IndexerInterface;
-use CmsIg\Seal\Marshaller\Marshaller;
+use CmsIg\Seal\Marshaller\FlattenMarshaller;
 use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Task\SyncTask;
 use CmsIg\Seal\Task\TaskInterface;
 
 class Typo3Indexer implements IndexerInterface
 {
-    private readonly Marshaller $marshaller;
+    private readonly FlattenMarshaller $marshaller;
 
     public function __construct(private Typo3AdapterHelper $adapterHelper)
     {
-        $this->marshaller = new Marshaller();
+        $this->marshaller = new FlattenMarshaller(fieldSeparator: '_');
     }
 
     public function save(Index $index, array $document, array $options = []): TaskInterface|null
     {
-        $this->delete($index, $document['id'])->wait();
+        $connection = $this->adapterHelper->getConnection();
+        $tableName = $this->adapterHelper->getTableName($index);
         $data = $this->marshaller->marshall($index->fields, $document);
-        $this->adapterHelper->getConnection()->insert($this->adapterHelper->getTableName($index), $data);
+
+        $tags = $data['tags'] ?? [];
+        if (isset($data['tags'])) {
+            unset($data['tags']);
+        }
+
+        if ($connection->count('*', $tableName, ['id' => $document['id']])) {
+            $connection->update($tableName, ['id' => $document['id']], $data);
+        } else {
+            $connection->insert($tableName, $data);
+        }
+
+
+        if (!empty($tags)) {
+            // @todo implement
+        }
+
 
         return new SyncTask(null);
     }
@@ -38,22 +55,23 @@ class Typo3Indexer implements IndexerInterface
     public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): TaskInterface|null
     {
         $connection = $this->adapterHelper->getConnection();
+        $tableName = $this->adapterHelper->getTableName($index);
 
         foreach ($deleteDocumentIdentifiers as $deleteDocumentIdentifier) {
-            $connection->delete($this->adapterHelper->getTableName($index), ['id' => $deleteDocumentIdentifier]);
+            $connection->delete($tableName, ['id' => $deleteDocumentIdentifier]);
         }
 
         $bulk = [];
         foreach ($saveDocuments as $saveDocument) {
             $bulk[] = $saveDocument;
             if (sizeof($bulk) >= $bulkSize) {
-                $connection->bulkInsert($this->adapterHelper->getTableName($index), $bulk);
+                $connection->bulkInsert($tableName, $bulk);
                 $bulk = [];
             }
         }
 
         if (!empty($bulk)) {
-            $connection->bulkInsert($this->adapterHelper->getTableName($index), $bulk);
+            $connection->bulkInsert($tableName, $bulk);
         }
 
         return new SyncTask(null);

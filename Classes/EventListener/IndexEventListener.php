@@ -7,6 +7,7 @@ namespace Lochmueller\Seal\EventListener;
 use DateTimeImmutable;
 use Lochmueller\Index\Event\IndexFileEvent;
 use Lochmueller\Index\Event\IndexPageEvent;
+use Lochmueller\Index\Traversing\RecordSelection;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Log\LoggerAwareInterface;
@@ -23,6 +24,7 @@ class IndexEventListener implements LoggerAwareInterface
     public function __construct(
         private readonly Seal            $seal,
         private readonly ResourceFactory $resourceFactory,
+        private readonly RecordSelection $recordSelection,
     ) {}
 
     #[AsEventListener('seal-index')]
@@ -31,13 +33,13 @@ class IndexEventListener implements LoggerAwareInterface
         try {
             $engine = $this->seal->buildEngineBySite($event->site);
 
-
-
             $preview = '';
             $size = 0;
             $extension = '';
             $uri = $event->uri;
+
             if ($event instanceof IndexFileEvent && isset($event->fileIdentifier)) {
+
                 try {
                     $file = $this->resourceFactory->getFileObjectFromCombinedIdentifier($event->fileIdentifier);
                     $size = $file->getSize();
@@ -56,7 +58,7 @@ class IndexEventListener implements LoggerAwareInterface
                         $preview = $event->site->getBase() . $processedImage->getPublicUrl();
                     }
                 } catch (\Exception $exception) {
-
+                    $this->logger->error($exception->getMessage(), ['exception' => $exception]);
                 }
             } elseif ($event instanceof IndexPageEvent && $uri === '') {
                 $uri = (string) $event->site->getRouter()->generateUri($event->pageUid);
@@ -65,14 +67,14 @@ class IndexEventListener implements LoggerAwareInterface
             $document = [
                 'id' => $event instanceof IndexPageEvent ? 'p-' . md5($uri) : 'd-' . md5($uri),
                 'site' => $event->site->getIdentifier(),
-                'title' => $event->title,
-                'content' => preg_replace('/\\s+/', ' ', strip_tags($event->content)),
                 'language' => isset($event->language) ? (string) $event->language : '0',
                 'uri' => $uri,
-                'extension' => $extension,
+                'indexdate' => (new \DateTimeImmutable())->format(DateTimeImmutable::ATOM),
+                'title' => $event->title,
+                'content' => preg_replace('/\\s+/', ' ', strip_tags($event->content)),
+                'tags' => $this->getTags($event),
                 'size' => $size,
-                'index_date' => (new \DateTimeImmutable())->format(DateTimeImmutable::ATOM),
-                #'access' => implode(',', $this->context->getPropertyFromAspect('frontend.user', 'groupIds', [0, -1])),
+                'extension' => $extension,
                 'preview' => $preview,
             ];
 
@@ -81,6 +83,19 @@ class IndexEventListener implements LoggerAwareInterface
             $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
         }
 
+    }
+
+    protected function getTags(IndexFileEvent|IndexPageEvent $event): array
+    {
+        $tags = [];
+        $tags[] = $event instanceof IndexPageEvent ? 'Page' : 'File';
+        if ($event instanceof IndexPageEvent && $event->pageUid) {
+            $row = $this->recordSelection->findRenderablePage($event->pageUid, $event->language);
+            if (isset($row['keywords'])) {
+                $tags = array_merge($tags, GeneralUtility::trimExplode(',', $row['keywords'], true));
+            }
+        }
+        return $tags;
     }
 
 }

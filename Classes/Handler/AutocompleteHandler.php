@@ -20,7 +20,6 @@ class AutocompleteHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-
         $params = $request->getQueryParams();
         $searchWord = trim($params['q'] ?? '');
 
@@ -49,7 +48,7 @@ class AutocompleteHandler implements RequestHandlerInterface
             $data = array_merge($data, $this->findSuggestions($searchWord, $item['title'] . ' ' . $item['content']));
         }
 
-        return new JsonResponse(array_unique($data), 200, ['X-Seal-Info' => $result->total() . ' items']);
+        return new JsonResponse(array_unique($data), 200, ['X-Seal-Info' => $result->total() . ' search items']);
     }
 
     public function findSuggestions($searchWord, $content): array

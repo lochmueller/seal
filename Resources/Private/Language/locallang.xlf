@@ -19,7 +19,6 @@
             <trans-unit id="site.sealItemsPerPage.description">
                 <source>The amount of items per page in the result list. Default value is 10.</source>
             </trans-unit>
-
             <trans-unit id="site.sealSearchDsn">
                 <source>Search Adapter DSN</source>
             </trans-unit>
@@ -83,6 +82,27 @@
             <trans-unit id="tx_seal_domain_model_index_default.size">
                 <source>Size</source>
             </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.meta">
+                <source>Meta</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.content">
+                <source>Content</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.file">
+                <source>File</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_stat.site">
+                <source>Site</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_stat.language">
+                <source>Language</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_stat.search_term">
+                <source>Search term </source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_stat.site">
+                <source>Site</source>
+            </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default.tags">
                 <source>Tags</source>
             </trans-unit>
@@ -97,6 +117,12 @@
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default.index_date">
                 <source>Index date</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default_tag">
+                <source>Index Tag</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default_tag.title">
+                <source>Title</source>
             </trans-unit>
             <trans-unit id="search.page.navigation">
                 <source>Search page navigation</source>
