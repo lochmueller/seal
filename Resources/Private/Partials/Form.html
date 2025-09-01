@@ -1,5 +1,6 @@
 <f:form action="search" controller="Search" class="mb-3">
-    <f:render partial="Form/SearchCondition" arguments="{_all}"/>
-    <!-- @todo add custom field via configuration -->
+    <f:for each="{filters}" as="filter">
+        <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}" arguments="{_all}"/>
+    </f:for>
     <f:form.submit value="suchen" class="btn btn-primary"/>
 </f:form>

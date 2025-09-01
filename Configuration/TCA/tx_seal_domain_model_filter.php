@@ -3,6 +3,7 @@
 return [
     'ctrl' => [
         'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_filter',
+        'iconfile' => 'EXT:seal/Resources/Public/Icons/Extension.png',
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -14,12 +15,14 @@ return [
         'enablecolumns' => [
             'disabled' => 'hidden',
         ],
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
     ],
-    // @todo add filter
     'columns' => [
         'title' => [
             'exclude' => 0,
-            'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_filter.title',
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_filter.title',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -54,6 +57,8 @@ return [
         ],
     ],
     'types' => [
-        '0' => ['showitem' => 'title,type'],
+        'searchCondition' => ['showitem' => 'title,type'],
+        'tagCondition' => ['showitem' => 'title,type'],
+        'geoDistanceCondition' => ['showitem' => 'title,type'],
     ],
 ];

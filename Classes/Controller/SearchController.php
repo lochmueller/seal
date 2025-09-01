@@ -6,6 +6,7 @@ namespace Lochmueller\Seal\Controller;
 
 use Lochmueller\Seal\Configuration\Configuration;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
+use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
@@ -18,13 +19,13 @@ use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
-class SearchController extends ActionController
+class SearchController extends AbstractSealController
 {
     public function __construct(
         private Seal                  $seal,
         protected ConfigurationLoader $configurationLoader,
+        protected Filter              $filter,
     ) {}
 
     public function searchAction(): ResponseInterface
@@ -34,8 +35,6 @@ class SearchController extends ActionController
         $currentPage = $this->request->hasArgument('currentPageNumber')
             ? (int) $this->request->getArgument('currentPageNumber')
             : 1;
-
-        $search = $this->request->getParsedBody()['tx_seal_search']['search'] ?? '';
 
         /** @var Site $site */
         $site = $this->request->getAttribute('site');
@@ -47,12 +46,12 @@ class SearchController extends ActionController
         // $config = new Configuration(searchDsn:'typo3://',itemsPerPage: 1, autocompleteMinCharacters: 1);
 
         $filter = [];
-        $filter[] = Condition::search($search);
+        foreach ($this->getFilterRowsByContentElementUid($this->getCurrentContentElementRow()['uid']) as $filterItem) {
+            $filter = $this->filter->addFilterConfiguration($filter, $filterItem, $this->request);
+        }
+
         $filter[] = Condition::equal('site', $site->getIdentifier());
         $filter[] = Condition::equal('language', (string) $language->getLanguageId());
-
-        // @todo Add more here
-        // Tags
 
         $result = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
             ->addFilter(Condition::and(...$filter))

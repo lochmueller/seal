@@ -13,7 +13,6 @@ use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
 use CmsIg\Seal\Search\Condition;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class Typo3Searcher implements SearcherInterface
 {
@@ -54,7 +53,7 @@ class Typo3Searcher implements SearcherInterface
         return new Result(
             $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
             $count,
-            $this->formatFacets($search->facets) // @todo add result information
+            $this->formatFacets($search->facets), // @todo add result information
         );
 
     }

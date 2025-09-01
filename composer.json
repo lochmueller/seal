@@ -21,7 +21,7 @@
     "typo3/cms-core": "^13.4",
     "typo3/cms-extbase": "^13.4",
     "cmsig/seal": "^0.12",
-    "lochmueller/index": "^0.2"
+    "lochmueller/index": "^0.3"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.84"
