@@ -65,6 +65,7 @@ class SearchController extends AbstractSealController
 
         $this->view->assignMultiple(
             [
+                'filters' => iterator_to_array($this->getFilterRowsByContentElementUid($this->getCurrentContentElementRow()['uid'])),
                 // @todo configure Pagination class
                 'pagination' => $this->getPagination(SimplePagination::class, 6, $paginator),
                 'paginator' => $paginator,

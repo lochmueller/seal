@@ -28,6 +28,9 @@
             <f:if condition="{item.size}">
                 | Size: {item.size -> f:format.bytes()}
             </f:if>
+            <f:if condition="{item.score}">
+                | Score: {item.score}
+            </f:if>
         </small>
     </div>
 </div>
