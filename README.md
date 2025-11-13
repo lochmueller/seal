@@ -7,16 +7,12 @@ without changing the integration. Have fun.
 
 ## Installation
 
-1. Run `composer require lochmueller/seal`
-2. *Optional: Install the right adapter, if you want to use a specific engine*
-3. Configure the search adapter via site configuration
-4. Load the SiteSet of the extension
-5. Install and configure the EXT:index extension
+1. Install and configure the [EXT:index](https://github.com/lochmueller/index) extension.
+2. Run `composer require lochmueller/seal`
+3. *Optional: Install the right adapter, if you want to use a specific engine*
+4. Configure the search adapter via site configuration
+5. Load the SiteSet of the extension
 6. Configure individual search options
-
-## Configuration
-
-Please configure the EXT:index extension to control the index process.
 
 ## Extension structure
 
