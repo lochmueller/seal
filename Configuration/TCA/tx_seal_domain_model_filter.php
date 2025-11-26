@@ -55,10 +55,18 @@ return [
                 'default' => 'searchCondition',
             ],
         ],
+        'tags' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_filter.tags',
+            'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_filter.tags.description',
+            'config' => [
+                'type' => 'text',
+            ],
+        ],
     ],
     'types' => [
         'searchCondition' => ['showitem' => 'title,type'],
-        'tagCondition' => ['showitem' => 'title,type'],
+        'tagCondition' => ['showitem' => 'title,type,tags'],
         'geoDistanceCondition' => ['showitem' => 'title,type'],
     ],
 ];

@@ -1,1 +1,17 @@
-<!-- @todo Geo Distance condition -->
+<div class="mb-3">
+    WIP!!!
+
+    <label class="form-label">
+        <f:translate key="distance"/>
+    </label>
+
+    <f:form.textfield id="seal_search_{filter.uid}_lat" name="geo_position_lat" class="form-control"/>
+    <f:form.textfield id="seal_search_{filter.uid}_lng" name="geo_position_lng" class="form-control"/>
+
+    <f:form.select id="seal_search_{filter.uid}_radius" name="geo_position_radius" class="form-control" options="{
+        10: '10 km',
+        25: '25 km',
+        50: '50 km',
+        100: '100 km'
+    }"/>
+</div>

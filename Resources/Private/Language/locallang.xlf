@@ -52,14 +52,17 @@
             <trans-unit id="results.no">
                 <source>No results with your current search.</source>
             </trans-unit>
+            <trans-unit id="distance">
+                <source>Distance</source>
+            </trans-unit>
             <trans-unit id="tx_seal_domain_model_filter.type.searchCondition">
-                <source>Search Condition (Search word) - once in Filter configuration</source>
+                <source>Search Condition (Search word) - allowed once in filter configuration</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_filter.type.tagCondition">
                 <source>Tag condition</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_filter.type.geoDistanceCondition">
-                <source>GEO distance condition</source>
+                <source>GEO distance condition - allowed once in filter configuration</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default">
                 <source>Index Default</source>

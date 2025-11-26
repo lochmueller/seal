@@ -15,6 +15,12 @@ class TagCondition implements FilterInterface
 
     public function getFilterConfiguration(array $filterItem, RequestInterface $request): array
     {
+        $filterName = 'field_' . $filterItem['uid'];
+        $values = $request->getParsedBody()['tx_seal_search'][$filterName] ?? [];
+
+        // @todo
+        #DebuggerUtility::var_dump($values);die();
+        #return [Condition::in($search)];
 
         // @todo implement
         return [];
