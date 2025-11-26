@@ -80,7 +80,7 @@ class IndexEventListener implements LoggerAwareInterface
 
             $engine->saveDocument(SchemaBuilder::DEFAULT_INDEX, $document);
         } catch (\Exception $exception) {
-            $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
         }
 
     }

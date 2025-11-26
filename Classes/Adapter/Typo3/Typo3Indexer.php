@@ -9,14 +9,22 @@ use CmsIg\Seal\Marshaller\FlattenMarshaller;
 use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Task\SyncTask;
 use CmsIg\Seal\Task\TaskInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
-class Typo3Indexer implements IndexerInterface
+class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private readonly FlattenMarshaller $marshaller;
 
     public function __construct(private Typo3AdapterHelper $adapterHelper)
     {
-        $this->marshaller = new FlattenMarshaller(fieldSeparator: '_');
+        $dateTimeFormat = $this->adapterHelper->getConnection()->getDatabasePlatform()->getDateTimeFormatString();
+        $this->marshaller = new FlattenMarshaller(
+            dateFormat: $dateTimeFormat,
+            fieldSeparator: '_',
+        );
     }
 
     public function save(Index $index, array $document, array $options = []): TaskInterface|null
@@ -30,10 +38,14 @@ class Typo3Indexer implements IndexerInterface
             unset($data['tags']);
         }
 
-        if ($connection->count('*', $tableName, ['id' => $document['id']])) {
-            $connection->update($tableName, ['id' => $document['id']], $data);
-        } else {
-            $connection->insert($tableName, $data);
+        try {
+            if ($connection->count('*', $tableName, ['id' => $document['id']])) {
+                $connection->update($tableName, ['id' => $document['id']], $data);
+            } else {
+                $connection->insert($tableName, $data);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
         }
 
 
