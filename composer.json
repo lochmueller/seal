@@ -24,6 +24,7 @@
     "lochmueller/index": "^1.1"
   },
   "require-dev": {
+    "typo3/testing-framework": "^8.0||^9.3",
     "friendsofphp/php-cs-fixer": "^3.84"
   },
   "suggest": {

@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class SearchController extends AbstractSealController
 {
     public function __construct(
-        private Seal                  $seal,
+        readonly private Seal                  $seal,
         protected ConfigurationLoader $configurationLoader,
         protected Filter              $filter,
     ) {}
