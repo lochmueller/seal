@@ -4,7 +4,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Search Engine Abstraction Layer',
     'description' => 'SEAL Search - Flexible integration of the Search Engine Abstraction Layer project',
-    'version' => '0.1.0',
+    'version' => '0.2.0',
     'category' => 'fe',
     'constraints' => [
         'depends' => [
