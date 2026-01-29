@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 defined('TYPO3') or die();
 
 use Lochmueller\Seal\Controller\SearchController;
@@ -31,7 +33,7 @@ ExtensionUtility::configurePlugin(
         SearchController::class => 'search',
     ],
     [
-        SearchController::class => 'search'
+        SearchController::class => 'search',
     ],
     ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
 );

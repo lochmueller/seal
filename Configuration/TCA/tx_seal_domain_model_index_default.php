@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'ctrl' => [
         'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default',
@@ -110,7 +112,7 @@ return [
             id,
             --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.meta,site,language,uri,indexdate,
             --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.content,title,content,tags,
-            --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.file,size,extension,preview'
+            --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.file,size,extension,preview',
         ],
     ],
 ];

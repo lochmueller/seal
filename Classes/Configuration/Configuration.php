@@ -12,6 +12,9 @@ class Configuration
         public readonly int $itemsPerPage,
     ) {}
 
+    /**
+     * @param array<string, mixed> $configuration
+     */
     public static function createByArray(array $configuration): Configuration
     {
         return new self(

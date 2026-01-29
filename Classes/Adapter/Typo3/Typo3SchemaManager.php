@@ -18,7 +18,7 @@ class Typo3SchemaManager implements SchemaManagerInterface
         return in_array($this->adapterHelper->getTableName($index), $this->adapterHelper->getConnection()->getSchemaInformation()->listTableNames(), true);
     }
 
-    public function dropIndex(Index $index, array $options = []): TaskInterface|null
+    public function dropIndex(Index $index, array $options = []): ?TaskInterface
     {
         if (!$this->existIndex($index)) {
             throw new \Exception('Please create the database structure with TYPO3 TCA management and ext_tables.sql handling for table: ' . $this->adapterHelper->getTableName($index), 1238123);
@@ -29,7 +29,7 @@ class Typo3SchemaManager implements SchemaManagerInterface
         return new SyncTask(null);
     }
 
-    public function createIndex(Index $index, array $options = []): TaskInterface|null
+    public function createIndex(Index $index, array $options = []): ?TaskInterface
     {
         if (!$this->existIndex($index)) {
             throw new \Exception('Please create the database structure with TYPO3 TCA management and ext_tables.sql handling for table: ' . $this->adapterHelper->getTableName($index), 1238123);

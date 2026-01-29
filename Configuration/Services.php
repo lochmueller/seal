@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use CmsIg\Seal\Adapter\Elasticsearch\ElasticsearchAdapterFactory;
 use CmsIg\Seal\Adapter\Loupe\LoupeAdapterFactory;
 use CmsIg\Seal\Adapter\Meilisearch\MeilisearchAdapterFactory;
@@ -13,8 +15,7 @@ use CmsIg\Seal\Adapter\Solr\SolrAdapterFactory;
 use CmsIg\Seal\Adapter\Typesense\TypesenseAdapterFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $checkedFactories = [

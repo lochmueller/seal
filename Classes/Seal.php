@@ -22,5 +22,4 @@ class Seal
         return $requestCache[$site->getIdentifier()];
     }
 
-
 }

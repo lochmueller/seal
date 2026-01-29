@@ -79,7 +79,10 @@ class Typo3Searcher implements SearcherInterface
 
 
     /**
-     * Based on the Loupe integration
+     * Based on the Loupe integration.
+     *
+     * @param array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition> $conditions
+     * @return array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression>
      */
     private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder): array
     {
@@ -88,9 +91,9 @@ class Typo3Searcher implements SearcherInterface
             match (true) {
                 $filter instanceof Condition\IdentifierCondition => $filters[] = $expressionBuilder->eq($index->getIdentifierField()->name, $this->escapeFilterValue($filter->identifier)),
                 $filter instanceof Condition\SearchCondition => $filters[] = '(' . $expressionBuilder->like('title', $expressionBuilder->literal('%' . $filter->query . '%')) . ' OR ' . $expressionBuilder->like('content', $expressionBuilder->literal('%' . $filter->query . '%')) . ')',
-                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($filter->field, $expressionBuilder->literal($filter->value)),
-                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($filter->field, $expressionBuilder->literal($filter->value)),
-                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($filter->field, $expressionBuilder->literal($filter->value)),
+                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($filter->field, $expressionBuilder->literal((string)$filter->value)),
+                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($filter->field, $expressionBuilder->literal((string)$filter->value)),
+                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($filter->field, $expressionBuilder->literal((string)$filter->value)),
                 $filter instanceof Condition\GreaterThanEqualCondition => $filters[] = $expressionBuilder->gte($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\LessThanCondition => $filters[] = $expressionBuilder->lt($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\LessThanEqualCondition => $filters[] = $expressionBuilder->lte($filter->field, $this->escapeFilterValue($filter->value)),
@@ -113,6 +116,10 @@ class Typo3Searcher implements SearcherInterface
             default => $this->adapterHelper->getConnection()->quote($value),
         };
     }
+    /**
+     * @param array<int, CountFacet|MinMaxFacet> $facets
+     * @return array<string, array<string, mixed>>
+     */
     private function formatFacets(array $facets): array
     {
         $formatted = [];

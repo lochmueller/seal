@@ -23,6 +23,9 @@ class SearchResultArrayPaginator extends AbstractPaginator
         $this->updateInternalState();
     }
 
+    /**
+     * @return iterable<array<string, mixed>>
+     */
     public function getPaginatedItems(): iterable
     {
         yield from $this->result;

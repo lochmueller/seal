@@ -14,6 +14,10 @@ class SearchCondition implements FilterInterface
         return 'searchCondition';
     }
 
+    /**
+     * @param array<string, mixed> $filterItem
+     * @return array<int, \CmsIg\Seal\Search\Condition\SearchCondition>
+     */
     public function getFilterConfiguration(array $filterItem, RequestInterface $request): array
     {
         $search = $request->getParsedBody()['tx_seal_search']['search'] ?? '';

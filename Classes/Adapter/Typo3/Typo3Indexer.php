@@ -27,7 +27,7 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
         );
     }
 
-    public function save(Index $index, array $document, array $options = []): TaskInterface|null
+    public function save(Index $index, array $document, array $options = []): ?TaskInterface
     {
         $connection = $this->adapterHelper->getConnection();
         $tableName = $this->adapterHelper->getTableName($index);
@@ -45,7 +45,7 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
                 $connection->insert($tableName, $data);
             }
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger?->error($e->getMessage());
         }
 
 
@@ -57,14 +57,14 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
         return new SyncTask(null);
     }
 
-    public function delete(Index $index, string $identifier, array $options = []): TaskInterface|null
+    public function delete(Index $index, string $identifier, array $options = []): ?TaskInterface
     {
         $this->adapterHelper->getConnection()->delete($this->adapterHelper->getTableName($index), ['id' => $identifier]);
 
         return new SyncTask(null);
     }
 
-    public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): TaskInterface|null
+    public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): ?TaskInterface
     {
         $connection = $this->adapterHelper->getConnection();
         $tableName = $this->adapterHelper->getTableName($index);
@@ -76,7 +76,7 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
         $bulk = [];
         foreach ($saveDocuments as $saveDocument) {
             $bulk[] = $saveDocument;
-            if (sizeof($bulk) >= $bulkSize) {
+            if (count($bulk) >= $bulkSize) {
                 $connection->bulkInsert($tableName, $bulk);
                 $bulk = [];
             }

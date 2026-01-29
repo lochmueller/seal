@@ -58,7 +58,7 @@ class IndexEventListener implements LoggerAwareInterface
                         $preview = $event->site->getBase() . $processedImage->getPublicUrl();
                     }
                 } catch (\Exception $exception) {
-                    $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+                    $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
                 }
             } elseif ($event instanceof IndexPageEvent && $uri === '') {
                 $uri = (string) $event->site->getRouter()->generateUri($event->pageUid);
@@ -80,11 +80,14 @@ class IndexEventListener implements LoggerAwareInterface
 
             $engine->saveDocument(SchemaBuilder::DEFAULT_INDEX, $document);
         } catch (\Exception $exception) {
-            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+            $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
         }
 
     }
 
+    /**
+     * @return array<int, string>
+     */
     protected function getTags(IndexFileEvent|IndexPageEvent $event): array
     {
         $tags = [];

@@ -9,14 +9,21 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class Filter
 {
+    /**
+     * @param iterable<FilterInterface> $filters
+     */
     public function __construct(
         #[AutowireIterator('seal.filter')]
         protected iterable $filters,
     ) {}
 
-    public function addFilterConfiguration(array $filter, array $filterItem, RequestInterface $request)
+    /**
+     * @param array<int, \CmsIg\Seal\Search\Condition\SearchCondition> $filter
+     * @param array<string, mixed> $filterItem
+     * @return array<int, \CmsIg\Seal\Search\Condition\SearchCondition>
+     */
+    public function addFilterConfiguration(array $filter, array $filterItem, RequestInterface $request): array
     {
-
         foreach ($this->filters as $filterItemValue) {
             /** @var $filterItemValue FilterInterface */
             if ($filterItemValue->getType() === $filterItem['type']) {

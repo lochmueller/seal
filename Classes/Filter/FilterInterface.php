@@ -13,6 +13,10 @@ interface FilterInterface
     public function getType(): string;
 
 
+    /**
+     * @param array<string, mixed> $filterItem
+     * @return array<int, \CmsIg\Seal\Search\Condition\SearchCondition>
+     */
     public function getFilterConfiguration(array $filterItem, RequestInterface $request): array;
 
 

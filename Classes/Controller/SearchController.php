@@ -77,7 +77,7 @@ class SearchController extends AbstractSealController
         return $this->htmlResponse();
     }
 
-    protected function getPagination($paginationClass, int $maximumNumberOfLinks, $paginator): PaginationInterface
+    protected function getPagination(string $paginationClass, int $maximumNumberOfLinks, PaginatorInterface $paginator): PaginationInterface
     {
         if (class_exists(NumberedPagination::class) && $paginationClass === NumberedPagination::class && $maximumNumberOfLinks) {
             return GeneralUtility::makeInstance(NumberedPagination::class, $paginator, $maximumNumberOfLinks);

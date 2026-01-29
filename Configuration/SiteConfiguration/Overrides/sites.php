@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $lll = 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:';
 
 $GLOBALS['SiteConfiguration']['site']['columns']['sealSearchDsn'] = [

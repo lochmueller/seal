@@ -51,7 +51,10 @@ class AutocompleteHandler implements RequestHandlerInterface
         return new JsonResponse(array_unique($data), 200, ['X-Seal-Info' => $result->total() . ' search items']);
     }
 
-    public function findSuggestions($searchWord, $content): array
+    /**
+     * @return array<int, string>
+     */
+    public function findSuggestions(string $searchWord, string $content): array
     {
         $suggestions = [];
 

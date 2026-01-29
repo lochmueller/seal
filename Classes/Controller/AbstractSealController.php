@@ -11,6 +11,9 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 abstract class AbstractSealController extends ActionController
 {
+    /**
+     * @return array<string, mixed>
+     */
     protected function getCurrentContentElementRow(): array
     {
         /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $currentContentObject */
@@ -19,7 +22,7 @@ abstract class AbstractSealController extends ActionController
     }
 
     /**
-     * @return iterable<array>
+     * @return iterable<array<string, mixed>>
      */
     protected function getFilterRowsByContentElementUid(int $uid): iterable
     {
