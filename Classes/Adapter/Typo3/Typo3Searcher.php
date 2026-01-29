@@ -91,9 +91,9 @@ class Typo3Searcher implements SearcherInterface
             match (true) {
                 $filter instanceof Condition\IdentifierCondition => $filters[] = $expressionBuilder->eq($index->getIdentifierField()->name, $this->escapeFilterValue($filter->identifier)),
                 $filter instanceof Condition\SearchCondition => $filters[] = '(' . $expressionBuilder->like('title', $expressionBuilder->literal('%' . $filter->query . '%')) . ' OR ' . $expressionBuilder->like('content', $expressionBuilder->literal('%' . $filter->query . '%')) . ')',
-                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($filter->field, $expressionBuilder->literal((string)$filter->value)),
-                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($filter->field, $expressionBuilder->literal((string)$filter->value)),
-                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($filter->field, $expressionBuilder->literal((string)$filter->value)),
+                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($filter->field, $expressionBuilder->literal((string) $filter->value)),
+                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($filter->field, $expressionBuilder->literal((string) $filter->value)),
+                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($filter->field, $expressionBuilder->literal((string) $filter->value)),
                 $filter instanceof Condition\GreaterThanEqualCondition => $filters[] = $expressionBuilder->gte($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\LessThanCondition => $filters[] = $expressionBuilder->lt($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\LessThanEqualCondition => $filters[] = $expressionBuilder->lte($filter->field, $this->escapeFilterValue($filter->value)),
