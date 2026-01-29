@@ -16,6 +16,11 @@
       "Lochmueller\\Seal\\": "Classes/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Lochmueller\\Seal\\Tests\\": "Tests/"
+    }
+  },
   "require": {
     "php": "^8.3",
     "typo3/cms-core": "^13.4||^14.0",
@@ -25,7 +30,8 @@
   },
   "require-dev": {
     "typo3/testing-framework": "^8.0||^9.3",
-    "friendsofphp/php-cs-fixer": "^3.84"
+    "friendsofphp/php-cs-fixer": "^3.84",
+    "phpstan/phpstan": "^2.1"
   },
   "suggest": {
     "cmsig/seal-memory-adapter": "An adapter to support to write into memory for cmsig/seal search abstraction.",
@@ -56,6 +62,18 @@
     }
   },
   "scripts": {
-    "code-fix": "PHP_CS_FIXER_IGNORE_ENV=1 .Build/bin/php-cs-fixer fix Classes --rules=@PER-CS2.0:risky,@PER-CS2.0,declare_strict_types,no_unused_imports --allow-risky yes --allow-unsupported-php-version yes"
+    "code-fix": [
+      "@php-cs-fixer"
+    ],
+    "code-check": [
+      "@phpstan"
+    ],
+    "code-test": [
+      "@phpunit"
+    ],
+    "phpunit": "phpunit -c Tests/UnitTests.xml",
+    "code-test-coverage": "XDEBUG_MODE=coverage phpunit -c Tests/UnitTests.xml --coverage-html .Build/coverage/",
+    "phpstan": "phpstan analyse Classes --memory-limit 1G --level 8",
+    "php-cs-fixer": "php-cs-fixer fix --allow-unsupported-php-version yes"
   }
 }
