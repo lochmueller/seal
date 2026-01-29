@@ -13,6 +13,7 @@ use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
 use CmsIg\Seal\Search\Condition\Condition;
 use TYPO3\CMS\Core\Pagination\PaginationInterface;
+use TYPO3\CMS\Core\Pagination\PaginatorInterface;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
@@ -23,7 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class SearchController extends AbstractSealController
 {
     public function __construct(
-        readonly private Seal                  $seal,
+        private readonly Seal                  $seal,
         protected ConfigurationLoader $configurationLoader,
         protected Filter              $filter,
     ) {}
