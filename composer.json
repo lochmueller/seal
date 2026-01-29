@@ -26,7 +26,7 @@
     "typo3/cms-core": "^13.4||^14.0",
     "typo3/cms-extbase": "^13.4||^14.0",
     "cmsig/seal": "^0.12",
-    "lochmueller/index": "^1.1"
+    "lochmueller/index": "^2.0"
   },
   "require-dev": {
     "typo3/testing-framework": "^8.0||^9.3",
