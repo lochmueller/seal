@@ -176,7 +176,7 @@ class TagConditionPropertyTest extends AbstractTest
      */
     private function createMockRequest(int $uid, array $selectedValues): ServerRequestInterface
     {
-        $request = $this->createMock(ServerRequestInterface::class);
+        $request = $this->createStub(ServerRequestInterface::class);
         $request->method('getParsedBody')->willReturn([
             'tx_seal_search' => [
                 'field_' . $uid => $selectedValues,

@@ -18,9 +18,9 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 
 class SchemaCommandTest extends AbstractTest
 {
-    private MockObject $siteFinderMock;
+    private MockObject&SiteFinder $siteFinderMock;
 
-    private MockObject $sealMock;
+    private MockObject&Seal $sealMock;
 
     private SchemaCommand $subject;
 
@@ -41,18 +41,17 @@ class SchemaCommandTest extends AbstractTest
             ->method('getAllSites')
             ->willReturn([]);
 
-        $inputMock = $this->createMock(InputInterface::class);
-        $outputMock = $this->createMock(OutputInterface::class);
+        $this->sealMock->expects(self::never())->method('buildEngineBySite');
 
-        $result = $this->invokeExecute($inputMock, $outputMock);
+        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
 
         self::assertSame(Command::SUCCESS, $result);
     }
 
     public function testExecuteCreatesSchemaForEachSite(): void
     {
-        $site1 = $this->createMock(Site::class);
-        $site2 = $this->createMock(Site::class);
+        $site1 = $this->createStub(Site::class);
+        $site2 = $this->createStub(Site::class);
 
         $engine1 = $this->createMock(EngineInterface::class);
         $engine2 = $this->createMock(EngineInterface::class);
@@ -74,18 +73,15 @@ class SchemaCommandTest extends AbstractTest
         $engine1->expects(self::once())->method('createSchema');
         $engine2->expects(self::once())->method('createSchema');
 
-        $inputMock = $this->createMock(InputInterface::class);
-        $outputMock = $this->createMock(OutputInterface::class);
-
-        $result = $this->invokeExecute($inputMock, $outputMock);
+        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
 
         self::assertSame(Command::SUCCESS, $result);
     }
 
     public function testExecuteCatchesExceptionAndContinues(): void
     {
-        $site1 = $this->createMock(Site::class);
-        $site2 = $this->createMock(Site::class);
+        $site1 = $this->createStub(Site::class);
+        $site2 = $this->createStub(Site::class);
 
         $engine1 = $this->createMock(EngineInterface::class);
         $engine2 = $this->createMock(EngineInterface::class);
@@ -110,17 +106,14 @@ class SchemaCommandTest extends AbstractTest
 
         $engine2->expects(self::once())->method('createSchema');
 
-        $inputMock = $this->createMock(InputInterface::class);
-        $outputMock = $this->createMock(OutputInterface::class);
-
-        $result = $this->invokeExecute($inputMock, $outputMock);
+        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
 
         self::assertSame(Command::SUCCESS, $result);
     }
 
     public function testExecuteLogsExceptionMessage(): void
     {
-        $site = $this->createMock(Site::class);
+        $site = $this->createStub(Site::class);
         $engine = $this->createMock(EngineInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -145,17 +138,14 @@ class SchemaCommandTest extends AbstractTest
 
         $this->subject->setLogger($logger);
 
-        $inputMock = $this->createMock(InputInterface::class);
-        $outputMock = $this->createMock(OutputInterface::class);
-
-        $result = $this->invokeExecute($inputMock, $outputMock);
+        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
 
         self::assertSame(Command::SUCCESS, $result);
     }
 
     public function testExecuteHandlesExceptionFromBuildEngineBySite(): void
     {
-        $site = $this->createMock(Site::class);
+        $site = $this->createStub(Site::class);
 
         $this->siteFinderMock
             ->expects(self::once())
@@ -168,10 +158,7 @@ class SchemaCommandTest extends AbstractTest
             ->with($site)
             ->willThrowException(new \Exception('Engine build failed'));
 
-        $inputMock = $this->createMock(InputInterface::class);
-        $outputMock = $this->createMock(OutputInterface::class);
-
-        $result = $this->invokeExecute($inputMock, $outputMock);
+        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
 
         self::assertSame(Command::SUCCESS, $result);
     }

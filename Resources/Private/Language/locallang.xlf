@@ -46,6 +46,12 @@
             <trans-unit id="tx_seal_domain_model_filter.type">
                 <source>Type</source>
             </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.tags">
+                <source>Tags</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.tags.description">
+                <source>Configure tags as key=value pairs, one per line. Example: page=Pages</source>
+            </trans-unit>
             <trans-unit id="results">
                 <source>%s results</source>
             </trans-unit>

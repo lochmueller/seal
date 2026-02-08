@@ -29,7 +29,7 @@ class AutocompleteHandler implements RequestHandlerInterface
         $config = $this->configurationLoader->loadBySite($site);
 
         if (strlen($searchWord) < $config->autocompleteMinCharacters) {
-            return new JsonResponse([], 204, ['X-Seal-Info' => 'To less chars for auto complete functions']);
+            return new JsonResponse([], 204, ['X-Seal-Info' => 'Too few chars for auto complete functions']);
         }
 
         $filter = [

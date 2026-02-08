@@ -187,8 +187,8 @@ class SearchControllerTest extends AbstractTest
         ]);
         $schema = new Schema([SchemaBuilder::DEFAULT_INDEX => $index]);
 
-        // Mock SearcherInterface to capture the Search and return a controlled Result
-        $searcher = $this->createMock(SearcherInterface::class);
+        // Stub SearcherInterface to capture the Search and return a controlled Result
+        $searcher = $this->createStub(SearcherInterface::class);
         $searcher->method('search')
             ->willReturnCallback(function (Search $search) use ($facetData): Result {
                 $this->capturedSearch = $search;
@@ -229,8 +229,8 @@ class SearchControllerTest extends AbstractTest
             ->onlyMethods(['getFilterRowsByContentElementUid', 'getCurrentContentElementRow'])
             ->getMock();
 
-        $subject->method('getCurrentContentElementRow')->willReturn(['uid' => 100]);
-        $subject->method('getFilterRowsByContentElementUid')->willReturn(new \ArrayIterator($filterRows));
+        $subject->expects(self::once())->method('getCurrentContentElementRow')->willReturn(['uid' => 100]);
+        $subject->expects(self::once())->method('getFilterRowsByContentElementUid')->willReturn(new \ArrayIterator($filterRows));
 
         // Set up the Extbase request with required attributes
         $site = $this->createStub(Site::class);
@@ -256,8 +256,8 @@ class SearchControllerTest extends AbstractTest
         $requestProp = $reflection->getProperty('request');
         $requestProp->setValue($subject, $extbaseRequest);
 
-        // Mock ViewInterface to capture assigned variables
-        $view = $this->createMock(ViewInterface::class);
+        // Stub ViewInterface to capture assigned variables
+        $view = $this->createStub(ViewInterface::class);
         $view->method('assignMultiple')
             ->willReturnCallback(function (array $values) use ($view): ViewInterface {
                 $this->capturedViewVariables = array_merge($this->capturedViewVariables, $values);

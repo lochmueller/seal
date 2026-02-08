@@ -61,7 +61,7 @@ class Typo3Searcher implements SearcherInterface
         return new Result(
             $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
             $count,
-            $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet)), // @todo add result information
+            $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet), $this->adapterHelper->getTableName($search->index), $filters), // @todo add result information
         );
 
     }
@@ -125,27 +125,50 @@ class Typo3Searcher implements SearcherInterface
     }
     /**
      * @param array<int, CountFacet|MinMaxFacet> $facets
+     * @param array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression> $filters
      * @return array<string, array<string, mixed>>
      */
-    private function formatFacets(array $facets): array
+    private function formatFacets(array $facets, string $tableName, array $filters): array
     {
         $formatted = [];
 
-
         foreach ($facets as $facet) {
-
-            /*
-            if ($facet instanceof MinMaxFacet && isset($facetStats[$facet->field])) {
-                $formatted[$facet->field]['min'] = $facetStats[$facet->field]['min'];
-                $formatted[$facet->field]['max'] = $facetStats[$facet->field]['max'];
-                continue;
+            if ($facet instanceof CountFacet) {
+                $formatted[$facet->field]['count'] = $this->computeCountFacet($facet->field, $tableName, $filters);
             }
-            if ($facet instanceof CountFacet && isset($facetDistribution[$facet->field])) {
-                $formatted[$facet->field]['count'] = $facetDistribution[$facet->field];
-            }
-            */
         }
 
         return $formatted;
+    }
+
+    /**
+     * @param array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression> $filters
+     * @return array<string, int>
+     */
+    private function computeCountFacet(string $field, string $tableName, array $filters): array
+    {
+        $connection = $this->adapterHelper->getConnection();
+        $tagTable = $tableName . '_tag';
+        $mmTable = $tableName . '_mm_tag';
+
+        $qb = $connection->createQueryBuilder();
+        $qb->select('t.title')
+            ->addSelectLiteral('COUNT(*) AS cnt')
+            ->from($tagTable, 't')
+            ->join('t', $mmTable, 'mm', 'mm.uid_foreign = t.uid')
+            ->join('mm', $tableName, 'p', 'p.uid = mm.uid_local');
+
+        if (!empty($filters)) {
+            $qb->where($qb->expr()->and(...$filters));
+        }
+
+        $qb->groupBy('t.title');
+
+        $counts = [];
+        foreach ($qb->executeQuery()->iterateAssociative() as $row) {
+            $counts[(string) $row['title']] = (int) $row['cnt'];
+        }
+
+        return $counts;
     }
 }
