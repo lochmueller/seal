@@ -52,6 +52,12 @@
             <trans-unit id="tx_seal_domain_model_filter.tags.description">
                 <source>Configure tags as key=value pairs, one per line. Example: page=Pages</source>
             </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.radius_steps">
+                <source>Radius steps</source>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.radius_steps.description">
+                <source>One entry per line in format: value=Label (e.g. 10=10 km)</source>
+            </trans-unit>
             <trans-unit id="results">
                 <source>%s results</source>
             </trans-unit>
@@ -60,6 +66,18 @@
             </trans-unit>
             <trans-unit id="distance">
                 <source>Distance</source>
+            </trans-unit>
+            <trans-unit id="geo.locate">
+                <source>Locate me</source>
+            </trans-unit>
+            <trans-unit id="geo.status.located">
+                <source>Location determined</source>
+            </trans-unit>
+            <trans-unit id="geo.status.denied">
+                <source>Location access denied</source>
+            </trans-unit>
+            <trans-unit id="geo.status.unavailable">
+                <source>Geolocation not available</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_filter.type.searchCondition">
                 <source>Search Condition (Search word) - allowed once in filter configuration</source>

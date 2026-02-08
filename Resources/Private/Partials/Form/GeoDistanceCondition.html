@@ -1,17 +1,59 @@
-<div class="mb-3">
-    WIP!!!
+<div class="mb-3 seal-geo-distance">
+    <fieldset>
+        <legend class="form-label">{filter.title}</legend>
 
-    <label class="form-label">
-        <f:translate key="distance"/>
-    </label>
+        <f:form.hidden id="seal_search_{filter.uid}_lat"
+                       name="geo_position_lat" value="" />
+        <f:form.hidden id="seal_search_{filter.uid}_lng"
+                       name="geo_position_lng" value="" />
 
-    <f:form.textfield id="seal_search_{filter.uid}_lat" name="geo_position_lat" class="form-control"/>
-    <f:form.textfield id="seal_search_{filter.uid}_lng" name="geo_position_lng" class="form-control"/>
+        <div class="mb-2">
+            <label for="seal_search_{filter.uid}_radius" class="form-label">
+                <f:translate key="distance"/>
+            </label>
+            <f:form.select id="seal_search_{filter.uid}_radius"
+                           name="geo_position_radius"
+                           class="form-control"
+                           options="{filter.parsedRadii}"
+                           optionValueField="value"
+                           optionLabelField="label" />
+        </div>
 
-    <f:form.select id="seal_search_{filter.uid}_radius" name="geo_position_radius" class="form-control" options="{
-        10: '10 km',
-        25: '25 km',
-        50: '50 km',
-        100: '100 km'
-    }"/>
+        <button type="button"
+                class="btn btn-secondary seal-geo-locate-btn"
+                data-lat-field="seal_search_{filter.uid}_lat"
+                data-lng-field="seal_search_{filter.uid}_lng">
+            <f:translate key="geo.locate"/>
+        </button>
+        <span class="seal-geo-status" style="display:none;"></span>
+    </fieldset>
 </div>
+
+<script>
+    document.querySelectorAll('.seal-geo-locate-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var latField = document.getElementById(btn.dataset.latField);
+            var lngField = document.getElementById(btn.dataset.lngField);
+            var status = btn.nextElementSibling;
+
+            if (!navigator.geolocation) {
+                status.textContent = '<f:translate key="geo.status.unavailable"/>';
+                status.style.display = 'inline';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    latField.value = position.coords.latitude;
+                    lngField.value = position.coords.longitude;
+                    status.textContent = '<f:translate key="geo.status.located"/>';
+                    status.style.display = 'inline';
+                },
+                function() {
+                    status.textContent = '<f:translate key="geo.status.denied"/>';
+                    status.style.display = 'inline';
+                }
+            );
+        });
+    });
+</script>

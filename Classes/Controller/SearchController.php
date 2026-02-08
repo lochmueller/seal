@@ -9,6 +9,7 @@ use CmsIg\Seal\Search\Facet\Facet;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Filter\Filter;
+use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Schema\SchemaBuilder;
@@ -29,6 +30,7 @@ class SearchController extends AbstractSealController
         protected ConfigurationLoader $configurationLoader,
         protected Filter              $filter,
         private readonly TagConfigurationParser $tagConfigurationParser,
+        private readonly RadiusConfigurationParser $radiusConfigurationParser,
     ) {}
 
     public function searchAction(): ResponseInterface
@@ -98,6 +100,17 @@ class SearchController extends AbstractSealController
                 ],
                 $configuredTags,
             );
+        }
+        unset($filterRow);
+
+        foreach ($filterRows as &$filterRow) {
+            if ($filterRow['type'] !== 'geoDistanceCondition') {
+                continue;
+            }
+            $configuredRadii = $this->radiusConfigurationParser->parse(
+                (string) ($filterRow['radius_steps'] ?? '')
+            );
+            $filterRow['parsedRadii'] = $configuredRadii;
         }
         unset($filterRow);
 

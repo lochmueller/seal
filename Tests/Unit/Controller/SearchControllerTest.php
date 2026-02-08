@@ -18,6 +18,7 @@ use Lochmueller\Seal\Configuration\Configuration;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Controller\SearchController;
 use Lochmueller\Seal\Filter\Filter;
+use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
@@ -224,8 +225,9 @@ class SearchControllerTest extends AbstractTest
 
         // Create controller with a partial mock to override getFilterRowsByContentElementUid
         $tagConfigurationParser = new TagConfigurationParser();
+        $radiusConfigurationParser = new RadiusConfigurationParser();
         $subject = $this->getMockBuilder(SearchController::class)
-            ->setConstructorArgs([$seal, $configLoader, $filter, $tagConfigurationParser])
+            ->setConstructorArgs([$seal, $configLoader, $filter, $tagConfigurationParser, $radiusConfigurationParser])
             ->onlyMethods(['getFilterRowsByContentElementUid', 'getCurrentContentElementRow'])
             ->getMock();
 

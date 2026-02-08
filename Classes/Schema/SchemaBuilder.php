@@ -35,6 +35,7 @@ class SchemaBuilder
             'site' => new Field\TextField('site', searchable: false), // Site identifier. Example: portal
             'language' => new Field\TextField('language', searchable: false), // Language UID as string. Example: "0"
             'uri' => new Field\TextField('uri', searchable: false), // URI.
+            'location' => new Field\GeoPointField('location', filterable: true), // Geo coordinates for distance search
             'indexdate' => new Field\DateTimeField('indexdate'), // The date time of the index insert/update
             // Content
             'title' => new Field\TextField('title', sortable: true), // Title. Example: Homepage - My Company

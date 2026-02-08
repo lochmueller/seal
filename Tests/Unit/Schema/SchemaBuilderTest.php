@@ -89,7 +89,7 @@ class SchemaBuilderTest extends AbstractTest
         $index = $this->subject->getPageIndex();
 
         $expectedFields = [
-            'id', 'site', 'language', 'uri', 'indexdate',
+            'id', 'site', 'language', 'uri', 'location', 'indexdate',
             'title', 'content', 'tags', 'size', 'extension', 'preview',
         ];
 
@@ -114,4 +114,20 @@ class SchemaBuilderTest extends AbstractTest
         self::assertInstanceOf(Field\TextField::class, $index->fields['extension']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['preview']);
     }
+
+    public function testGetPageIndexContainsLocationFieldOfTypeGeoPointField(): void
+    {
+        $index = $this->subject->getPageIndex();
+
+        self::assertArrayHasKey('location', $index->fields, "Field 'location' missing from page index");
+        self::assertInstanceOf(Field\GeoPointField::class, $index->fields['location']);
+    }
+
+    public function testGetPageIndexLocationFieldIsFilterable(): void
+    {
+        $index = $this->subject->getPageIndex();
+
+        self::assertTrue($index->fields['location']->filterable, "Field 'location' should be filterable");
+    }
+
 }
