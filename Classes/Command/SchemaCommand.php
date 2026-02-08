@@ -35,7 +35,7 @@ class SchemaCommand extends Command implements LoggerAwareInterface
                 $engine = $this->seal->buildEngineBySite($site);
                 $engine->createSchema();
             } catch (\Exception $e) {
-                $this->logger?->info($e->getMessage());
+                $this->logger?->warning($e->getMessage(), ['exception' => $e]);
             }
         }
 

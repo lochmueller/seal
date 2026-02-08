@@ -104,7 +104,7 @@ class SchemaBuilderTest extends AbstractTest
 
         self::assertInstanceOf(Field\IdentifierField::class, $index->fields['id']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['site']);
-        self::assertInstanceOf(Field\IntegerField::class, $index->fields['language']);
+        self::assertInstanceOf(Field\TextField::class, $index->fields['language']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['uri']);
         self::assertInstanceOf(Field\DateTimeField::class, $index->fields['indexdate']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['title']);

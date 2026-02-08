@@ -133,8 +133,8 @@ class SchemaCommandTest extends AbstractTest
             ->willThrowException(new \Exception('Schema creation failed'));
 
         $logger->expects(self::once())
-            ->method('info')
-            ->with('Schema creation failed');
+            ->method('warning')
+            ->with('Schema creation failed', self::arrayHasKey('exception'));
 
         $this->subject->setLogger($logger);
 

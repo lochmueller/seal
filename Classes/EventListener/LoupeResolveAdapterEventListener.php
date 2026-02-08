@@ -15,10 +15,6 @@ use TYPO3\CMS\Core\Core\Environment;
  */
 class LoupeResolveAdapterEventListener
 {
-    public function __construct(
-        protected Environment $environment,
-    ) {}
-
     #[AsEventListener('seal-adapter-loupe')]
     public function indexPageContent(ResolveAdapterEvent $event): void
     {
@@ -30,7 +26,7 @@ class LoupeResolveAdapterEventListener
             throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-loupe-adapter');
         }
 
-        $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn->host . ($event->searchDsn->path ?? '');
+        $directory = Environment::getProjectPath() . '/' . $event->searchDsn->host . ($event->searchDsn->path ?? '');
         $event->adapter = (new LoupeAdapterFactory())->createAdapter(['host' => $directory]);
     }
 }
