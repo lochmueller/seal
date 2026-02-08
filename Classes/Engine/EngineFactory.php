@@ -46,8 +46,8 @@ class EngineFactory
             }
         }
 
-        /** @var ResolveAdapterEvent $resolveAdapterEvent */
-        $resolveAdapterEvent = $this->eventDispatcher->dispatch(new ResolveAdapterEvent($dsn, $site, $adapter));
+        $resolveAdapterEvent = new ResolveAdapterEvent($dsn, $site, $adapter);
+        $this->eventDispatcher->dispatch($resolveAdapterEvent);
 
         if ($resolveAdapterEvent->adapter === null) {
             throw new AdapterNotFoundException('No valid adapter found for site "' . $site->getIdentifier() . '"', 23482934);

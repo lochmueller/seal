@@ -14,6 +14,7 @@ use Lochmueller\Seal\EventListener\IndexEventListener;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\Site;
@@ -35,10 +36,14 @@ class IndexEventListenerTest extends AbstractTest
         $resourceFactoryStub = $this->createStub(ResourceFactory::class);
         $this->recordSelectionStub = $this->createStub(RecordSelection::class);
 
+        $eventDispatcherStub = $this->createStub(EventDispatcherInterface::class);
+        $eventDispatcherStub->method('dispatch')->willReturnArgument(0);
+
         $this->subject = new IndexEventListener(
             $this->sealStub,
             $resourceFactoryStub,
             $this->recordSelectionStub,
+            $eventDispatcherStub,
         );
     }
 

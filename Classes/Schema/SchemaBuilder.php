@@ -23,9 +23,8 @@ class SchemaBuilder
         ]);
 
         $event = new BuildSchemaEvent($schema);
-        /** @var BuildSchemaEvent $dispatchedEvent */
-        $dispatchedEvent = $this->eventDispatcher->dispatch($event);
-        return $dispatchedEvent->schema;
+        $this->eventDispatcher->dispatch($event);
+        return $event->schema;
     }
 
     public function getPageIndex(): Index

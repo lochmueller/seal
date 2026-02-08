@@ -8,8 +8,10 @@ use DateTimeImmutable;
 use Lochmueller\Index\Event\IndexFileEvent;
 use Lochmueller\Index\Event\IndexPageEvent;
 use Lochmueller\Index\Traversing\RecordSelection;
+use Lochmueller\Seal\Event\BeforeSaveDocumentEvent;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
@@ -26,6 +28,7 @@ class IndexEventListener implements LoggerAwareInterface
         private readonly Seal            $seal,
         private readonly ResourceFactory $resourceFactory,
         private readonly RecordSelection $recordSelection,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {}
 
     #[AsEventListener('seal-index')]
@@ -81,7 +84,10 @@ class IndexEventListener implements LoggerAwareInterface
                 'preview' => $preview,
             ];
 
-            $engine->saveDocument(SchemaBuilder::DEFAULT_INDEX, $document);
+            $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, SchemaBuilder::DEFAULT_INDEX);
+            $this->eventDispatcher->dispatch($beforeSaveEvent);
+
+            $engine->saveDocument(SchemaBuilder::DEFAULT_INDEX, $beforeSaveEvent->document);
         } catch (\Exception $exception) {
             $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
         }
