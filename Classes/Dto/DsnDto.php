@@ -7,7 +7,7 @@ namespace Lochmueller\Seal\Dto;
 class DsnDto
 {
     /**
-     * @param array<string, string> $query
+     * @param array<string, array<mixed>|string> $query
      */
     public function __construct(
         public readonly string  $scheme,

@@ -54,8 +54,11 @@ class SearchController extends AbstractSealController
         $filter[] = Condition::equal('site', $site->getIdentifier());
         $filter[] = Condition::equal('language', (string) $language->getLanguageId());
 
-        $result = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
-            ->addFilter(Condition::and(...$filter))
+        $searchBuilder = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX);
+        foreach ($filter as $condition) {
+            $searchBuilder->addFilter($condition);
+        }
+        $result = $searchBuilder
             ->limit($config->itemsPerPage)
             ->offset(($currentPage - 1) * $config->itemsPerPage)
             ->highlight(['title'])
@@ -80,10 +83,13 @@ class SearchController extends AbstractSealController
     protected function getPagination(string $paginationClass, int $maximumNumberOfLinks, PaginatorInterface $paginator): PaginationInterface
     {
         if (class_exists(NumberedPagination::class) && $paginationClass === NumberedPagination::class && $maximumNumberOfLinks) {
+            /** @var PaginationInterface */
             return GeneralUtility::makeInstance(NumberedPagination::class, $paginator, $maximumNumberOfLinks);
         } elseif (class_exists(SlidingWindowPagination::class) && $paginationClass === SlidingWindowPagination::class && $maximumNumberOfLinks) {
+            /** @var PaginationInterface */
             return GeneralUtility::makeInstance(SlidingWindowPagination::class, $paginator, $maximumNumberOfLinks);
         } elseif (class_exists($paginationClass)) {
+            /** @var PaginationInterface */
             return GeneralUtility::makeInstance($paginationClass, $paginator);
         }
         return GeneralUtility::makeInstance(SimplePagination::class, $paginator);

@@ -24,6 +24,8 @@ class DsnParser
 
         $query = [];
         parse_str($parts['query'] ?? '', $query);
+        /** @var array<string, array<mixed>|string> $parsedQuery */
+        $parsedQuery = $query;
 
         return new DsnDto(
             scheme: $parts['scheme'],
@@ -32,7 +34,7 @@ class DsnParser
             host: $parts['host'] ?? null,
             port: $parts['port'] ?? null,
             path: isset($parts['path']) ? ltrim($parts['path'], '/') : null,
-            query: $query,
+            query: $parsedQuery,
         );
     }
 }

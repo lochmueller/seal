@@ -38,8 +38,11 @@ class AutocompleteHandler implements RequestHandlerInterface
             Condition::equal('language', (string) (($request->getAttributes()['language'] ?? null)?->getLanguageId() ?? 0)),
         ];
 
-        $result = $this->seal->buildEngineBySite($site)->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX)
-            ->addFilter(Condition::and(...$filter))
+        $searchBuilder = $this->seal->buildEngineBySite($site)->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX);
+        foreach ($filter as $condition) {
+            $searchBuilder->addFilter($condition);
+        }
+        $result = $searchBuilder
             ->limit(25)
             ->getResult();
 

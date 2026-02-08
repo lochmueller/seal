@@ -29,13 +29,16 @@ class Typo3Searcher implements SearcherInterface
         $queryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
         $queryBuilder->from($this->adapterHelper->getTableName($search->index));
 
-        $filters = $this->recursiveResolveFilterConditions($search->index, $search->filters, $queryBuilder->expr());
+        /** @var array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition> $searchFilters */
+        $searchFilters = $search->filters;
+        $filters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $queryBuilder->expr());
 
         if (!empty($filters)) {
             $queryBuilder->where($queryBuilder->expr()->and(...$filters));
         }
 
-        $count = (int) $queryBuilder->count('*')->executeQuery()->fetchAssociative()['COUNT(*)'];
+        $countRow = $queryBuilder->count('*')->executeQuery()->fetchAssociative();
+        $count = (int) ($countRow !== false ? $countRow['COUNT(*)'] : 0);
 
         $queryBuilder->select('*');
         if (0 !== $search->offset) {
@@ -53,7 +56,7 @@ class Typo3Searcher implements SearcherInterface
         return new Result(
             $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
             $count,
-            $this->formatFacets($search->facets), // @todo add result information
+            $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet)), // @todo add result information
         );
 
     }
@@ -100,8 +103,7 @@ class Typo3Searcher implements SearcherInterface
                 $filter instanceof Condition\InCondition => $filters[] = $expressionBuilder->in($filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\NotInCondition => $filters[] = $expressionBuilder->notIn($filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\AndCondition => $filters[] = $expressionBuilder->and(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
-                $filter instanceof Condition\OrCondition => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
-                default => throw new \LogicException($filter::class . ' filter not implemented.'),
+                default => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
             };
         }
 

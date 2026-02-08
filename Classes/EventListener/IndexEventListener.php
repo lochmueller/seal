@@ -14,6 +14,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Service\ImageService;
 
@@ -42,25 +43,27 @@ class IndexEventListener implements LoggerAwareInterface
 
                 try {
                     $file = $this->resourceFactory->getFileObjectFromCombinedIdentifier($event->fileIdentifier);
-                    $size = $file->getSize();
-                    $extension = $file->getExtension();
-                    $uri = $event->site->getBase() . $file->getPublicUrl();
-                    $shouldRenderPreview = GeneralUtility::inList($GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'], strtolower($file->getExtension()));
+                    if ($file !== null) {
+                        $size = $file->getSize();
+                        $extension = $file->getExtension();
+                        $uri = $event->site->getBase() . $file->getPublicUrl();
+                        $shouldRenderPreview = GeneralUtility::inList($GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'], strtolower($file->getExtension()));
 
-                    if ($shouldRenderPreview) {
-                        $imageService = GeneralUtility::makeInstance(ImageService::class);
-                        $image = $imageService->getImage('', $file, false);
-                        $processedImage = $imageService->applyProcessingInstructions($image, [
-                            'maxWidth' => 200,
-                            'maxHeight' => 200,
-                        ]);
+                        if ($shouldRenderPreview) {
+                            $imageService = GeneralUtility::makeInstance(ImageService::class);
+                            $image = $imageService->getImage('', $file, false);
+                            $processedImage = $imageService->applyProcessingInstructions($image, [
+                                'maxWidth' => 200,
+                                'maxHeight' => 200,
+                            ]);
 
-                        $preview = $event->site->getBase() . $processedImage->getPublicUrl();
+                            $preview = $event->site->getBase() . $processedImage->getPublicUrl();
+                        }
                     }
                 } catch (\Exception $exception) {
                     $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
                 }
-            } elseif ($event instanceof IndexPageEvent && $uri === '') {
+            } elseif ($event instanceof IndexPageEvent && $uri === '' && $event->site instanceof Site) {
                 $uri = (string) $event->site->getRouter()->generateUri($event->pageUid);
             }
 

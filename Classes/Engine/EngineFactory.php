@@ -39,9 +39,10 @@ class EngineFactory
         $adapter = null;
 
         foreach ($this->adapterFactories as $adapterFactory) {
-            /** @var $adapterFactory AdapterFactoryInterface */
             if ($dsn->scheme === $adapterFactory::getName()) {
-                $adapter = $adapterFactory->createAdapter($dsn->toArray());
+                /** @var array{scheme: string, host: string, port?: int, user?: string, pass?: string, path?: string, query: array<string, array<string>|string>, fragment?: string} $dsnArray */
+                $dsnArray = $dsn->toArray();
+                $adapter = $adapterFactory->createAdapter($dsnArray);
             }
         }
 

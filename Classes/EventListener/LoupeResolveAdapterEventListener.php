@@ -22,7 +22,7 @@ class LoupeResolveAdapterEventListener
     #[AsEventListener('seal-adapter-loupe')]
     public function indexPageContent(ResolveAdapterEvent $event): void
     {
-        if (!str_starts_with($event->searchDsn['scheme'], 'loupe')) {
+        if (!str_starts_with($event->searchDsn->scheme, 'loupe')) {
             return;
         }
 
@@ -30,7 +30,7 @@ class LoupeResolveAdapterEventListener
             throw new AdapterDependenciesNotFoundException(package: 'cmsig/seal-loupe-adapter');
         }
 
-        $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn['host'] . ($event->searchDsn['path'] ?? '');
+        $directory = $this->environment->getProjectPath() . '/' . $event->searchDsn->host . ($event->searchDsn->path ?? '');
         $event->adapter = (new LoupeAdapterFactory())->createAdapter(['host' => $directory]);
     }
 }

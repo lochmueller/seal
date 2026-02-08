@@ -25,7 +25,6 @@ class Filter
     public function addFilterConfiguration(array $filter, array $filterItem, RequestInterface $request): array
     {
         foreach ($this->filters as $filterItemValue) {
-            /** @var $filterItemValue FilterInterface */
             if ($filterItemValue->getType() === $filterItem['type']) {
                 $filter = array_merge($filter, $filterItemValue->getFilterConfiguration($filterItem, $request));
             }

@@ -54,14 +54,22 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
         }
 
 
-        return new SyncTask(null);
+        if ($options !== []) {
+            return new SyncTask($document);
+        }
+
+        return null;
     }
 
     public function delete(Index $index, string $identifier, array $options = []): ?TaskInterface
     {
         $this->adapterHelper->getConnection()->delete($this->adapterHelper->getTableName($index), ['id' => $identifier]);
 
-        return new SyncTask(null);
+        if ($options !== []) {
+            return new SyncTask(null);
+        }
+
+        return null;
     }
 
     public function bulk(Index $index, iterable $saveDocuments, iterable $deleteDocumentIdentifiers, int $bulkSize = 100, array $options = []): ?TaskInterface
@@ -86,6 +94,10 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
             $connection->bulkInsert($tableName, $bulk);
         }
 
-        return new SyncTask(null);
+        if ($options !== []) {
+            return new SyncTask(null);
+        }
+
+        return null;
     }
 }
