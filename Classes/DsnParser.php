@@ -13,7 +13,7 @@ class DsnParser
         $parts = parse_url($dsn);
 
         if ($parts === false || !isset($parts['scheme'])) {
-            if (preg_match('/^([a-z0-9]*):\/\/.*/', $dsn, $matches)) {
+            if (preg_match('/^([a-z0-9]+):\/\/.*/', $dsn, $matches)) {
                 $parts = [
                     'scheme' => $matches[1],
                 ];

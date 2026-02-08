@@ -37,7 +37,12 @@ class Typo3Searcher implements SearcherInterface
             $queryBuilder->where($queryBuilder->expr()->and(...$filters));
         }
 
-        $countRow = $queryBuilder->count('*')->executeQuery()->fetchAssociative();
+        $countQueryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
+        $countQueryBuilder->from($this->adapterHelper->getTableName($search->index));
+        if (!empty($filters)) {
+            $countQueryBuilder->where($countQueryBuilder->expr()->and(...$this->recursiveResolveFilterConditions($search->index, $searchFilters, $countQueryBuilder->expr())));
+        }
+        $countRow = $countQueryBuilder->count('*')->executeQuery()->fetchAssociative();
         $count = (int) ($countRow !== false ? $countRow['COUNT(*)'] : 0);
 
         $queryBuilder->select('*');

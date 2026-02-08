@@ -31,8 +31,6 @@ class SearchController extends AbstractSealController
 
     public function searchAction(): ResponseInterface
     {
-        $engine = $this->seal->buildEngineBySite($GLOBALS['TYPO3_REQUEST']->getAttribute('site'));
-
         $currentPage = $this->request->hasArgument('currentPageNumber')
             ? (int) $this->request->getArgument('currentPageNumber')
             : 1;
@@ -43,6 +41,8 @@ class SearchController extends AbstractSealController
         $language = $this->request->getAttribute('language');
 
         $config = $this->configurationLoader->loadBySite($site);
+
+        $engine = $this->seal->buildEngineBySite($site);
 
         // $config = new Configuration(searchDsn:'typo3://',itemsPerPage: 1, autocompleteMinCharacters: 1);
 

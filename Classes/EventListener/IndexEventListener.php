@@ -72,7 +72,7 @@ class IndexEventListener implements LoggerAwareInterface
                 'site' => $event->site->getIdentifier(),
                 'language' => isset($event->language) ? (string) $event->language : '0',
                 'uri' => $uri,
-                'indexdate' => (new \DateTimeImmutable())->format(DateTimeImmutable::ATOM),
+                'indexdate' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM),
                 'title' => $event->title,
                 'content' => preg_replace('/\\s+/', ' ', strip_tags($event->content)),
                 'tags' => $this->getTags($event),

@@ -40,7 +40,7 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
 
         try {
             if ($connection->count('*', $tableName, ['id' => $document['id']])) {
-                $connection->update($tableName, ['id' => $document['id']], $data);
+                $connection->update($tableName, $data, ['id' => $document['id']]);
             } else {
                 $connection->insert($tableName, $data);
             }
@@ -83,7 +83,11 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
 
         $bulk = [];
         foreach ($saveDocuments as $saveDocument) {
-            $bulk[] = $saveDocument;
+            $data = $this->marshaller->marshall($index->fields, $saveDocument);
+            if (isset($data['tags'])) {
+                unset($data['tags']);
+            }
+            $bulk[] = $data;
             if (count($bulk) >= $bulkSize) {
                 $connection->bulkInsert($tableName, $bulk);
                 $bulk = [];
