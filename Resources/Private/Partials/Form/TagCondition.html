@@ -1,14 +1,20 @@
 <div class="mb-3">
-    WIP!!!
-
-    <label class="form-label">{filter.title}</label>
-
-    <ul>
-        <li>
-            <f:form.checkbox  name="field_{filter.uid}" value="1" aria-describedby="searchHelp" multiple="1"/>
-        </li>
-        <li>
-            <f:form.checkbox  name="field_{filter.uid}" value="2" aria-describedby="searchHelp" multiple="1"/>
-        </li>
-    </ul>
+    <fieldset>
+        <legend class="form-label">{filter.title}</legend>
+        <f:for each="{filter.parsedTags}" as="tag">
+            <div class="form-check">
+                <f:form.checkbox
+                    id="seal_tag_{filter.uid}_{tag.value}"
+                    name="field_{filter.uid}[]"
+                    value="{tag.value}"
+                    checked="{tag.selected}"
+                    class="form-check-input"
+                    multiple="1"
+                />
+                <label class="form-check-label" for="seal_tag_{filter.uid}_{tag.value}">
+                    {tag.label} ({tag.count})
+                </label>
+            </div>
+        </f:for>
+    </fieldset>
 </div>

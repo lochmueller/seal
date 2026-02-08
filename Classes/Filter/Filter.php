@@ -18,9 +18,9 @@ class Filter
     ) {}
 
     /**
-     * @param array<int, \CmsIg\Seal\Search\Condition\SearchCondition> $filter
+     * @param array<int, \CmsIg\Seal\Search\Condition\EqualCondition|\CmsIg\Seal\Search\Condition\SearchCondition|\CmsIg\Seal\Search\Condition\GeoDistanceCondition> $filter
      * @param array<string, mixed> $filterItem
-     * @return array<int, \CmsIg\Seal\Search\Condition\SearchCondition>
+     * @return array<int, \CmsIg\Seal\Search\Condition\EqualCondition|\CmsIg\Seal\Search\Condition\SearchCondition|\CmsIg\Seal\Search\Condition\GeoDistanceCondition>
      */
     public function addFilterConfiguration(array $filter, array $filterItem, RequestInterface $request): array
     {
