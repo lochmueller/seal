@@ -101,16 +101,10 @@
                 <source>Language</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_stat.search_term">
-                <source>Search term </source>
-            </trans-unit>
-            <trans-unit id="tx_seal_domain_model_stat.site">
-                <source>Site</source>
+                <source>Search term</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default.tags">
                 <source>Tags</source>
-            </trans-unit>
-            <trans-unit id="tx_seal_domain_model_index_default.content">
-                <source>Content</source>
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default.preview">
                 <source>Preview</source>
@@ -126,6 +120,9 @@
             </trans-unit>
             <trans-unit id="tx_seal_domain_model_index_default_tag.title">
                 <source>Title</source>
+            </trans-unit>
+            <trans-unit id="search.submit">
+                <source>Search</source>
             </trans-unit>
             <trans-unit id="search.page.navigation">
                 <source>Search page navigation</source>

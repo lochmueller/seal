@@ -2,5 +2,5 @@
     <f:for each="{filters}" as="filter">
         <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}" arguments="{_all}"/>
     </f:for>
-    <f:form.submit value="suchen" class="btn btn-primary"/>
+    <f:form.submit value="{f:translate(key: 'search.submit')}" class="btn btn-primary"/>
 </f:form>
