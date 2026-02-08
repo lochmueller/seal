@@ -81,21 +81,8 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
             $connection->delete($tableName, ['id' => $deleteDocumentIdentifier]);
         }
 
-        $bulk = [];
         foreach ($saveDocuments as $saveDocument) {
-            $data = $this->marshaller->marshall($index->fields, $saveDocument);
-            if (isset($data['tags'])) {
-                unset($data['tags']);
-            }
-            $bulk[] = $data;
-            if (count($bulk) >= $bulkSize) {
-                $connection->bulkInsert($tableName, $bulk);
-                $bulk = [];
-            }
-        }
-
-        if (!empty($bulk)) {
-            $connection->bulkInsert($tableName, $bulk);
+            $this->save($index, $saveDocument, $options);
         }
 
         if ($options !== []) {
