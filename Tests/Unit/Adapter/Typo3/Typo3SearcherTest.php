@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Tests\Unit\Adapter\Typo3;
 
+use CmsIg\Seal\Schema\Field\GeoPointField;
 use CmsIg\Seal\Schema\Field\IdentifierField;
 use CmsIg\Seal\Schema\Field\TextField;
 use CmsIg\Seal\Schema\Index;
@@ -365,4 +366,166 @@ class Typo3SearcherTest extends AbstractTest
         self::assertCount(1, $documents);
         self::assertSame('doc-1', $documents[0]['id']);
     }
+
+    public function testGeoDistanceConditionGeneratesCorrectSqlWhereClause(): void
+    {
+        $capturedWhere = null;
+
+        $expressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $expressionBuilder->method('and')->willReturnCallback(
+            static function () use (&$capturedWhere): CompositeExpression {
+                $args = func_get_args();
+                $capturedWhere = $args;
+                return CompositeExpression::and(...$args);
+            },
+        );
+
+        $doctrineResult = $this->createStub(DoctrineResult::class);
+        $doctrineResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 0]);
+        $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
+
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->method('from')->willReturnSelf();
+        $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('count')->willReturnSelf();
+        $queryBuilder->method('setFirstResult')->willReturnSelf();
+        $queryBuilder->method('setMaxResults')->willReturnSelf();
+        $queryBuilder->method('executeQuery')->willReturn($doctrineResult);
+
+        $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
+        $adapterHelper->method('getConnection')->willReturn($this->createStub(Connection::class));
+        $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
+        $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
+
+        $subject = new Typo3Searcher($adapterHelper);
+        $search = new Search($this->index, filters: [
+            new Condition\GeoDistanceCondition('location', 48.137154, 11.576124, 10000),
+        ]);
+
+        $subject->search($search);
+
+        self::assertNotNull($capturedWhere, 'WHERE clause should have been set');
+        self::assertCount(1, $capturedWhere);
+
+        $sql = (string) $capturedWhere[0];
+        self::assertStringContainsString('6371000 * ACOS(', $sql);
+        self::assertStringContainsString('COS(RADIANS(48.137154))', $sql);
+        self::assertStringContainsString('COS(RADIANS(location_latitude))', $sql);
+        self::assertStringContainsString('COS(RADIANS(location_longitude) - RADIANS(11.576124))', $sql);
+        self::assertStringContainsString('SIN(RADIANS(48.137154))', $sql);
+        self::assertStringContainsString('SIN(RADIANS(location_latitude))', $sql);
+        self::assertStringContainsString('<= 10000', $sql);
+    }
+
+    public function testGeoDistanceConditionCombinedWithOtherFilters(): void
+    {
+        $capturedWhere = null;
+
+        $expressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $expressionBuilder->method('eq')->willReturn('title = \'Test\'');
+        $expressionBuilder->method('and')->willReturnCallback(
+            static function () use (&$capturedWhere): CompositeExpression {
+                $args = func_get_args();
+                $capturedWhere = $args;
+                return CompositeExpression::and(...$args);
+            },
+        );
+
+        $doctrineResult = $this->createStub(DoctrineResult::class);
+        $doctrineResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 0]);
+        $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
+
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->method('from')->willReturnSelf();
+        $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('count')->willReturnSelf();
+        $queryBuilder->method('setFirstResult')->willReturnSelf();
+        $queryBuilder->method('setMaxResults')->willReturnSelf();
+        $queryBuilder->method('executeQuery')->willReturn($doctrineResult);
+
+        $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
+        $adapterHelper->method('getConnection')->willReturn($this->createStub(Connection::class));
+        $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
+        $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
+
+        $subject = new Typo3Searcher($adapterHelper);
+        $search = new Search($this->index, filters: [
+            new Condition\EqualCondition('title', 'Test'),
+            new Condition\GeoDistanceCondition('location', 48.137154, 11.576124, 5000),
+        ]);
+
+        $subject->search($search);
+
+        self::assertNotNull($capturedWhere, 'WHERE clause should have been set');
+        self::assertCount(2, $capturedWhere);
+        self::assertSame('title = \'Test\'', $capturedWhere[0]);
+        self::assertStringContainsString('6371000 * ACOS(', (string) $capturedWhere[1]);
+        self::assertStringContainsString('<= 5000', (string) $capturedWhere[1]);
+    }
+
+    public function testDocumentAtExactSearchPointReturnedWithPositiveDistance(): void
+    {
+        $indexWithLocation = new Index('default', [
+            'id' => new IdentifierField('id'),
+            'title' => new TextField('title'),
+            'location' => new GeoPointField('location', filterable: true),
+        ]);
+
+        $expressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $expressionBuilder->method('and')->willReturn(CompositeExpression::and('1=1'));
+
+        $countResult = $this->createStub(DoctrineResult::class);
+        $countResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 1]);
+
+        $hitsResult = $this->createStub(DoctrineResult::class);
+        $hitsResult->method('iterateAssociative')->willReturn(new \ArrayIterator([
+            [
+                'id' => 'doc-1',
+                'title' => 'Munich',
+                'location_latitude' => 48.137154,
+                'location_longitude' => 11.576124,
+            ],
+        ]));
+
+        $callCount = 0;
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->method('from')->willReturnSelf();
+        $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('count')->willReturnSelf();
+        $queryBuilder->method('setFirstResult')->willReturnSelf();
+        $queryBuilder->method('setMaxResults')->willReturnSelf();
+        $queryBuilder->method('executeQuery')->willReturnCallback(
+            function () use (&$callCount, $countResult, $hitsResult): DoctrineResult {
+                return ++$callCount <= 1 ? $countResult : $hitsResult;
+            },
+        );
+
+        $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
+        $adapterHelper->method('getConnection')->willReturn($this->createStub(Connection::class));
+        $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
+        $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
+
+        $subject = new Typo3Searcher($adapterHelper);
+        $search = new Search($indexWithLocation, filters: [
+            new Condition\GeoDistanceCondition('location', 48.137154, 11.576124, 1),
+        ]);
+
+        $result = $subject->search($search);
+
+        self::assertSame(1, $result->total());
+
+        $documents = iterator_to_array($result);
+        self::assertCount(1, $documents);
+        self::assertSame('doc-1', $documents[0]['id']);
+        self::assertArrayHasKey('location', $documents[0]);
+        self::assertSame(48.137154, $documents[0]['location']['latitude']);
+        self::assertSame(11.576124, $documents[0]['location']['longitude']);
+    }
+
 }

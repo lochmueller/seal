@@ -9,13 +9,9 @@ use Lochmueller\Seal\Tests\Unit\AbstractTest;
 
 /**
  * Feature: tag-faceting, Property 1: Parsen erzeugt korrekte Struktur mit getrimmten Werten
- *
- * Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5
  */
 class TagConfigurationParserPropertyTest extends AbstractTest
 {
-    private const PROPERTY_TEST_ITERATIONS = 100;
-
     private TagConfigurationParser $subject;
 
     protected function setUp(): void
@@ -30,12 +26,10 @@ class TagConfigurationParserPropertyTest extends AbstractTest
      * For any arbitrary tag configuration string (including blank lines, entries with and without `=`,
      * arbitrary whitespace padding), parsing shall produce an array where each entry contains the keys
      * `value` and `label`, both without leading or trailing whitespace, and blank lines are ignored.
-     *
-     * **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5**
      */
     public function testParseProducesCorrectStructureWithTrimmedValues(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuration = $this->generateRandomConfiguration();
             $result = $this->subject->parse($configuration);
 
@@ -67,12 +61,10 @@ class TagConfigurationParserPropertyTest extends AbstractTest
 
     /**
      * Feature: tag-faceting, Property 1 (sub-property): Entries without `=` use value as label
-     *
-     * **Validates: Requirement 1.3**
      */
     public function testEntriesWithoutEqualsUseValueAsLabel(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuration = $this->generateConfigurationWithoutEquals();
             $result = $this->subject->parse($configuration);
 
@@ -89,12 +81,10 @@ class TagConfigurationParserPropertyTest extends AbstractTest
 
     /**
      * Feature: tag-faceting, Property 1 (sub-property): Empty configuration returns empty array
-     *
-     * **Validates: Requirement 1.4**
      */
     public function testEmptyConfigurationReturnsEmptyArray(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuration = $this->generateEmptyConfiguration();
             $result = $this->subject->parse($configuration);
 
@@ -107,12 +97,10 @@ class TagConfigurationParserPropertyTest extends AbstractTest
      *
      * For any arbitrary array of tag entries with non-empty, trimmed `value` and `label` values,
      * `parse(format(tags))` shall return an equivalent array.
-     *
-     * **Validates: Requirements 1.6**
      */
     public function testParseFormatRoundTrip(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $tags = $this->generateRandomTagArray();
             $formatted = $this->subject->format($tags);
             $reparsed = $this->subject->parse($formatted);
@@ -130,8 +118,6 @@ class TagConfigurationParserPropertyTest extends AbstractTest
 
     /**
      * Feature: tag-faceting, Property 2 (sub-property): Round-trip with empty array
-     *
-     * **Validates: Requirements 1.6**
      */
     public function testParseFormatRoundTripWithEmptyArray(): void
     {

@@ -36,8 +36,6 @@ use TYPO3\CMS\Extbase\Mvc\Request;
 
 /**
  * Unit tests for SearchController faceting logic.
- *
- * Validates: Requirements 3.1, 3.2, 3.3
  */
 class SearchControllerTest extends AbstractTest
 {
@@ -49,7 +47,6 @@ class SearchControllerTest extends AbstractTest
     private array $capturedViewVariables = [];
 
     /**
-     * Validates: Requirement 3.1
      * Test: tagCondition vorhanden → Facet wird hinzugefügt
      */
     public function testSearchActionAddsFacetWhenTagConditionPresent(): void
@@ -71,7 +68,6 @@ class SearchControllerTest extends AbstractTest
     }
 
     /**
-     * Validates: Requirement 3.3
      * Test: kein tagCondition → kein Facet
      */
     public function testSearchActionDoesNotAddFacetWithoutTagCondition(): void
@@ -89,7 +85,6 @@ class SearchControllerTest extends AbstractTest
     }
 
     /**
-     * Validates: Requirement 3.2
      * Test: Facetten-Daten werden korrekt an View übergeben
      */
     public function testSearchActionPassesFacetDataToView(): void
@@ -109,7 +104,6 @@ class SearchControllerTest extends AbstractTest
 
 
     /**
-     * Validates: Requirement 3.2
      * Test: No tags key in facets → empty array passed to view
      */
     public function testSearchActionPassesEmptyTagFacetsWhenNoTagsInResult(): void
@@ -126,7 +120,6 @@ class SearchControllerTest extends AbstractTest
     }
 
     /**
-     * Validates: Requirements 4.1, 4.3
      * Test: parsedTags with facet counts are attached to tagCondition filter rows
      */
     public function testSearchActionEnrichesFilterRowsWithParsedTags(): void
@@ -151,7 +144,6 @@ class SearchControllerTest extends AbstractTest
     }
 
     /**
-     * Validates: Requirement 4.2
      * Test: selected tags from request are marked as selected in parsedTags
      */
     public function testSearchActionMarkesSelectedTagsInParsedTags(): void

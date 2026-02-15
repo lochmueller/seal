@@ -57,6 +57,22 @@ return [
                 'dbType' => 'datetime',
             ],
         ],
+        'location_latitude' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.location_latitude',
+            'config' => [
+                'type' => 'number',
+                'format' => 'decimal',
+            ],
+        ],
+        'location_longitude' => [
+            'exclude' => 0,
+            'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.location_longitude',
+            'config' => [
+                'type' => 'number',
+                'format' => 'decimal',
+            ],
+        ],
         // Content
         'title' => [
             'exclude' => 0,
@@ -110,7 +126,7 @@ return [
     'types' => [
         '0' => ['showitem' => '
             id,
-            --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.meta,site,language,uri,indexdate,
+            --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.meta,site,language,uri,indexdate,location_latitude,location_longitude,
             --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.content,title,content,tags,
             --div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:tx_seal_domain_model_index_default.file,size,extension,preview',
         ],

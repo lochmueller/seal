@@ -13,8 +13,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Unit tests for TagCondition with concrete scenarios.
- *
- * Validates: Requirements 2.1, 2.2, 2.3
  */
 class TagConditionTest extends AbstractTest
 {
@@ -31,9 +29,6 @@ class TagConditionTest extends AbstractTest
         self::assertSame('tagCondition', $this->subject->getType());
     }
 
-    /**
-     * Validates: Requirement 2.2
-     */
     public function testNoTagsSelectedReturnsEmptyConditions(): void
     {
         $filterItem = [
@@ -47,9 +42,6 @@ class TagConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirement 2.1
-     */
     public function testValidTagsSelectedProduceEqualConditions(): void
     {
         $filterItem = [
@@ -71,9 +63,6 @@ class TagConditionTest extends AbstractTest
         self::assertSame('file', $conditions[1]->value);
     }
 
-    /**
-     * Validates: Requirement 2.3
-     */
     public function testInvalidTagsSelectedReturnsEmptyConditions(): void
     {
         $filterItem = [
@@ -87,9 +76,6 @@ class TagConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirements 2.1, 2.3
-     */
     public function testMixedValidAndInvalidTagsOnlyProduceValidConditions(): void
     {
         $filterItem = [
@@ -111,9 +97,6 @@ class TagConditionTest extends AbstractTest
         self::assertSame('news', $conditions[1]->value);
     }
 
-    /**
-     * Validates: Requirements 2.1, 2.2
-     */
     public function testEmptyTagConfigurationReturnsEmptyConditions(): void
     {
         $filterItem = [
@@ -127,9 +110,6 @@ class TagConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirement 2.2
-     */
     public function testRequestWithoutParsedBodyReturnsEmptyConditions(): void
     {
         $filterItem = [

@@ -12,13 +12,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Feature: geo-distance-filter, Property 2, Property 3
- *
- * Validates: Requirements 3.1, 3.4, 3.5
  */
 class GeoDistanceConditionPropertyTest extends AbstractTest
 {
-    private const PROPERTY_TEST_ITERATIONS = 100;
-
     private GeoDistanceCondition $subject;
 
     private RadiusConfigurationParser $parser;
@@ -38,12 +34,10 @@ class GeoDistanceConditionPropertyTest extends AbstractTest
      * shall return exactly one GeoDistanceCondition whose distance equals
      * radius * 1000 (meters), whose latitude and longitude match the input
      * values, and whose field is 'location'.
-     *
-     * **Validates: Requirements 3.1, 3.5**
      */
     public function testValidGeoInputsProduceCorrectCondition(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuredRadii = $this->generateRandomRadiusSteps();
             $configurationString = $this->parser->format($configuredRadii);
             $selectedEntry = $configuredRadii[array_rand($configuredRadii)];
@@ -68,12 +62,10 @@ class GeoDistanceConditionPropertyTest extends AbstractTest
 
     /**
      * Feature: geo-distance-filter, Property 3
-     *
-     * **Validates: Requirements 3.4**
      */
     public function testInvalidCoordinatesProduceEmptyResult(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuredRadii = $this->generateRandomRadiusSteps();
             $configurationString = $this->parser->format($configuredRadii);
             $selectedEntry = $configuredRadii[array_rand($configuredRadii)];

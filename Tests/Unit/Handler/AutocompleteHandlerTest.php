@@ -15,7 +15,7 @@ use Lochmueller\Seal\Handler\AutocompleteHandler;
 use Lochmueller\Seal\Schema\SchemaBuilder as SealSchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
@@ -25,39 +25,39 @@ class AutocompleteHandlerTest extends AbstractTest
 {
     private AutocompleteHandler $subject;
 
-    private MockObject&Seal $seal;
+    private Stub&Seal $seal;
 
-    private MockObject&ConfigurationLoader $configurationLoader;
+    private Stub&ConfigurationLoader $configurationLoader;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seal = $this->createMock(Seal::class);
-        $this->configurationLoader = $this->createMock(ConfigurationLoader::class);
+        $this->seal = $this->createStub(Seal::class);
+        $this->configurationLoader = $this->createStub(ConfigurationLoader::class);
 
         $this->subject = new AutocompleteHandler($this->seal, $this->configurationLoader);
     }
 
-    private function createSiteStub(string $identifier = 'test-site'): MockObject&SiteInterface
+    private function createSiteStub(string $identifier = 'test-site'): Stub&SiteInterface
     {
-        $site = $this->createMock(SiteInterface::class);
+        $site = $this->createStub(SiteInterface::class);
         $site->method('getIdentifier')->willReturn($identifier);
 
         return $site;
     }
 
-    private function createLanguageStub(int $languageId = 0): MockObject&SiteLanguage
+    private function createLanguageStub(int $languageId = 0): Stub&SiteLanguage
     {
-        $language = $this->createMock(SiteLanguage::class);
+        $language = $this->createStub(SiteLanguage::class);
         $language->method('getLanguageId')->willReturn($languageId);
 
         return $language;
     }
 
-    private function createRequest(string $query, SiteInterface $site, ?SiteLanguage $language = null): MockObject&ServerRequestInterface
+    private function createRequest(string $query, SiteInterface $site, ?SiteLanguage $language = null): Stub&ServerRequestInterface
     {
-        $request = $this->createMock(ServerRequestInterface::class);
+        $request = $this->createStub(ServerRequestInterface::class);
         $request->method('getQueryParams')->willReturn(['q' => $query]);
 
         $attributes = ['site' => $site];
@@ -85,16 +85,16 @@ class AutocompleteHandlerTest extends AbstractTest
             SealSchemaBuilder::DEFAULT_INDEX => $schemaBuilder->getPageIndex(),
         ]);
 
-        $searcher = $this->createMock(SearcherInterface::class);
+        $searcher = $this->createStub(SearcherInterface::class);
         $searcher->method('search')->willReturn($result);
 
         $searchBuilder = new SearchBuilder($schema, $searcher);
         $searchBuilder->index(SealSchemaBuilder::DEFAULT_INDEX);
 
-        $engine = $this->createMock(EngineInterface::class);
+        $engine = $this->createStub(EngineInterface::class);
         $engine->method('createSearchBuilder')->willReturn($searchBuilder);
 
-        $this->seal->method('buildEngineBySite')->with($site)->willReturn($engine);
+        $this->seal->method('buildEngineBySite')->willReturn($engine);
     }
 
     public function testFindSuggestionsReturnsMatchingWords(): void
@@ -168,7 +168,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $request = $this->createRequest('ab', $site);
 
@@ -182,7 +182,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $request = $this->createRequest('', $site);
 
@@ -195,7 +195,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $request = $this->createRequest('   ', $site);
 
@@ -208,7 +208,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $this->configureSearchResult($site, [
             ['title' => 'Search Engine', 'content' => 'searching for results'],
@@ -228,7 +228,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $this->configureSearchResult($site, []);
 
@@ -245,7 +245,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $this->configureSearchResult($site, [
             ['title' => 'Testing guide', 'content' => 'test your code'],
@@ -269,7 +269,7 @@ class AutocompleteHandlerTest extends AbstractTest
         $site = $this->createSiteStub();
         $language = $this->createLanguageStub(1);
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $this->configureSearchResult($site, [
             ['title' => 'Suchmaschine', 'content' => 'suchen nach Ergebnissen'],
@@ -289,7 +289,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 5, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $request = $this->createRequest('test', $site);
 
@@ -302,7 +302,7 @@ class AutocompleteHandlerTest extends AbstractTest
     {
         $site = $this->createSiteStub();
         $config = new Configuration('typo3://', 3, 10);
-        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $this->configureSearchResult($site, [
             ['title' => 'First result', 'content' => 'content here'],

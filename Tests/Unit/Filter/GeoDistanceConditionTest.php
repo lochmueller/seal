@@ -12,8 +12,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Unit tests for GeoDistanceCondition edge cases.
- *
- * Validates: Requirements 3.2, 3.3
  */
 class GeoDistanceConditionTest extends AbstractTest
 {
@@ -30,9 +28,6 @@ class GeoDistanceConditionTest extends AbstractTest
         self::assertSame('geoDistanceCondition', $this->subject->getType());
     }
 
-    /**
-     * Validates: Requirement 3.3
-     */
     public function testMissingLatReturnsEmptyArray(): void
     {
         $filterItem = ['radius_steps' => "10=10 km\n25=25 km"];
@@ -46,9 +41,6 @@ class GeoDistanceConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirement 3.3
-     */
     public function testMissingLngReturnsEmptyArray(): void
     {
         $filterItem = ['radius_steps' => "10=10 km\n25=25 km"];
@@ -62,9 +54,6 @@ class GeoDistanceConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirement 3.3
-     */
     public function testMissingRadiusReturnsEmptyArray(): void
     {
         $filterItem = ['radius_steps' => "10=10 km\n25=25 km"];
@@ -78,9 +67,6 @@ class GeoDistanceConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirement 3.3
-     */
     public function testMissingAllCoordinatesReturnsEmptyArray(): void
     {
         $filterItem = ['radius_steps' => "10=10 km\n25=25 km"];
@@ -91,9 +77,6 @@ class GeoDistanceConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirement 3.2
-     */
     public function testRadiusNotInConfiguredStepsReturnsEmptyArray(): void
     {
         $filterItem = ['radius_steps' => "10=10 km\n25=25 km\n50=50 km"];
@@ -108,9 +91,6 @@ class GeoDistanceConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    /**
-     * Validates: Requirement 3.3
-     */
     public function testRequestWithoutParsedBodyReturnsEmptyArray(): void
     {
         $filterItem = ['radius_steps' => "10=10 km\n25=25 km"];

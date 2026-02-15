@@ -12,13 +12,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Feature: tag-faceting, Property 3: TagCondition erzeugt Bedingungen nur für gültige ausgewählte Tags
- *
- * Validates: Requirements 2.1, 2.2, 2.3
  */
 class TagConditionPropertyTest extends AbstractTest
 {
-    private const PROPERTY_TEST_ITERATIONS = 100;
-
     private TagCondition $subject;
 
     private TagConfigurationParser $parser;
@@ -37,12 +33,10 @@ class TagConditionPropertyTest extends AbstractTest
      * (including invalid values), the TagCondition shall return exactly as many EqualCondition
      * objects as there are selected values that are also contained in the configured tags.
      * Each condition shall target the field `tags` with the corresponding value.
-     *
-     * **Validates: Requirements 2.1, 2.2, 2.3**
      */
     public function testOnlyValidSelectedTagsProduceConditions(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuredTags = $this->generateRandomTagEntries();
             $configurationString = $this->parser->format($configuredTags);
             $allowedValues = array_map(
@@ -103,12 +97,10 @@ class TagConditionPropertyTest extends AbstractTest
 
     /**
      * Feature: tag-faceting, Property 3 (sub-property): No tags selected returns empty array
-     *
-     * **Validates: Requirement 2.2**
      */
     public function testNoTagsSelectedReturnsEmptyArray(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuredTags = $this->generateRandomTagEntries();
             $configurationString = $this->parser->format($configuredTags);
             $uid = random_int(1, 9999);
@@ -132,12 +124,10 @@ class TagConditionPropertyTest extends AbstractTest
 
     /**
      * Feature: tag-faceting, Property 3 (sub-property): Only invalid tags selected returns empty array
-     *
-     * **Validates: Requirement 2.3**
      */
     public function testOnlyInvalidTagsSelectedReturnsEmptyArray(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuredTags = $this->generateRandomTagEntries();
             $configurationString = $this->parser->format($configuredTags);
             $allowedValues = array_map(

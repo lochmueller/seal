@@ -17,9 +17,6 @@ class RadiusConfigurationParserTest extends AbstractTest
         $this->parser = new RadiusConfigurationParser();
     }
 
-    /**
-     * Validates: Requirements 1.6
-     */
     public function testParseEmptyStringReturnsEmptyArray(): void
     {
         $result = $this->parser->parse('');
@@ -27,9 +24,6 @@ class RadiusConfigurationParserTest extends AbstractTest
         self::assertSame([], $result);
     }
 
-    /**
-     * Validates: Requirements 1.6
-     */
     public function testParseOnlyWhitespaceLinesReturnsEmptyArray(): void
     {
         $configuration = "\n\n   \n\t\n";
@@ -39,9 +33,6 @@ class RadiusConfigurationParserTest extends AbstractTest
         self::assertSame([], $result);
     }
 
-    /**
-     * Validates: Requirements 1.5
-     */
     public function testParseSkipsInvalidLines(): void
     {
         $configuration = "10=10 km\nabc=Invalid\n50=50 km";
@@ -53,9 +44,6 @@ class RadiusConfigurationParserTest extends AbstractTest
         self::assertSame(['value' => 50, 'label' => '50 km'], $result[1]);
     }
 
-    /**
-     * Validates: Requirements 1.5
-     */
     public function testParseSkipsBlankLinesBetweenValidEntries(): void
     {
         $configuration = "10=10 km\n\n25=25 km\n   \n50=50 km\n";
@@ -96,9 +84,6 @@ class RadiusConfigurationParserTest extends AbstractTest
         self::assertSame(['value' => 10, 'label' => '10 km'], $result[0]);
     }
 
-    /**
-     * Validates: Requirements 1.5
-     */
     public function testParseSkipsLinesWithEmptyValueBeforeEquals(): void
     {
         $configuration = "=Label\n10=10 km";

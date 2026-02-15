@@ -39,6 +39,12 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
             unset($data['tags']);
         }
 
+        if (isset($data['location']) && is_array($data['location'])) {
+            $data['location_latitude'] = (float) ($data['location']['latitude'] ?? 0.0);
+            $data['location_longitude'] = (float) ($data['location']['longitude'] ?? 0.0);
+        }
+        unset($data['location']);
+
         try {
             if ($connection->count('*', $tableName, ['id' => $document['id']])) {
                 $connection->update($tableName, $data, ['id' => $document['id']]);

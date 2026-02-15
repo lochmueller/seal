@@ -9,13 +9,9 @@ use Lochmueller\Seal\Tests\Unit\AbstractTest;
 
 /**
  * Feature: geo-distance-filter, Property 1: Round-Trip des RadiusConfigurationParser
- *
- * Validates: Requirements 1.2, 1.3, 1.4
  */
 class RadiusConfigurationParserPropertyTest extends AbstractTest
 {
-    private const PROPERTY_TEST_ITERATIONS = 100;
-
     private RadiusConfigurationParser $subject;
 
     protected function setUp(): void
@@ -30,12 +26,10 @@ class RadiusConfigurationParserPropertyTest extends AbstractTest
      * For any valid radius configuration (multi-line text with numeric values and labels),
      * parsing, formatting, and re-parsing shall produce an equivalent result:
      * parse(format(parse(config))) == parse(config)
-     *
-     * **Validates: Requirements 1.2, 1.3, 1.4**
      */
     public function testParseFormatParseRoundTrip(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuration = $this->generateRandomRadiusConfiguration();
             $firstParse = $this->subject->parse($configuration);
             $formatted = $this->subject->format($firstParse);
@@ -58,12 +52,10 @@ class RadiusConfigurationParserPropertyTest extends AbstractTest
      *
      * For any arbitrary array of radius entries with positive integer values and non-empty labels,
      * parse(format(radii)) shall return an equivalent array.
-     *
-     * **Validates: Requirements 1.2, 1.3, 1.4**
      */
     public function testFormatParseRoundTripFromArray(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $radii = $this->generateRandomRadiusArray();
             $formatted = $this->subject->format($radii);
             $reparsed = $this->subject->parse($formatted);
@@ -81,12 +73,10 @@ class RadiusConfigurationParserPropertyTest extends AbstractTest
 
     /**
      * Feature: geo-distance-filter, Property 1 (sub-property): Round-trip with empty configuration
-     *
-     * **Validates: Requirements 1.2, 1.3, 1.4**
      */
     public function testRoundTripWithEmptyConfiguration(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuration = $this->generateEmptyConfiguration();
             $firstParse = $this->subject->parse($configuration);
             $formatted = $this->subject->format($firstParse);
@@ -107,12 +97,10 @@ class RadiusConfigurationParserPropertyTest extends AbstractTest
      * Configurations containing a mix of valid numeric entries, invalid non-numeric entries,
      * and blank lines shall produce a stable round-trip: invalid lines are dropped on first parse,
      * and the result is stable through format and re-parse.
-     *
-     * **Validates: Requirements 1.2, 1.3, 1.4**
      */
     public function testRoundTripWithMixedValidAndInvalidLines(): void
     {
-        for ($i = 0; $i < self::PROPERTY_TEST_ITERATIONS; $i++) {
+        for ($i = 0; $i < self::TEST_ITERATIONS; $i++) {
             $configuration = $this->generateMixedConfiguration();
             $firstParse = $this->subject->parse($configuration);
             $formatted = $this->subject->format($firstParse);

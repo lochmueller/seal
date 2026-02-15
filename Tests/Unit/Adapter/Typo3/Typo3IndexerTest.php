@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Tests\Unit\Adapter\Typo3;
 
+use CmsIg\Seal\Schema\Field\GeoPointField;
 use CmsIg\Seal\Schema\Field\IdentifierField;
 use CmsIg\Seal\Schema\Field\TextField;
 use CmsIg\Seal\Schema\Index;
@@ -198,6 +199,68 @@ class Typo3IndexerTest extends AbstractTest
         );
 
         self::assertInstanceOf(SyncTask::class, $task);
+    }
+
+    public function testSaveDocumentWithLocationField(): void
+    {
+        $selectResult = $this->createStub(Result::class);
+        $selectResult->method('fetchAssociative')->willReturn(false);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('count')->willReturn(0);
+        $connection->method('select')->willReturn($selectResult);
+
+        $insertedData = [];
+        $connection->expects(self::once())
+            ->method('insert')
+            ->willReturnCallback(function (string $table, array $data) use (&$insertedData): int {
+                $insertedData = $data;
+                return 1;
+            });
+
+        $indexWithLocation = new Index('default', [
+            'id' => new IdentifierField('id'),
+            'title' => new TextField('title'),
+            'location' => new GeoPointField('location'),
+        ]);
+
+        $subject = $this->createSubjectWithConnection($connection);
+        $subject->save($indexWithLocation, [
+            'id' => 'doc-1',
+            'title' => 'Munich',
+            'location' => ['latitude' => 48.137154, 'longitude' => 11.576124],
+        ]);
+
+        self::assertArrayHasKey('location_latitude', $insertedData);
+        self::assertArrayHasKey('location_longitude', $insertedData);
+        self::assertSame(48.137154, $insertedData['location_latitude']);
+        self::assertSame(11.576124, $insertedData['location_longitude']);
+        self::assertArrayNotHasKey('location', $insertedData);
+    }
+
+    public function testSaveDocumentWithoutLocationField(): void
+    {
+        $selectResult = $this->createStub(Result::class);
+        $selectResult->method('fetchAssociative')->willReturn(false);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('count')->willReturn(0);
+        $connection->method('select')->willReturn($selectResult);
+
+        $insertedData = [];
+        $connection->expects(self::once())
+            ->method('insert')
+            ->willReturnCallback(function (string $table, array $data) use (&$insertedData): int {
+                $insertedData = $data;
+                return 1;
+            });
+
+        $subject = $this->createSubjectWithConnection($connection);
+        $subject->save($this->index, ['id' => 'doc-1', 'title' => 'Test', 'content' => 'Body']);
+
+        self::assertArrayNotHasKey('location_latitude', $insertedData);
+        self::assertArrayNotHasKey('location_longitude', $insertedData);
+        self::assertArrayNotHasKey('location', $insertedData);
     }
 
     public function testSaveSyncsTags(): void

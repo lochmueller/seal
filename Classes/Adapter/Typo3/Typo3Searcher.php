@@ -29,7 +29,7 @@ class Typo3Searcher implements SearcherInterface
         $queryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
         $queryBuilder->from($this->adapterHelper->getTableName($search->index));
 
-        /** @var array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition> $searchFilters */
+        /** @var array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|Condition\GeoDistanceCondition> $searchFilters */
         $searchFilters = $search->filters;
         $filters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $queryBuilder->expr());
 
@@ -75,6 +75,14 @@ class Typo3Searcher implements SearcherInterface
     private function hitsDocuments(Index $index, iterable $hits): \Generator
     {
         foreach ($hits as $hit) {
+            if (isset($hit['location_latitude']) || isset($hit['location_longitude'])) {
+                $hit['location'] = [
+                    'latitude' => (float) ($hit['location_latitude'] ?? 0.0),
+                    'longitude' => (float) ($hit['location_longitude'] ?? 0.0),
+                ];
+                unset($hit['location_latitude'], $hit['location_longitude']);
+            }
+
             yield $this->marshaller->unmarshall($index->fields, $hit);
         }
     }
@@ -89,7 +97,7 @@ class Typo3Searcher implements SearcherInterface
     /**
      * Based on the Loupe integration.
      *
-     * @param array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|object> $conditions
+     * @param array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|Condition\GeoDistanceCondition|object> $conditions
      * @return array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression>
      */
     private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder): array
@@ -112,6 +120,7 @@ class Typo3Searcher implements SearcherInterface
                 $filter instanceof Condition\NotInCondition => $filters[] = $expressionBuilder->notIn($filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\AndCondition => $filters[] = $expressionBuilder->and(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
                 $filter instanceof Condition\OrCondition => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
+                $filter instanceof Condition\GeoDistanceCondition => $filters[] = $this->buildGeoDistanceExpression($filter),
                 default => throw new \LogicException('Unsupported filter condition type: ' . $filter::class),
             };
         }
@@ -122,6 +131,37 @@ class Typo3Searcher implements SearcherInterface
     private function escapeLikeValue(string $value): string
     {
         return addcslashes($value, '%_\\');
+    }
+
+    /**
+     * Builds a Haversine SQL WHERE clause for geo-distance filtering.
+     *
+     * Uses the Haversine formula to calculate the great-circle distance
+     * between the search point and stored coordinates, returning only
+     * documents within the specified radius.
+     */
+    private function buildGeoDistanceExpression(Condition\GeoDistanceCondition $condition): string
+    {
+        $latField = $condition->field . '_latitude';
+        $lngField = $condition->field . '_longitude';
+        $lat = $condition->latitude;
+        $lng = $condition->longitude;
+        $distance = $condition->distance;
+
+        return \sprintf(
+            '6371000 * ACOS('
+            . 'COS(RADIANS(%s)) * COS(RADIANS(%s))'
+            . ' * COS(RADIANS(%s) - RADIANS(%s))'
+            . ' + SIN(RADIANS(%s)) * SIN(RADIANS(%s))'
+            . ') <= %s',
+            $lat,
+            $latField,
+            $lngField,
+            $lng,
+            $lat,
+            $latField,
+            $distance,
+        );
     }
 
     private function escapeFilterValue(mixed $value): string
