@@ -29,7 +29,7 @@ class AutocompleteHandler implements RequestHandlerInterface
         $config = $this->configurationLoader->loadBySite($site);
 
         if (strlen($searchWord) < $config->autocompleteMinCharacters) {
-            return new JsonResponse([], 204, ['X-Seal-Info' => 'Too few chars for auto complete functions']);
+            return new JsonResponse(null, 204, ['X-Seal-Info' => 'Too few chars for auto complete functions']);
         }
 
         $filter = [
@@ -64,7 +64,7 @@ class AutocompleteHandler implements RequestHandlerInterface
         preg_match_all('/\b\w+\b/u', $content, $matches);
 
         foreach ($matches[0] as $word) {
-            if (mb_strpos(strtolower($word), strtolower($searchWord)) === 0) {
+            if (mb_strpos(mb_strtolower($word), mb_strtolower($searchWord)) === 0) {
                 $suggestions[$word] = true;
             }
         }

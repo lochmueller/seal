@@ -43,6 +43,7 @@ class EngineFactory
                 /** @var array{scheme: string, host: string, port?: int, user?: string, pass?: string, path?: string, query: array<string, array<string>|string>, fragment?: string} $dsnArray */
                 $dsnArray = $dsn->toArray();
                 $adapter = $adapterFactory->createAdapter($dsnArray);
+                break;
             }
         }
 

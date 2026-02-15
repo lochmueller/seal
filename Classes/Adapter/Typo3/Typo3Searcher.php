@@ -89,7 +89,7 @@ class Typo3Searcher implements SearcherInterface
     /**
      * Based on the Loupe integration.
      *
-     * @param array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition> $conditions
+     * @param array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|object> $conditions
      * @return array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression>
      */
     private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder): array
@@ -98,21 +98,30 @@ class Typo3Searcher implements SearcherInterface
         foreach ($conditions as $filter) {
             match (true) {
                 $filter instanceof Condition\IdentifierCondition => $filters[] = $expressionBuilder->eq($index->getIdentifierField()->name, $this->escapeFilterValue($filter->identifier)),
-                $filter instanceof Condition\SearchCondition => $filters[] = '(' . $expressionBuilder->like('title', $expressionBuilder->literal('%' . $filter->query . '%')) . ' OR ' . $expressionBuilder->like('content', $expressionBuilder->literal('%' . $filter->query . '%')) . ')',
-                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($filter->field, $expressionBuilder->literal((string) $filter->value)),
-                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($filter->field, $expressionBuilder->literal((string) $filter->value)),
-                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($filter->field, $expressionBuilder->literal((string) $filter->value)),
+                $filter instanceof Condition\SearchCondition => $filters[] = $expressionBuilder->or(
+                    $expressionBuilder->like('title', $expressionBuilder->literal('%' . $this->escapeLikeValue($filter->query) . '%')),
+                    $expressionBuilder->like('content', $expressionBuilder->literal('%' . $this->escapeLikeValue($filter->query) . '%')),
+                ),
+                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\GreaterThanEqualCondition => $filters[] = $expressionBuilder->gte($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\LessThanCondition => $filters[] = $expressionBuilder->lt($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\LessThanEqualCondition => $filters[] = $expressionBuilder->lte($filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\InCondition => $filters[] = $expressionBuilder->in($filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\NotInCondition => $filters[] = $expressionBuilder->notIn($filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\AndCondition => $filters[] = $expressionBuilder->and(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
-                default => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
+                $filter instanceof Condition\OrCondition => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
+                default => throw new \LogicException('Unsupported filter condition type: ' . $filter::class),
             };
         }
 
         return $filters;
+    }
+
+    private function escapeLikeValue(string $value): string
+    {
+        return addcslashes($value, '%_\\');
     }
 
     private function escapeFilterValue(mixed $value): string

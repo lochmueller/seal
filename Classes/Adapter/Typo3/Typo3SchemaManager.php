@@ -21,10 +21,15 @@ class Typo3SchemaManager implements SchemaManagerInterface
     public function dropIndex(Index $index, array $options = []): ?TaskInterface
     {
         if (!$this->existIndex($index)) {
-            throw new \Exception('Please create the database structure with TYPO3 TCA management and ext_tables.sql handling for table: ' . $this->adapterHelper->getTableName($index), 1238123);
+            return null;
         }
 
-        $this->adapterHelper->getConnection()->truncate($this->adapterHelper->getTableName($index));
+        $tableName = $this->adapterHelper->getTableName($index);
+        $connection = $this->adapterHelper->getConnection();
+
+        $connection->truncate($tableName . '_mm_tag');
+        $connection->truncate($tableName . '_tag');
+        $connection->truncate($tableName);
 
         return new SyncTask(null);
     }

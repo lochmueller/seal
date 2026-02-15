@@ -130,7 +130,7 @@ class DsnParserTest extends AbstractTest
         self::assertSame([
             'scheme' => 'mysql',
             'user' => 'user',
-            'password' => 'pass',
+            'pass' => 'pass',
             'host' => 'localhost',
             'port' => 3306,
             'path' => 'db',

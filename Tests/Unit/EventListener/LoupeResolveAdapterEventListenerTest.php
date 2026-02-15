@@ -30,7 +30,7 @@ class LoupeResolveAdapterEventListenerTest extends AbstractTest
         $site = $this->createStub(SiteInterface::class);
         $event = new ResolveAdapterEvent($dsn, $site);
 
-        $this->subject->indexPageContent($event);
+        $this->subject->resolveAdapter($event);
 
         self::assertNull($event->adapter);
     }
@@ -41,7 +41,7 @@ class LoupeResolveAdapterEventListenerTest extends AbstractTest
         $site = $this->createStub(SiteInterface::class);
         $event = new ResolveAdapterEvent($dsn, $site);
 
-        $this->subject->indexPageContent($event);
+        $this->subject->resolveAdapter($event);
 
         self::assertNull($event->adapter);
     }
@@ -59,6 +59,6 @@ class LoupeResolveAdapterEventListenerTest extends AbstractTest
         $this->expectException(AdapterDependenciesNotFoundException::class);
         $this->expectExceptionMessageMatches('/cmsig\/seal-loupe-adapter/');
 
-        $this->subject->indexPageContent($event);
+        $this->subject->resolveAdapter($event);
     }
 }

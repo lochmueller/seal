@@ -29,7 +29,7 @@ class DsnDto
         return [
             'scheme' => $this->scheme,
             'user' => $this->user,
-            'password' => $this->password,
+            'pass' => $this->password,
             'host' => $this->host,
             'port' => $this->port,
             'path' => $this->path,

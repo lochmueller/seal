@@ -4,23 +4,97 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Tests\Unit\Handler;
 
+use CmsIg\Seal\Adapter\SearcherInterface;
+use CmsIg\Seal\EngineInterface;
+use CmsIg\Seal\Schema\Schema;
+use CmsIg\Seal\Search\Result;
+use CmsIg\Seal\Search\SearchBuilder;
+use Lochmueller\Seal\Configuration\Configuration;
+use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Handler\AutocompleteHandler;
+use Lochmueller\Seal\Schema\SchemaBuilder as SealSchemaBuilder;
+use Lochmueller\Seal\Seal;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 
 class AutocompleteHandlerTest extends AbstractTest
 {
     private AutocompleteHandler $subject;
 
+    private MockObject&Seal $seal;
+
+    private MockObject&ConfigurationLoader $configurationLoader;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        // AutocompleteHandler needs Seal and ConfigurationLoader for handle(),
-        // but findSuggestions() is a pure function we can test directly.
-        $seal = $this->createStub(\Lochmueller\Seal\Seal::class);
-        $configLoader = $this->createStub(\Lochmueller\Seal\Configuration\ConfigurationLoader::class);
+        $this->seal = $this->createMock(Seal::class);
+        $this->configurationLoader = $this->createMock(ConfigurationLoader::class);
 
-        $this->subject = new AutocompleteHandler($seal, $configLoader);
+        $this->subject = new AutocompleteHandler($this->seal, $this->configurationLoader);
+    }
+
+    private function createSiteStub(string $identifier = 'test-site'): MockObject&SiteInterface
+    {
+        $site = $this->createMock(SiteInterface::class);
+        $site->method('getIdentifier')->willReturn($identifier);
+
+        return $site;
+    }
+
+    private function createLanguageStub(int $languageId = 0): MockObject&SiteLanguage
+    {
+        $language = $this->createMock(SiteLanguage::class);
+        $language->method('getLanguageId')->willReturn($languageId);
+
+        return $language;
+    }
+
+    private function createRequest(string $query, SiteInterface $site, ?SiteLanguage $language = null): MockObject&ServerRequestInterface
+    {
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getQueryParams')->willReturn(['q' => $query]);
+
+        $attributes = ['site' => $site];
+        if ($language !== null) {
+            $attributes['language'] = $language;
+        }
+        $request->method('getAttributes')->willReturn($attributes);
+
+        return $request;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $documents
+     */
+    private function configureSearchResult(SiteInterface $site, array $documents): void
+    {
+        $generator = (static function () use ($documents): \Generator {
+            yield from $documents;
+        })();
+        $result = new Result($generator, count($documents));
+
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
+        $schemaBuilder = new SealSchemaBuilder($eventDispatcher);
+        $schema = new Schema([
+            SealSchemaBuilder::DEFAULT_INDEX => $schemaBuilder->getPageIndex(),
+        ]);
+
+        $searcher = $this->createMock(SearcherInterface::class);
+        $searcher->method('search')->willReturn($result);
+
+        $searchBuilder = new SearchBuilder($schema, $searcher);
+        $searchBuilder->index(SealSchemaBuilder::DEFAULT_INDEX);
+
+        $engine = $this->createMock(EngineInterface::class);
+        $engine->method('createSearchBuilder')->willReturn($searchBuilder);
+
+        $this->seal->method('buildEngineBySite')->with($site)->willReturn($engine);
     }
 
     public function testFindSuggestionsReturnsMatchingWords(): void
@@ -88,5 +162,158 @@ class AutocompleteHandlerTest extends AbstractTest
 
         self::assertContains('hello', $result);
         self::assertNotContains('world', $result);
+    }
+
+    public function testHandleReturnsTooFewCharsResponseWhenSearchWordTooShort(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $request = $this->createRequest('ab', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(204, $response->getStatusCode());
+        self::assertSame('Too few chars for auto complete functions', $response->getHeaderLine('X-Seal-Info'));
+    }
+
+    public function testHandleReturnsTooFewCharsForEmptyQuery(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $request = $this->createRequest('', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(204, $response->getStatusCode());
+    }
+
+    public function testHandleReturnsTooFewCharsForWhitespaceOnlyQuery(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $request = $this->createRequest('   ', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(204, $response->getStatusCode());
+    }
+
+    public function testHandleReturnsJsonWithSuggestions(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $this->configureSearchResult($site, [
+            ['title' => 'Search Engine', 'content' => 'searching for results'],
+        ]);
+
+        $request = $this->createRequest('sea', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        self::assertContains('Search', $body);
+        self::assertContains('searching', $body);
+    }
+
+    public function testHandleReturnsEmptyArrayWhenNoDocumentsMatch(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $this->configureSearchResult($site, []);
+
+        $request = $this->createRequest('xyz', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        self::assertSame([], $body);
+    }
+
+    public function testHandleReturnsUniqueSuggestionsAcrossMultipleDocuments(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $this->configureSearchResult($site, [
+            ['title' => 'Testing guide', 'content' => 'test your code'],
+            ['title' => 'Test driven', 'content' => 'testing is important'],
+        ]);
+
+        $request = $this->createRequest('test', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        // Results should be unique
+        self::assertSame(array_unique($body), $body);
+        self::assertContains('test', $body);
+        self::assertContains('Testing', $body);
+    }
+
+    public function testHandleUsesLanguageFromRequestAttributes(): void
+    {
+        $site = $this->createSiteStub();
+        $language = $this->createLanguageStub(1);
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $this->configureSearchResult($site, [
+            ['title' => 'Suchmaschine', 'content' => 'suchen nach Ergebnissen'],
+        ]);
+
+        $request = $this->createRequest('such', $site, $language);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        self::assertContains('Suchmaschine', $body);
+        self::assertContains('suchen', $body);
+    }
+
+    public function testHandleRespectsCustomMinCharactersSetting(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 5, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $request = $this->createRequest('test', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(204, $response->getStatusCode());
+    }
+
+    public function testHandleIncludesTotalInHeader(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->with($site)->willReturn($config);
+
+        $this->configureSearchResult($site, [
+            ['title' => 'First result', 'content' => 'content here'],
+            ['title' => 'Second result', 'content' => 'more content'],
+        ]);
+
+        $request = $this->createRequest('con', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('2 search items', $response->getHeaderLine('X-Seal-Info'));
     }
 }

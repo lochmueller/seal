@@ -16,7 +16,7 @@ use TYPO3\CMS\Core\Core\Environment;
 class LoupeResolveAdapterEventListener
 {
     #[AsEventListener('seal-adapter-loupe')]
-    public function indexPageContent(ResolveAdapterEvent $event): void
+    public function resolveAdapter(ResolveAdapterEvent $event): void
     {
         if (!str_starts_with($event->searchDsn->scheme, 'loupe')) {
             return;

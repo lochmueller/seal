@@ -19,10 +19,6 @@ class SearchCondition implements FilterInterface
      * @param array<string, mixed> $filterItem
      * @return array<int, \CmsIg\Seal\Search\Condition\EqualCondition|\CmsIg\Seal\Search\Condition\SearchCondition|\CmsIg\Seal\Search\Condition\GeoDistanceCondition>
      */
-    /**
-     * @param array<string, mixed> $filterItem
-     * @return array<int, \CmsIg\Seal\Search\Condition\EqualCondition|\CmsIg\Seal\Search\Condition\SearchCondition|\CmsIg\Seal\Search\Condition\GeoDistanceCondition>
-     */
     public function getFilterConfiguration(array $filterItem, RequestInterface $request): array
     {
         $search = '';

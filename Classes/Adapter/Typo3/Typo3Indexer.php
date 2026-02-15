@@ -47,8 +47,9 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
             }
         } catch (\Exception $e) {
             $this->logger?->error($e->getMessage());
-        }
 
+            return null;
+        }
 
         $this->syncTags($tableName, $document['id'], $tags);
 

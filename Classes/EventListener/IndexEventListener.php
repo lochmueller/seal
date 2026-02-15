@@ -77,7 +77,7 @@ class IndexEventListener implements LoggerAwareInterface
                 'uri' => $uri,
                 'indexdate' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM),
                 'title' => $event->title,
-                'content' => preg_replace('/\\s+/', ' ', strip_tags($event->content)),
+                'content' => (string) preg_replace('/\\s+/', ' ', strip_tags($event->content)),
                 'tags' => $this->getTags($event),
                 'size' => $size,
                 'extension' => $extension,
