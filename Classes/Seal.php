@@ -6,10 +6,9 @@ namespace Lochmueller\Seal;
 
 use CmsIg\Seal\EngineInterface;
 use Lochmueller\Seal\Engine\EngineFactory;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
-class Seal implements SingletonInterface
+class Seal
 {
     /**
      * @var array<string, EngineInterface>

@@ -13,6 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 
 class AutocompleteHandler implements RequestHandlerInterface
 {
@@ -35,8 +36,11 @@ class AutocompleteHandler implements RequestHandlerInterface
         $filter = [
             Condition::search($searchWord),
             Condition::equal('site', $site->getIdentifier()),
-            Condition::equal('language', (string) (($request->getAttributes()['language'] ?? null)?->getLanguageId() ?? 0)),
         ];
+
+        /** @var SiteLanguage|null $language */
+        $language = $request->getAttribute('language');
+        $filter[] = Condition::equal('language', (string) ($language?->getLanguageId() ?? 0));
 
         $searchBuilder = $this->seal->buildEngineBySite($site)->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX);
         foreach ($filter as $condition) {

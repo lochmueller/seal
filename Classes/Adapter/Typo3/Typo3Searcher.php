@@ -20,7 +20,11 @@ class Typo3Searcher implements SearcherInterface
 
     public function __construct(private Typo3AdapterHelper $adapterHelper)
     {
-        $this->marshaller = new FlattenMarshaller(fieldSeparator: '_');
+        $dateTimeFormat = $this->adapterHelper->getConnection()->getDatabasePlatform()->getDateTimeFormatString();
+        $this->marshaller = new FlattenMarshaller(
+            dateFormat: $dateTimeFormat,
+            fieldSeparator: '_',
+        );
     }
 
 

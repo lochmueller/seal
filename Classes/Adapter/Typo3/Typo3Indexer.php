@@ -81,6 +81,10 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
         // Resolve uid_local from the document id
         $row = $connection->select(['uid'], $tableName, ['id' => $documentId])->fetchAssociative();
         if ($row === false) {
+            $this->logger?->warning('Cannot sync tags: document not found in table', [
+                'table' => $tableName,
+                'documentId' => $documentId,
+            ]);
             return;
         }
         $uidLocal = (int) $row['uid'];
