@@ -14,7 +14,7 @@ class DsnDto
         #[\SensitiveParameter]
         public readonly ?string $user = null,
         #[\SensitiveParameter]
-        public readonly ?string $password = null,
+        public readonly ?string $pass = null,
         public readonly ?string $host = null,
         public readonly ?int    $port = null,
         public readonly ?string $path = null,
@@ -29,7 +29,7 @@ class DsnDto
         return [
             'scheme' => $this->scheme,
             'user' => $this->user,
-            'pass' => $this->password,
+            'pass' => $this->pass,
             'host' => $this->host,
             'port' => $this->port,
             'path' => $this->path,

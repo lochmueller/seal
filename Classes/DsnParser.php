@@ -30,7 +30,7 @@ class DsnParser
         return new DsnDto(
             scheme: $parts['scheme'],
             user: $parts['user'] ?? null,
-            password: $parts['pass'] ?? null,
+            pass: $parts['pass'] ?? null,
             host: $parts['host'] ?? null,
             port: $parts['port'] ?? null,
             path: isset($parts['path']) ? ltrim($parts['path'], '/') : null,
