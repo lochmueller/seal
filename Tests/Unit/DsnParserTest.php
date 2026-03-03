@@ -25,7 +25,7 @@ class DsnParserTest extends AbstractTest
         self::assertSame('mysql', $result->scheme);
         self::assertSame('localhost', $result->host);
         self::assertNull($result->user);
-        self::assertNull($result->password);
+        self::assertNull($result->pass);
         self::assertNull($result->port);
         self::assertNull($result->path);
         self::assertSame([], $result->query);
@@ -37,7 +37,7 @@ class DsnParserTest extends AbstractTest
 
         self::assertSame('mysql', $result->scheme);
         self::assertSame('user', $result->user);
-        self::assertSame('password', $result->password);
+        self::assertSame('password', $result->pass);
         self::assertSame('localhost', $result->host);
         self::assertSame(3306, $result->port);
         self::assertSame('database', $result->path);
@@ -77,7 +77,7 @@ class DsnParserTest extends AbstractTest
 
         self::assertSame('redis', $result->scheme);
         self::assertSame('admin', $result->user);
-        self::assertNull($result->password);
+        self::assertNull($result->pass);
         self::assertSame('localhost', $result->host);
         self::assertSame(6379, $result->port);
     }
@@ -96,7 +96,7 @@ class DsnParserTest extends AbstractTest
 
         self::assertSame('user', $result->user);
         // Note: parse_url does not decode URL-encoded characters
-        self::assertSame('p%40ss%3Aword', $result->password);
+        self::assertSame('p%40ss%3Aword', $result->pass);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dsnSchemeProvider')]

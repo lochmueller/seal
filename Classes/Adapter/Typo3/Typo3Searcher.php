@@ -31,7 +31,6 @@ class Typo3Searcher implements SearcherInterface
     public function search(Search $search): Result
     {
         $queryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
-        $queryBuilder->from($this->adapterHelper->getTableName($search->index));
 
         /** @var array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|Condition\GeoDistanceCondition> $searchFilters */
         $searchFilters = $search->filters;
@@ -42,7 +41,6 @@ class Typo3Searcher implements SearcherInterface
         }
 
         $countQueryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
-        $countQueryBuilder->from($this->adapterHelper->getTableName($search->index));
         $countFilters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $countQueryBuilder->expr());
         if (!empty($countFilters)) {
             $countQueryBuilder->where($countQueryBuilder->expr()->and(...$countFilters));
@@ -106,25 +104,26 @@ class Typo3Searcher implements SearcherInterface
      */
     private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder): array
     {
+        $tableAlias = 'idx.';
         $filters = [];
         foreach ($conditions as $filter) {
             match (true) {
-                $filter instanceof Condition\IdentifierCondition => $filters[] = $expressionBuilder->eq($index->getIdentifierField()->name, $this->escapeFilterValue($filter->identifier)),
+                $filter instanceof Condition\IdentifierCondition => $filters[] = $expressionBuilder->eq($tableAlias . $index->getIdentifierField()->name, $this->escapeFilterValue($filter->identifier)),
                 $filter instanceof Condition\SearchCondition => $filters[] = $expressionBuilder->or(
-                    $expressionBuilder->like('title', $expressionBuilder->literal('%' . $this->escapeLikeValue($filter->query) . '%')),
-                    $expressionBuilder->like('content', $expressionBuilder->literal('%' . $this->escapeLikeValue($filter->query) . '%')),
+                    $expressionBuilder->like($tableAlias . 'title', $expressionBuilder->literal('%' . $this->escapeLikeValue($filter->query) . '%')),
+                    $expressionBuilder->like($tableAlias . 'content', $expressionBuilder->literal('%' . $this->escapeLikeValue($filter->query) . '%')),
                 ),
-                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($filter->field, $this->escapeFilterValue($filter->value)),
-                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($filter->field, $this->escapeFilterValue($filter->value)),
-                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($filter->field, $this->escapeFilterValue($filter->value)),
-                $filter instanceof Condition\GreaterThanEqualCondition => $filters[] = $expressionBuilder->gte($filter->field, $this->escapeFilterValue($filter->value)),
-                $filter instanceof Condition\LessThanCondition => $filters[] = $expressionBuilder->lt($filter->field, $this->escapeFilterValue($filter->value)),
-                $filter instanceof Condition\LessThanEqualCondition => $filters[] = $expressionBuilder->lte($filter->field, $this->escapeFilterValue($filter->value)),
-                $filter instanceof Condition\InCondition => $filters[] = $expressionBuilder->in($filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
-                $filter instanceof Condition\NotInCondition => $filters[] = $expressionBuilder->notIn($filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
+                $filter instanceof Condition\EqualCondition => $filters[] = $expressionBuilder->eq($tableAlias . $filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\NotEqualCondition => $filters[] = $expressionBuilder->neq($tableAlias . $filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\GreaterThanCondition => $filters[] = $expressionBuilder->gt($tableAlias . $filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\GreaterThanEqualCondition => $filters[] = $expressionBuilder->gte($tableAlias . $filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\LessThanCondition => $filters[] = $expressionBuilder->lt($tableAlias . $filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\LessThanEqualCondition => $filters[] = $expressionBuilder->lte($tableAlias . $filter->field, $this->escapeFilterValue($filter->value)),
+                $filter instanceof Condition\InCondition => $filters[] = $expressionBuilder->in($tableAlias . $filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
+                $filter instanceof Condition\NotInCondition => $filters[] = $expressionBuilder->notIn($tableAlias . $filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\AndCondition => $filters[] = $expressionBuilder->and(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
                 $filter instanceof Condition\OrCondition => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
-                $filter instanceof Condition\GeoDistanceCondition => $filters[] = $this->buildGeoDistanceExpression($filter),
+                $filter instanceof Condition\GeoDistanceCondition => $filters[] = $this->buildGeoDistanceExpression($filter, 'idx'),
                 default => throw new \LogicException('Unsupported filter condition type: ' . $filter::class),
             };
         }
@@ -144,10 +143,11 @@ class Typo3Searcher implements SearcherInterface
      * between the search point and stored coordinates, returning only
      * documents within the specified radius.
      */
-    private function buildGeoDistanceExpression(Condition\GeoDistanceCondition $condition): string
+    private function buildGeoDistanceExpression(Condition\GeoDistanceCondition $condition, string $tableAlias = ''): string
     {
-        $latField = $condition->field . '_latitude';
-        $lngField = $condition->field . '_longitude';
+        $prefix = $tableAlias !== '' ? $tableAlias . '.' : '';
+        $latField = $prefix . $condition->field . '_latitude';
+        $lngField = $prefix . $condition->field . '_longitude';
         $lat = (float) $condition->latitude;
         $lng = (float) $condition->longitude;
         $distance = (float) $condition->distance;
@@ -209,7 +209,7 @@ class Typo3Searcher implements SearcherInterface
             ->addSelectLiteral('COUNT(*) AS cnt')
             ->from($tagTable, 't')
             ->join('t', $mmTable, 'mm', 'mm.uid_foreign = t.uid')
-            ->join('mm', $tableName, 'p', 'p.uid = mm.uid_local');
+            ->join('mm', $tableName, 'idx', 'idx.uid = mm.uid_local');
 
         if (!empty($filters)) {
             $qb->where($qb->expr()->and(...$filters));

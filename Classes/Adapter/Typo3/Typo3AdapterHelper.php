@@ -18,7 +18,9 @@ class Typo3AdapterHelper
     }
     public function getQueryBuilder(Index $index): QueryBuilder
     {
-        return GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->getTableName($index));
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->getTableName($index));
+        $queryBuilder->from($this->getTableName($index), 'idx');
+        return $queryBuilder;
     }
 
     public function getTableName(Index $index): string

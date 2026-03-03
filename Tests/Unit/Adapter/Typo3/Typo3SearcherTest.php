@@ -412,10 +412,10 @@ class Typo3SearcherTest extends AbstractTest
         $sql = (string) $capturedWhere[0];
         self::assertStringContainsString('6371000 * ACOS(', $sql);
         self::assertStringContainsString('COS(RADIANS(48.137154))', $sql);
-        self::assertStringContainsString('COS(RADIANS(location_latitude))', $sql);
-        self::assertStringContainsString('COS(RADIANS(location_longitude) - RADIANS(11.576124))', $sql);
+        self::assertStringContainsString('COS(RADIANS(idx.location_latitude))', $sql);
+        self::assertStringContainsString('COS(RADIANS(idx.location_longitude) - RADIANS(11.576124))', $sql);
         self::assertStringContainsString('SIN(RADIANS(48.137154))', $sql);
-        self::assertStringContainsString('SIN(RADIANS(location_latitude))', $sql);
+        self::assertStringContainsString('SIN(RADIANS(idx.location_latitude))', $sql);
         self::assertStringContainsString('<= 10000.000000', $sql);
     }
 
