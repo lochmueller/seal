@@ -11,7 +11,7 @@ class StartController extends AbstractSealController
     public function startAction(): ResponseInterface
     {
         $this->view->assignMultiple([
-            'filters' => $this->addCaclulatedValuesForFilterRows(iterator_to_array($this->getFilterRowsByContentElementUid($this->getCurrentContentElementRow()['uid']))),
+            'filters' => $this->addCalculatedValuesForFilterRows(iterator_to_array($this->getFilterRowsByContentElementUid($this->getCurrentContentElementRow()['uid']))),
         ]);
 
         return $this->htmlResponse();

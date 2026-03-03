@@ -65,6 +65,9 @@ class AutocompleteHandlerTest extends AbstractTest
             $attributes['language'] = $language;
         }
         $request->method('getAttributes')->willReturn($attributes);
+        $request->method('getAttribute')->willReturnCallback(
+            static fn(string $name) => $attributes[$name] ?? null,
+        );
 
         return $request;
     }

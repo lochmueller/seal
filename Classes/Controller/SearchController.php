@@ -26,12 +26,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class SearchController extends AbstractSealController
 {
     public function __construct(
-        private readonly TagConfigurationParser $tagConfigurationParser,
-        private readonly RadiusConfigurationParser $radiusConfigurationParser,
+        TagConfigurationParser $tagConfigurationParser,
+        RadiusConfigurationParser $radiusConfigurationParser,
         private readonly Seal                  $seal,
         protected ConfigurationLoader $configurationLoader,
         protected Filter              $filter,
-    ) {}
+    ) {
+        parent::__construct($tagConfigurationParser, $radiusConfigurationParser);
+    }
 
     public function searchAction(): ResponseInterface
     {
@@ -88,7 +90,7 @@ class SearchController extends AbstractSealController
 
         $this->view->assignMultiple(
             [
-                'filters' => $this->addCaclulatedValuesForFilterRows($filterRows),
+                'filters' => $this->addCalculatedValuesForFilterRows($filterRows, $requestData, $tagFacetCounts),
                 'tagFacets' => $tagFacets,
                 'pagination' => $this->getPagination(SimplePagination::class, 6, $paginator),
                 'paginator' => $paginator,

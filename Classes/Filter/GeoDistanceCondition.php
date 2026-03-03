@@ -36,9 +36,9 @@ class GeoDistanceCondition implements FilterInterface
             return [];
         }
 
-        $lat = (float)($searchData['geo_position_lat'] ?? 0.0);
-        $lng = (float)($searchData['geo_position_lng'] ?? 0.0);
-        $radius = (int)($searchData['geo_position_radius'] ?? 0);
+        $lat = (float) ($searchData['geo_position_lat'] ?? 0.0);
+        $lng = (float) ($searchData['geo_position_lng'] ?? 0.0);
+        $radius = (int) ($searchData['geo_position_radius'] ?? 0);
 
         if ($lat === 0.0 || $lng === 0.0 || $radius === 0) {
             return [];

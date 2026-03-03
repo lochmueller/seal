@@ -67,7 +67,7 @@ class Typo3SearcherTest extends AbstractTest
         $expressionBuilder->method('or')->willReturn(CompositeExpression::or('1=1'));
 
         $doctrineResult = $this->createStub(DoctrineResult::class);
-        $doctrineResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 0]);
+        $doctrineResult->method('fetchOne')->willReturn(0);
         $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
 
         $queryBuilder = $this->createStub(QueryBuilder::class);
@@ -107,7 +107,7 @@ class Typo3SearcherTest extends AbstractTest
         $expressionBuilder->method('and')->willReturn(CompositeExpression::and('1=1'));
 
         $doctrineResult = $this->createStub(DoctrineResult::class);
-        $doctrineResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 0]);
+        $doctrineResult->method('fetchOne')->willReturn(0);
         $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
 
         $queryBuilder->method('expr')->willReturn($expressionBuilder);
@@ -230,7 +230,7 @@ class Typo3SearcherTest extends AbstractTest
         $expressionBuilder->method('and')->willReturn(CompositeExpression::and('1=1'));
 
         $doctrineResult = $this->createStub(DoctrineResult::class);
-        $doctrineResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 0]);
+        $doctrineResult->method('fetchOne')->willReturn(0);
         $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
 
         $queryBuilder->method('expr')->willReturn($expressionBuilder);
@@ -330,7 +330,7 @@ class Typo3SearcherTest extends AbstractTest
         $expressionBuilder->method('and')->willReturn(CompositeExpression::and('1=1'));
 
         $countResult = $this->createStub(DoctrineResult::class);
-        $countResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 1]);
+        $countResult->method('fetchOne')->willReturn(1);
 
         $hitsResult = $this->createStub(DoctrineResult::class);
         $hitsResult->method('iterateAssociative')->willReturn(new \ArrayIterator([
@@ -381,7 +381,7 @@ class Typo3SearcherTest extends AbstractTest
         );
 
         $doctrineResult = $this->createStub(DoctrineResult::class);
-        $doctrineResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 0]);
+        $doctrineResult->method('fetchOne')->willReturn(0);
         $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
 
         $queryBuilder = $this->createStub(QueryBuilder::class);
@@ -416,7 +416,7 @@ class Typo3SearcherTest extends AbstractTest
         self::assertStringContainsString('COS(RADIANS(location_longitude) - RADIANS(11.576124))', $sql);
         self::assertStringContainsString('SIN(RADIANS(48.137154))', $sql);
         self::assertStringContainsString('SIN(RADIANS(location_latitude))', $sql);
-        self::assertStringContainsString('<= 10000', $sql);
+        self::assertStringContainsString('<= 10000.000000', $sql);
     }
 
     public function testGeoDistanceConditionCombinedWithOtherFilters(): void
@@ -434,7 +434,7 @@ class Typo3SearcherTest extends AbstractTest
         );
 
         $doctrineResult = $this->createStub(DoctrineResult::class);
-        $doctrineResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 0]);
+        $doctrineResult->method('fetchOne')->willReturn(0);
         $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
 
         $queryBuilder = $this->createStub(QueryBuilder::class);
@@ -464,7 +464,7 @@ class Typo3SearcherTest extends AbstractTest
         self::assertCount(2, $capturedWhere);
         self::assertSame('title = \'Test\'', $capturedWhere[0]);
         self::assertStringContainsString('6371000 * ACOS(', (string) $capturedWhere[1]);
-        self::assertStringContainsString('<= 5000', (string) $capturedWhere[1]);
+        self::assertStringContainsString('<= 5000.000000', (string) $capturedWhere[1]);
     }
 
     public function testDocumentAtExactSearchPointReturnedWithPositiveDistance(): void
@@ -479,7 +479,7 @@ class Typo3SearcherTest extends AbstractTest
         $expressionBuilder->method('and')->willReturn(CompositeExpression::and('1=1'));
 
         $countResult = $this->createStub(DoctrineResult::class);
-        $countResult->method('fetchAssociative')->willReturn(['COUNT(*)' => 1]);
+        $countResult->method('fetchOne')->willReturn(1);
 
         $hitsResult = $this->createStub(DoctrineResult::class);
         $hitsResult->method('iterateAssociative')->willReturn(new \ArrayIterator([

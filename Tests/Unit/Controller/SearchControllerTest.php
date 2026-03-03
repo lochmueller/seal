@@ -219,7 +219,7 @@ class SearchControllerTest extends AbstractTest
         $tagConfigurationParser = new TagConfigurationParser();
         $radiusConfigurationParser = new RadiusConfigurationParser();
         $subject = $this->getMockBuilder(SearchController::class)
-            ->setConstructorArgs([$seal, $configLoader, $filter, $tagConfigurationParser, $radiusConfigurationParser])
+            ->setConstructorArgs([$tagConfigurationParser, $radiusConfigurationParser, $seal, $configLoader, $filter])
             ->onlyMethods(['getFilterRowsByContentElementUid', 'getCurrentContentElementRow'])
             ->getMock();
 

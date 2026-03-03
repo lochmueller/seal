@@ -25,7 +25,7 @@ class AutocompleteHandler implements RequestHandlerInterface
         $searchWord = trim($params['q'] ?? '');
 
         /** @var SiteInterface $site */
-        $site = $request->getAttributes()['site'];
+        $site = $request->getAttribute('site');
 
         $config = $this->configurationLoader->loadBySite($site);
 

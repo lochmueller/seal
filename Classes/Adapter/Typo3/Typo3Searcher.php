@@ -43,11 +43,11 @@ class Typo3Searcher implements SearcherInterface
 
         $countQueryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
         $countQueryBuilder->from($this->adapterHelper->getTableName($search->index));
-        if (!empty($filters)) {
-            $countQueryBuilder->where($countQueryBuilder->expr()->and(...$this->recursiveResolveFilterConditions($search->index, $searchFilters, $countQueryBuilder->expr())));
+        $countFilters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $countQueryBuilder->expr());
+        if (!empty($countFilters)) {
+            $countQueryBuilder->where($countQueryBuilder->expr()->and(...$countFilters));
         }
-        $countRow = $countQueryBuilder->count('*')->executeQuery()->fetchAssociative();
-        $count = (int) ($countRow !== false ? $countRow['COUNT(*)'] : 0);
+        $count = (int) $countQueryBuilder->count('*')->executeQuery()->fetchOne();
 
         $queryBuilder->select('*');
         if (0 !== $search->offset) {
@@ -148,16 +148,16 @@ class Typo3Searcher implements SearcherInterface
     {
         $latField = $condition->field . '_latitude';
         $lngField = $condition->field . '_longitude';
-        $lat = $condition->latitude;
-        $lng = $condition->longitude;
-        $distance = $condition->distance;
+        $lat = (float) $condition->latitude;
+        $lng = (float) $condition->longitude;
+        $distance = (float) $condition->distance;
 
         return \sprintf(
             '6371000 * ACOS('
-            . 'COS(RADIANS(%s)) * COS(RADIANS(%s))'
-            . ' * COS(RADIANS(%s) - RADIANS(%s))'
-            . ' + SIN(RADIANS(%s)) * SIN(RADIANS(%s))'
-            . ') <= %s',
+            . 'COS(RADIANS(%F)) * COS(RADIANS(%s))'
+            . ' * COS(RADIANS(%s) - RADIANS(%F))'
+            . ' + SIN(RADIANS(%F)) * SIN(RADIANS(%s))'
+            . ') <= %F',
             $lat,
             $latField,
             $lngField,
