@@ -40,12 +40,14 @@ class SearchResultArrayPaginator extends AbstractPaginator
     protected function getAmountOfItemsOnCurrentPage(): int
     {
         $total = $this->getTotalAmountOfItems();
-        $itemsPerPage = $this->localItemsPerPage;
-        $currentPage = $this->getCurrentPageNumber();
 
-        $remaining = $total - (($currentPage - 1) * $itemsPerPage);
+        if ($total === 0) {
+            return 0;
+        }
 
-        return min($itemsPerPage, max(0, $remaining));
+        $remainingItems = $total - ($this->localItemsPerPage * ($this->getCurrentPageNumber() - 1));
+
+        return min($this->localItemsPerPage, max(0, $remainingItems));
     }
 
     protected function updatePaginatedItems(int $itemsPerPage, int $offset): void
