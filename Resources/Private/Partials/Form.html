@@ -1,6 +1,6 @@
 <f:form action="search" controller="Search" class="mb-3">
     <f:for each="{filters}" as="filter">
-        <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}" arguments="{_all}"/>
+        <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}" arguments="{filter:filter}"/>
     </f:for>
     <f:form.submit value="{f:translate(key: 'search.submit')}" class="btn btn-primary"/>
 </f:form>

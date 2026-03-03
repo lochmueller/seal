@@ -36,21 +36,13 @@ class GeoDistanceCondition implements FilterInterface
             return [];
         }
 
-        $latRaw = $searchData['geo_position_lat'] ?? null;
-        $lngRaw = $searchData['geo_position_lng'] ?? null;
-        $radiusRaw = $searchData['geo_position_radius'] ?? null;
+        $lat = (float)($searchData['geo_position_lat'] ?? 0.0);
+        $lng = (float)($searchData['geo_position_lng'] ?? 0.0);
+        $radius = (int)($searchData['geo_position_radius'] ?? 0);
 
-        if ($latRaw === null || $latRaw === '' || $lngRaw === null || $lngRaw === '' || $radiusRaw === null || $radiusRaw === '') {
+        if ($lat === 0.0 || $lng === 0.0 || $radius === 0) {
             return [];
         }
-
-        if (!is_numeric($latRaw) || !is_numeric($lngRaw) || !is_numeric($radiusRaw)) {
-            return [];
-        }
-
-        $lat = (float) $latRaw;
-        $lng = (float) $lngRaw;
-        $radius = (int) $radiusRaw;
 
         if ($lat < -90.0 || $lat > 90.0) {
             return [];
@@ -70,8 +62,6 @@ class GeoDistanceCondition implements FilterInterface
             return [];
         }
 
-        $meters = $radius * 1000;
-
-        return [Condition::geoDistance('location', $lat, $lng, $meters)];
+        return [Condition::geoDistance('location', $lat, $lng, $radius * 1000)];
     }
 }

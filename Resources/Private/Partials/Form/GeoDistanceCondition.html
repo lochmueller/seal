@@ -25,35 +25,12 @@
                 data-lng-field="seal_search_{filter.uid}_lng">
             <f:translate key="geo.locate"/>
         </button>
-        <span class="seal-geo-status" style="display:none;"></span>
+        <span class="seal-geo-status" style="display:none;"
+              data-msg-unavailable="{f:translate(key: 'geo.status.unavailable')}"
+              data-msg-located="{f:translate(key: 'geo.status.located')}"
+              data-msg-denied="{f:translate(key: 'geo.status.denied')}"></span>
     </fieldset>
 </div>
 
-<script>
-    document.querySelectorAll('.seal-geo-locate-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var latField = document.getElementById(btn.dataset.latField);
-            var lngField = document.getElementById(btn.dataset.lngField);
-            var status = btn.nextElementSibling;
-
-            if (!navigator.geolocation) {
-                status.textContent = '<f:translate key="geo.status.unavailable"/>';
-                status.style.display = 'inline';
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    latField.value = position.coords.latitude;
-                    lngField.value = position.coords.longitude;
-                    status.textContent = '<f:translate key="geo.status.located"/>';
-                    status.style.display = 'inline';
-                },
-                function() {
-                    status.textContent = '<f:translate key="geo.status.denied"/>';
-                    status.style.display = 'inline';
-                }
-            );
-        });
-    });
-</script>
+<f:asset.script identifier="seal-geo-distance"
+                src="EXT:seal/Resources/Public/JavaScript/GeoDistanceCondition.js" />

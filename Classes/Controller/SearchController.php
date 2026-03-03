@@ -26,11 +26,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class SearchController extends AbstractSealController
 {
     public function __construct(
+        private readonly TagConfigurationParser $tagConfigurationParser,
+        private readonly RadiusConfigurationParser $radiusConfigurationParser,
         private readonly Seal                  $seal,
         protected ConfigurationLoader $configurationLoader,
         protected Filter              $filter,
-        private readonly TagConfigurationParser $tagConfigurationParser,
-        private readonly RadiusConfigurationParser $radiusConfigurationParser,
     ) {}
 
     public function searchAction(): ResponseInterface
@@ -84,41 +84,11 @@ class SearchController extends AbstractSealController
         $parsedBody = $this->request->getParsedBody();
         $requestData = is_array($parsedBody) ? ($parsedBody['tx_seal_search'] ?? []) : [];
 
-        foreach ($filterRows as &$filterRow) {
-            if ($filterRow['type'] !== 'tagCondition') {
-                continue;
-            }
-            $configuredTags = $this->tagConfigurationParser->parse((string) ($filterRow['tags'] ?? ''));
-            $selectedValues = (array) ($requestData['field_' . $filterRow['uid']] ?? []);
-
-            $filterRow['parsedTags'] = array_map(
-                static fn(array $tag): array => [
-                    'value' => $tag['value'],
-                    'label' => $tag['label'],
-                    'count' => $tagFacetCounts[$tag['value']] ?? 0,
-                    'selected' => in_array($tag['value'], $selectedValues, true),
-                ],
-                $configuredTags,
-            );
-        }
-        unset($filterRow);
-
-        foreach ($filterRows as &$filterRow) {
-            if ($filterRow['type'] !== 'geoDistanceCondition') {
-                continue;
-            }
-            $configuredRadii = $this->radiusConfigurationParser->parse(
-                (string) ($filterRow['radius_steps'] ?? '')
-            );
-            $filterRow['parsedRadii'] = $configuredRadii;
-        }
-        unset($filterRow);
-
         $paginator = new SearchResultArrayPaginator($result, $currentPage, $config->itemsPerPage);
 
         $this->view->assignMultiple(
             [
-                'filters' => $filterRows,
+                'filters' => $this->addCaclulatedValuesForFilterRows($filterRows),
                 'tagFacets' => $tagFacets,
                 'pagination' => $this->getPagination(SimplePagination::class, 6, $paginator),
                 'paginator' => $paginator,
