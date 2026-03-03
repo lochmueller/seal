@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2013-09-19T09:11:39Z"
+          product-name="seal">
+        <header/>
+        <body>
+            <trans-unit id="seal">
+                <source>SEAL (Search Engine Abstraction Layer)</source>
+                <target>SEAL (Search Engine Abstraction Layer)</target>
+            </trans-unit>
+            <trans-unit id="site.sealAutocompleteMinCharacters">
+                <source>Autocomplete min chars</source>
+                <target>Autovervollständigung Mindestzeichen</target>
+            </trans-unit>
+            <trans-unit id="site.sealAutocompleteMinCharacters.description">
+                <source>Minimum chars for the auto complete endpoint of this site. Default value is 3.</source>
+                <target>Mindestanzahl an Zeichen für den Autovervollständigungs-Endpunkt dieser Seite. Standardwert ist 3.</target>
+            </trans-unit>
+            <trans-unit id="site.sealItemsPerPage">
+                <source>Items per page</source>
+                <target>Einträge pro Seite</target>
+            </trans-unit>
+            <trans-unit id="site.sealItemsPerPage.description">
+                <source>The amount of items per page in the result list. Default value is 10.</source>
+                <target>Anzahl der Einträge pro Seite in der Ergebnisliste. Standardwert ist 10.</target>
+            </trans-unit>
+            <trans-unit id="site.sealSearchDsn">
+                <source>Search Adapter DSN</source>
+                <target>Suchadapter-DSN</target>
+            </trans-unit>
+            <trans-unit id="site.sealSearchDsn.description">
+                <source>Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN.</source>
+                <target>Konfigurieren Sie den Suchadapter über DSN. Beispiele sind "typo3://" oder "loupe://var/indices/". Bitte prüfen Sie die AdapterFactory der verschiedenen Adapter-Pakete. Wenn ein Adapter-Paket über Composer installiert ist, können Sie den Adapter über DSN erstellen.</target>
+            </trans-unit>
+            <trans-unit id="plugin.label">
+                <source>SEAL Search</source>
+                <target>SEAL Suche</target>
+            </trans-unit>
+            <trans-unit id="plugin.description">
+                <source>SEAL Search plugin with advanced index and filter features.</source>
+                <target>SEAL Such-Plugin mit erweiterten Index- und Filterfunktionen.</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_configuration">
+                <source>Configuration</source>
+                <target>Konfiguration</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_configuration.title">
+                <source>Title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter">
+                <source>Filter</source>
+                <target>Filter</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.title">
+                <source>Title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type">
+                <source>Type</source>
+                <target>Typ</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.tags">
+                <source>Tags</source>
+                <target>Schlagwörter</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.tags.description">
+                <source>Configure tags as key=value pairs, one per line. Example: page=Pages</source>
+                <target>Schlagwörter als Schlüssel=Wert-Paare konfigurieren, eines pro Zeile. Beispiel: page=Seiten</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.radius_steps">
+                <source>Radius steps</source>
+                <target>Radius-Stufen</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.radius_steps.description">
+                <source>One entry per line in format: value=Label (e.g. 10=10 km)</source>
+                <target>Ein Eintrag pro Zeile im Format: Wert=Bezeichnung (z.B. 10=10 km)</target>
+            </trans-unit>
+            <trans-unit id="results">
+                <source>%s results</source>
+                <target>%s Ergebnisse</target>
+            </trans-unit>
+            <trans-unit id="results.no">
+                <source>No results with your current search.</source>
+                <target>Keine Ergebnisse für Ihre aktuelle Suche.</target>
+            </trans-unit>
+            <trans-unit id="distance">
+                <source>Distance</source>
+                <target>Entfernung</target>
+            </trans-unit>
+            <trans-unit id="geo.locate">
+                <source>Locate me</source>
+                <target>Mich lokalisieren</target>
+            </trans-unit>
+            <trans-unit id="geo.status.located">
+                <source>Location determined</source>
+                <target>Standort ermittelt</target>
+            </trans-unit>
+            <trans-unit id="geo.status.denied">
+                <source>Location access denied</source>
+                <target>Standortzugriff verweigert</target>
+            </trans-unit>
+            <trans-unit id="geo.status.unavailable">
+                <source>Geolocation not available</source>
+                <target>Geolokalisierung nicht verfügbar</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type.searchCondition">
+                <source>Search Condition (Search word) - allowed once in filter configuration</source>
+                <target>Suchbedingung (Suchwort) - einmalig in der Filterkonfiguration erlaubt</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type.tagCondition">
+                <source>Tag condition</source>
+                <target>Schlagwort-Bedingung</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_filter.type.geoDistanceCondition">
+                <source>GEO distance condition - allowed once in filter configuration</source>
+                <target>GEO-Entfernungsbedingung - einmalig in der Filterkonfiguration erlaubt</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default">
+                <source>Index Default</source>
+                <target>Index Standard</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.site">
+                <source>Site</source>
+                <target>Seite</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.id">
+                <source>ID</source>
+                <target>ID</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.language">
+                <source>Language</source>
+                <target>Sprache</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.title">
+                <source>Title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.extension">
+                <source>Extension</source>
+                <target>Erweiterung</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.size">
+                <source>Size</source>
+                <target>Größe</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.meta">
+                <source>Meta</source>
+                <target>Meta</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.content">
+                <source>Content</source>
+                <target>Inhalt</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.file">
+                <source>File</source>
+                <target>Datei</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_stat.site">
+                <source>Site</source>
+                <target>Seite</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_stat.language">
+                <source>Language</source>
+                <target>Sprache</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_stat.search_term">
+                <source>Search term</source>
+                <target>Suchbegriff</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.tags">
+                <source>Tags</source>
+                <target>Schlagwörter</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.preview">
+                <source>Preview</source>
+                <target>Vorschau</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.uri">
+                <source>URI</source>
+                <target>URI</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default.index_date">
+                <source>Index date</source>
+                <target>Indexierungsdatum</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default_tag">
+                <source>Index Tag</source>
+                <target>Index-Schlagwort</target>
+            </trans-unit>
+            <trans-unit id="tx_seal_domain_model_index_default_tag.title">
+                <source>Title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="search.submit">
+                <source>Search</source>
+                <target>Suchen</target>
+            </trans-unit>
+            <trans-unit id="search.page.navigation">
+                <source>Search page navigation</source>
+                <target>Suchseiten-Navigation</target>
+            </trans-unit>
+            <trans-unit id="searchword">
+                <source>Searchword</source>
+                <target>Suchwort</target>
+            </trans-unit>
+            <trans-unit id="searchword.help">
+                <source>Searchword for the fulltext search.</source>
+                <target>Suchwort für die Volltextsuche.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

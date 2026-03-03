@@ -1,35 +1,35 @@
 <div class="mb-3 seal-geo-distance">
-    <fieldset>
-        <legend class="form-label">{filter.title}</legend>
+    <label class="form-label">{filter.title}</label>
 
-        <f:form.hidden id="seal_search_{filter.uid}_lat"
-                       name="geo_position_lat" value="" />
-        <f:form.hidden id="seal_search_{filter.uid}_lng"
-                       name="geo_position_lng" value="" />
+    <f:form.hidden id="seal_search_{filter.uid}_lat"
+                   name="geo_position_lat"
+                   value="" />
+    <f:form.hidden id="seal_search_{filter.uid}_lng"
+                   name="geo_position_lng"
+                   value="" />
 
-        <div class="mb-2">
-            <label for="seal_search_{filter.uid}_radius" class="form-label">
-                <f:translate key="distance"/>
-            </label>
-            <f:form.select id="seal_search_{filter.uid}_radius"
-                           name="geo_position_radius"
-                           class="form-control"
-                           options="{filter.parsedRadii}"
-                           optionValueField="value"
-                           optionLabelField="label" />
-        </div>
+    <div class="mb-2">
+        <label for="seal_search_{filter.uid}_radius" class="form-label">
+            <f:translate key="distance"/>
+        </label>
+        <f:form.select id="seal_search_{filter.uid}_radius"
+                       name="geo_position_radius"
+                       class="form-control"
+                       options="{filter.parsedRadii}"
+                       optionValueField="value"
+                       optionLabelField="label" />
+    </div>
 
-        <button type="button"
-                class="btn btn-secondary seal-geo-locate-btn"
-                data-lat-field="seal_search_{filter.uid}_lat"
-                data-lng-field="seal_search_{filter.uid}_lng">
-            <f:translate key="geo.locate"/>
-        </button>
-        <span class="seal-geo-status" style="display:none;"
-              data-msg-unavailable="{f:translate(key: 'geo.status.unavailable')}"
-              data-msg-located="{f:translate(key: 'geo.status.located')}"
-              data-msg-denied="{f:translate(key: 'geo.status.denied')}"></span>
-    </fieldset>
+    <button type="button"
+            class="btn btn-secondary seal-geo-locate-btn"
+            data-lat-field="seal_search_{filter.uid}_lat"
+            data-lng-field="seal_search_{filter.uid}_lng">
+        <f:translate key="geo.locate"/>
+    </button>
+    <span class="seal-geo-status" style="display:none;"
+          data-msg-unavailable="{f:translate(key: 'geo.status.unavailable')}"
+          data-msg-located="{f:translate(key: 'geo.status.located')}"
+          data-msg-denied="{f:translate(key: 'geo.status.denied')}"></span>
 </div>
 
 <f:asset.script identifier="seal-geo-distance"
