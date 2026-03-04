@@ -20,9 +20,11 @@ use Lochmueller\Seal\Controller\SearchController;
 use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
+use Lochmueller\Seal\Repository\StatRepository;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
+use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -163,11 +165,66 @@ class SearchControllerTest extends AbstractTest
     }
 
     /**
+     * Test: logSearchQuery() wird mit korrektem Suchbegriff, Site und Sprache aufgerufen
+     */
+    public function testSearchActionCallsLogSearchQueryWithCorrectParameters(): void
+    {
+        $filterRows = [
+            ['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1],
+        ];
+
+        $statRepository = $this->createMock(StatRepository::class);
+        $statRepository->expects(self::once())
+            ->method('logSearchQuery')
+            ->with('TYPO3 search', 'main', 0);
+
+        $subject = $this->buildController(
+            $filterRows,
+            [],
+            ['tx_seal_search' => ['search' => 'TYPO3 search']],
+            $statRepository,
+        );
+        $subject->searchAction();
+    }
+
+    /**
+     * Test: Datenbankfehler in logSearchQuery() unterbricht die Suchverarbeitung nicht
+     */
+    public function testSearchActionContinuesWhenLogSearchQueryThrowsException(): void
+    {
+        $filterRows = [
+            ['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1],
+        ];
+
+        $statRepository = $this->createMock(StatRepository::class);
+        $statRepository->expects(self::once())
+            ->method('logSearchQuery')
+            ->willThrowException(new \RuntimeException('Database connection lost'));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('error')
+            ->with('Database connection lost', self::arrayHasKey('exception'));
+
+        $subject = $this->buildController(
+            $filterRows,
+            [],
+            ['tx_seal_search' => ['search' => 'test query']],
+            $statRepository,
+        );
+        $subject->setLogger($logger);
+
+        $response = $subject->searchAction();
+
+        self::assertInstanceOf(ResponseInterface::class, $response);
+    }
+
+    /**
      * @param array<int, array<string, mixed>> $filterRows
      * @param array<string, mixed> $facetData
      * @param array<string, mixed>|null $parsedBody
      */
-    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null): SearchController
+    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null, ?StatRepository $statRepository = null): SearchController
     {
         $this->capturedSearch = null;
         $this->capturedViewVariables = [];
@@ -215,11 +272,14 @@ class SearchControllerTest extends AbstractTest
         $filter = $this->createStub(Filter::class);
         $filter->method('addFilterConfiguration')->willReturnArgument(0);
 
+        // Mock StatRepository (use provided or create no-op stub)
+        $statRepository ??= $this->createStub(StatRepository::class);
+
         // Create controller with a partial mock to override getFilterRowsByContentElementUid
         $tagConfigurationParser = new TagConfigurationParser();
         $radiusConfigurationParser = new RadiusConfigurationParser();
         $subject = $this->getMockBuilder(SearchController::class)
-            ->setConstructorArgs([$tagConfigurationParser, $radiusConfigurationParser, $seal, $configLoader, $filter])
+            ->setConstructorArgs([$tagConfigurationParser, $radiusConfigurationParser, $seal, $configLoader, $filter, $statRepository])
             ->onlyMethods(['getFilterRowsByContentElementUid', 'getCurrentContentElementRow'])
             ->getMock();
 

@@ -12,9 +12,12 @@ use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
+use Lochmueller\Seal\Repository\StatRepository;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Pagination\PaginationInterface;
 use TYPO3\CMS\Core\Pagination\PaginatorInterface;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
@@ -23,14 +26,17 @@ use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class SearchController extends AbstractSealController
+class SearchController extends AbstractSealController implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     public function __construct(
         TagConfigurationParser $tagConfigurationParser,
         RadiusConfigurationParser $radiusConfigurationParser,
-        private readonly Seal                  $seal,
+        private readonly Seal $seal,
         protected ConfigurationLoader $configurationLoader,
-        protected Filter              $filter,
+        protected Filter $filter,
+        private readonly StatRepository $statRepository,
     ) {
         parent::__construct($tagConfigurationParser, $radiusConfigurationParser);
     }
@@ -79,11 +85,19 @@ class SearchController extends AbstractSealController
             ->highlight(['title'])
             ->getResult();
 
+        $parsedBody = $this->request->getParsedBody();
+        $searchTerm = is_array($parsedBody) ? (string) ($parsedBody['tx_seal_search']['search'] ?? '') : '';
+
+        try {
+            $this->statRepository->logSearchQuery($searchTerm, $site->getIdentifier(), $language->getLanguageId());
+        } catch (\Exception $exception) {
+            $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
+        }
+
         $facets = $result->facets();
         $tagFacets = $facets['tags'] ?? [];
         $tagFacetCounts = $tagFacets['count'] ?? [];
 
-        $parsedBody = $this->request->getParsedBody();
         $requestData = is_array($parsedBody) ? ($parsedBody['tx_seal_search'] ?? []) : [];
 
         $paginator = new SearchResultArrayPaginator($result, $currentPage, $config->itemsPerPage);

@@ -44,7 +44,8 @@
     "cmsig/seal-algolia-adapter": "An adapter to support algolia in cmsig/seal search abstraction.",
     "cmsig/seal-solr-adapter": "An adapter to support apache solr in cmsig/seal search abstraction.",
     "cmsig/seal-read-write-adapter": "An adapter to support to split read and write operations for the cmsig/seal package.",
-    "cmsig/seal-multi-adapter": "An adapter to support to write into multiple other adapters cmsig/seal package."
+    "cmsig/seal-multi-adapter": "An adapter to support to write into multiple other adapters cmsig/seal package.",
+    "typo3/cms-dashboard": "Enables SEAL dashboard widgets for search statistics and index monitoring"
   },
   "extra": {
     "typo3/cms": {
