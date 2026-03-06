@@ -6,6 +6,7 @@ namespace Lochmueller\Seal\Tests\Unit;
 
 use Lochmueller\Seal\DsnParser;
 use Lochmueller\Seal\Dto\DsnDto;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class DsnParserTest extends AbstractTest
 {
@@ -14,7 +15,9 @@ class DsnParserTest extends AbstractTest
     protected function setUp(): void
     {
         parent::setUp();
-        $this->subject = new DsnParser();
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
+        $eventDispatcher->method('dispatch')->willReturnArgument(0);
+        $this->subject = new DsnParser($eventDispatcher);
     }
 
     public function testParseSimpleDsn(): void

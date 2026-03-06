@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace Lochmueller\Seal;
 
 use Lochmueller\Seal\Dto\DsnDto;
+use Lochmueller\Seal\Event\AfterDsnParsedEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class DsnParser
 {
+    public function __construct(
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {}
+
     public function parse(string $dsn): DsnDto
     {
         $parts = parse_url($dsn);
@@ -27,7 +33,7 @@ class DsnParser
         /** @var array<string, array<mixed>|string> $parsedQuery */
         $parsedQuery = $query;
 
-        return new DsnDto(
+        $dsnDto = new DsnDto(
             scheme: $parts['scheme'],
             user: $parts['user'] ?? null,
             pass: $parts['pass'] ?? null,
@@ -36,5 +42,10 @@ class DsnParser
             path: isset($parts['path']) ? ltrim($parts['path'], '/') : null,
             query: $parsedQuery,
         );
+
+        $event = new AfterDsnParsedEvent($dsnDto, $dsn);
+        $this->eventDispatcher->dispatch($event);
+
+        return $event->dsnDto;
     }
 }
