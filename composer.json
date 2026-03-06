@@ -1,8 +1,8 @@
 {
   "name": "lochmueller/seal",
-  "type": "typo3-cms-extension",
   "description": "SEAL Search - Flexible integration of the Search Engine Abstraction Layer project",
   "license": "GPL-2.0-or-later",
+  "type": "typo3-cms-extension",
   "keywords": [
     "typo3",
     "cmsig",
@@ -11,6 +11,32 @@
     "search-client",
     "search"
   ],
+  "require": {
+    "php": "^8.3",
+    "cmsig/seal": "^0.12",
+    "lochmueller/index": "^2.0",
+    "typo3/cms-core": "^13.4 || ^14.0",
+    "typo3/cms-extbase": "^13.4 || ^14.0"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.84",
+    "phpstan/phpstan": "^2.1",
+    "typo3/testing-framework": "^8.0 || ^9.3"
+  },
+  "suggest": {
+    "cmsig/seal-algolia-adapter": "An adapter to support algolia in cmsig/seal search abstraction.",
+    "cmsig/seal-elasticsearch-adapter": "An adapter to support elasticsearch in cmsig/seal search abstraction.",
+    "cmsig/seal-loupe-adapter": "An adapter to support loupe in cmsig/seal search abstraction.",
+    "cmsig/seal-meilisearch-adapter": "An adapter to support meilisearch in cmsig/seal search abstraction.",
+    "cmsig/seal-memory-adapter": "An adapter to support to write into memory for cmsig/seal search abstraction.",
+    "cmsig/seal-multi-adapter": "An adapter to support to write into multiple other adapters cmsig/seal package.",
+    "cmsig/seal-opensearch-adapter": "An adapter to support opensearch in cmsig/seal search abstraction.",
+    "cmsig/seal-read-write-adapter": "An adapter to support to split read and write operations for the cmsig/seal package.",
+    "cmsig/seal-redisearch-adapter": "An adapter to support RediSearch in cmsig/seal search abstraction.",
+    "cmsig/seal-solr-adapter": "An adapter to support apache solr in cmsig/seal search abstraction.",
+    "cmsig/seal-typesense-adapter": "An adapter to support typesense in cmsig/seal search abstraction.",
+    "typo3/cms-dashboard": "Enables SEAL dashboard widgets for search statistics and index monitoring"
+  },
   "autoload": {
     "psr-4": {
       "Lochmueller\\Seal\\": "Classes/"
@@ -21,60 +47,34 @@
       "Lochmueller\\Seal\\Tests\\": "Tests/"
     }
   },
-  "require": {
-    "php": "^8.3",
-    "typo3/cms-core": "^13.4||^14.0",
-    "typo3/cms-extbase": "^13.4||^14.0",
-    "cmsig/seal": "^0.12",
-    "lochmueller/index": "^2.0"
-  },
-  "require-dev": {
-    "typo3/testing-framework": "^8.0||^9.3",
-    "friendsofphp/php-cs-fixer": "^3.84",
-    "phpstan/phpstan": "^2.1"
-  },
-  "suggest": {
-    "cmsig/seal-memory-adapter": "An adapter to support to write into memory for cmsig/seal search abstraction.",
-    "cmsig/seal-loupe-adapter": "An adapter to support loupe in cmsig/seal search abstraction.",
-    "cmsig/seal-redisearch-adapter": "An adapter to support RediSearch in cmsig/seal search abstraction.",
-    "cmsig/seal-meilisearch-adapter": "An adapter to support meilisearch in cmsig/seal search abstraction.",
-    "cmsig/seal-elasticsearch-adapter": "An adapter to support elasticsearch in cmsig/seal search abstraction.",
-    "cmsig/seal-typesense-adapter": "An adapter to support typesense in cmsig/seal search abstraction.",
-    "cmsig/seal-opensearch-adapter": "An adapter to support opensearch in cmsig/seal search abstraction.",
-    "cmsig/seal-algolia-adapter": "An adapter to support algolia in cmsig/seal search abstraction.",
-    "cmsig/seal-solr-adapter": "An adapter to support apache solr in cmsig/seal search abstraction.",
-    "cmsig/seal-read-write-adapter": "An adapter to support to split read and write operations for the cmsig/seal package.",
-    "cmsig/seal-multi-adapter": "An adapter to support to write into multiple other adapters cmsig/seal package.",
-    "typo3/cms-dashboard": "Enables SEAL dashboard widgets for search statistics and index monitoring"
+  "config": {
+    "allow-plugins": {
+      "typo3/class-alias-loader": true,
+      "typo3/cms-composer-installers": true
+    },
+    "bin-dir": ".Build/bin",
+    "vendor-dir": ".Build/vendor"
   },
   "extra": {
     "typo3/cms": {
-      "extension-key": "seal",
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "extension-key": "seal",
       "web-dir": ".Build/Web"
     }
   },
-  "config": {
-    "vendor-dir": ".Build/vendor",
-    "bin-dir": ".Build/bin",
-    "allow-plugins": {
-      "typo3/cms-composer-installers": true,
-      "typo3/class-alias-loader": true
-    }
-  },
   "scripts": {
-    "code-fix": [
-      "@php-cs-fixer"
-    ],
     "code-check": [
       "@phpstan"
+    ],
+    "code-fix": [
+      "@php-cs-fixer"
     ],
     "code-test": [
       "@phpunit"
     ],
-    "phpunit": "phpunit -c Tests/UnitTests.xml",
     "code-test-coverage": "XDEBUG_MODE=coverage phpunit -c Tests/UnitTests.xml --coverage-html .Build/coverage/",
+    "php-cs-fixer": "php-cs-fixer fix --allow-unsupported-php-version yes",
     "phpstan": "phpstan analyse Classes --memory-limit 1G --level 8",
-    "php-cs-fixer": "php-cs-fixer fix --allow-unsupported-php-version yes"
+    "phpunit": "phpunit -c Tests/UnitTests.xml"
   }
 }
