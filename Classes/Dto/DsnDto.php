@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Dto;
 
-class DsnDto
+readonly class DsnDto
 {
     /**
      * @param array<string, array<mixed>|string> $query

@@ -12,6 +12,7 @@ use CmsIg\Seal\Search\Facet\MinMaxFacet;
 use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
 use CmsIg\Seal\Search\Condition;
+use TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 
 class Typo3Searcher implements SearcherInterface
@@ -100,7 +101,7 @@ class Typo3Searcher implements SearcherInterface
      * Based on the Loupe integration.
      *
      * @param array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|Condition\GeoDistanceCondition|object> $conditions
-     * @return array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression>
+     * @return array<int, string|CompositeExpression>
      */
     private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder): array
     {
@@ -123,7 +124,7 @@ class Typo3Searcher implements SearcherInterface
                 $filter instanceof Condition\NotInCondition => $filters[] = $expressionBuilder->notIn($tableAlias . $filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\AndCondition => $filters[] = $expressionBuilder->and(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
                 $filter instanceof Condition\OrCondition => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
-                $filter instanceof Condition\GeoDistanceCondition => $filters[] = $this->buildGeoDistanceExpression($filter, 'idx'),
+                $filter instanceof Condition\GeoDistanceCondition => $filters[] = $this->buildGeoDistanceExpression($filter, $expressionBuilder, 'idx'),
                 default => throw new \LogicException('Unsupported filter condition type: ' . $filter::class),
             };
         }
@@ -143,7 +144,7 @@ class Typo3Searcher implements SearcherInterface
      * between the search point and stored coordinates, returning only
      * documents within the specified radius.
      */
-    private function buildGeoDistanceExpression(Condition\GeoDistanceCondition $condition, string $tableAlias = ''): string
+    private function buildGeoDistanceExpression(Condition\GeoDistanceCondition $condition, ExpressionBuilder $expressionBuilder, string $tableAlias = ''): CompositeExpression
     {
         $prefix = $tableAlias !== '' ? $tableAlias . '.' : '';
         $latField = $prefix . $condition->field . '_latitude';
@@ -152,7 +153,7 @@ class Typo3Searcher implements SearcherInterface
         $lng = (float) $condition->longitude;
         $distance = (float) $condition->distance;
 
-        return \sprintf(
+        return $expressionBuilder->and(\sprintf(
             '6371000 * ACOS('
             . 'COS(RADIANS(%F)) * COS(RADIANS(%s))'
             . ' * COS(RADIANS(%s) - RADIANS(%F))'
@@ -165,7 +166,7 @@ class Typo3Searcher implements SearcherInterface
             $lat,
             $latField,
             $distance,
-        );
+        ));
     }
 
     private function escapeFilterValue(mixed $value): string
@@ -178,7 +179,7 @@ class Typo3Searcher implements SearcherInterface
     }
     /**
      * @param array<int, CountFacet|MinMaxFacet> $facets
-     * @param array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression> $filters
+     * @param array<int, string|CompositeExpression> $filters
      * @return array<string, array<string, mixed>>
      */
     private function formatFacets(array $facets, string $tableName, array $filters): array
@@ -195,7 +196,7 @@ class Typo3Searcher implements SearcherInterface
     }
 
     /**
-     * @param array<int, string|\TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression> $filters
+     * @param array<int, string|CompositeExpression> $filters
      * @return array<string, int>
      */
     private function computeCountFacet(string $field, string $tableName, array $filters): array

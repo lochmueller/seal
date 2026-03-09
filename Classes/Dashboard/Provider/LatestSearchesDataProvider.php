@@ -14,7 +14,7 @@ class LatestSearchesDataProvider implements ListDataProviderInterface
     ) {}
 
     /**
-     * @return array<int, array{string, string, string, string}>
+     * @return array<int, string>
      */
     public function getItems(): array
     {

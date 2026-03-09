@@ -61,7 +61,7 @@ class AutocompleteHandler implements RequestHandlerInterface
     /**
      * @return array<int, string>
      */
-    public function findSuggestions(string $searchWord, string $content): array
+    private function findSuggestions(string $searchWord, string $content): array
     {
         $suggestions = [];
 
