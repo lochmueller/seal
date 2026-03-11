@@ -1,2 +1,9 @@
-/.gitignore export-ignore
+/.Build/ export-ignore
+/.gitattributes export-ignore
 /.github export-ignore
+/.gitignore export-ignore
+/composer.lock export-ignore
+/AGENTS.md export-ignore
+/.github/ export-ignore
+/.php-cs-fixer.dist.php export-ignore
+/Tests/ export-ignore
