@@ -5,7 +5,7 @@
         <h1>
             <f:translate key="results" arguments="{0: paginator.totalAmountOfItems}"/>
         </h1>
-        <f:render partial="Result/List" arguments="{items: paginator.paginatedItems}"/>
+        <f:render partial="Result/List" arguments="{paginator: paginator, pagination: pagination}"/>
         <!-- @TODO PAGINATION for active search -->
         <f:render partial="Result/Pagination" arguments="{_all}"/>
     </f:then>
