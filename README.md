@@ -11,7 +11,7 @@ SEAL Search - Flexible integration of the Search Engine Abstraction Layer ([SEAL
 ## Installation
 
 1. Install and configure the [EXT:index](https://github.com/lochmueller/index) extension
-2. Run `composer require lochmueller/seal`
+2. Run `composer require lochmueller/seal` (note: This extension only works in composer mode)
 3. *Optional: Install the right adapter if you want to use a specific engine (see below)*
 4. Load the SiteSet `lochmueller/seal` in your site configuration
 5. Configure the search adapter via site configuration (DSN)
@@ -21,11 +21,11 @@ SEAL Search - Flexible integration of the Search Engine Abstraction Layer ([SEAL
 
 The extension is configured via the TYPO3 site configuration. The following options are available:
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `sealSearchDsn` | `typo3://` | DSN for the search adapter |
-| `sealAutocompleteMinCharacters` | `3` | Minimum characters for autocomplete |
-| `sealItemsPerPage` | `10` | Items per page in search results |
+| Option                          | Default    | Description                         |
+|---------------------------------|------------|-------------------------------------|
+| `sealSearchDsn`                 | `typo3://` | DSN for the search adapter          |
+| `sealAutocompleteMinCharacters` | `3`        | Minimum characters for autocomplete |
+| `sealItemsPerPage`              | `10`       | Items per page in search results    |
 
 ### DSN Examples
 
@@ -45,19 +45,19 @@ redisearch://127.0.0.1:6379        # RediSearch
 
 Install the adapter you need via composer:
 
-| Adapter | Package |
-|---------|---------|
-| Memory (Testing) | `composer require cmsig/seal-memory-adapter` |
-| Loupe | `composer require cmsig/seal-loupe-adapter` |
-| Meilisearch | `composer require cmsig/seal-meilisearch-adapter` |
-| Elasticsearch | `composer require cmsig/seal-elasticsearch-adapter` |
-| Typesense | `composer require cmsig/seal-typesense-adapter` |
-| Algolia | `composer require cmsig/seal-algolia-adapter` |
-| Apache Solr | `composer require cmsig/seal-solr-adapter` |
-| OpenSearch | `composer require cmsig/seal-opensearch-adapter` |
-| RediSearch | `composer require cmsig/seal-redisearch-adapter` |
-| Read/Write Split | `composer require cmsig/seal-read-write-adapter` |
-| Multi Adapter | `composer require cmsig/seal-multi-adapter` |
+| Adapter          | Package                                                   |
+|------------------|-----------------------------------------------------------|
+| Memory (Testing) | `composer require cmsig/seal-memory-adapter`              |
+| Loupe            | `composer require cmsig/seal-loupe-adapter` (Recommended) |
+| Meilisearch      | `composer require cmsig/seal-meilisearch-adapter`         |
+| Elasticsearch    | `composer require cmsig/seal-elasticsearch-adapter`       |
+| Typesense        | `composer require cmsig/seal-typesense-adapter`           |
+| Algolia          | `composer require cmsig/seal-algolia-adapter`             |
+| Apache Solr      | `composer require cmsig/seal-solr-adapter`                |
+| OpenSearch       | `composer require cmsig/seal-opensearch-adapter`          |
+| RediSearch       | `composer require cmsig/seal-redisearch-adapter`          |
+| Read/Write Split | `composer require cmsig/seal-read-write-adapter`          |
+| Multi Adapter    | `composer require cmsig/seal-multi-adapter`               |
 
 ## CLI Commands
 
@@ -68,20 +68,20 @@ vendor/bin/typo3 seal:schema
 
 ## Extension Structure
 
-| Directory | Description |
-|-----------|-------------|
-| `Adapter/` | The SEAL TYPO3 Adapter for local database |
-| `Command/` | CLI tools for schema management |
-| `Controller/` | Frontend plugins |
-| `Engine/` | Factory for engine creation |
-| `Event/` | PSR-14 events of EXT:seal |
+| Directory        | Description                                 |
+|------------------|---------------------------------------------|
+| `Adapter/`       | The SEAL TYPO3 Adapter for local database   |
+| `Command/`       | CLI tools for schema management             |
+| `Controller/`    | Frontend plugins                            |
+| `Engine/`        | Factory for engine creation                 |
+| `Event/`         | PSR-14 events of EXT:seal                   |
 | `EventListener/` | Event listeners and connection to EXT:index |
-| `Exception/` | Custom exceptions |
-| `Filter/` | Search filter implementations |
-| `Handler/` | Request handlers (e.g., autocomplete) |
-| `Middleware/` | PSR-15 middleware stack |
-| `Pagination/` | Fluid pagination based on SEAL Generator |
-| `Schema/` | Schema structure management |
+| `Exception/`     | Custom exceptions                           |
+| `Filter/`        | Search filter implementations               |
+| `Handler/`       | Request handlers (e.g., autocomplete)       |
+| `Middleware/`    | PSR-15 middleware stack                     |
+| `Pagination/`    | Fluid pagination based on SEAL Generator    |
+| `Schema/`        | Schema structure management                 |
 
 ## Development
 
