@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Tests\Unit\Dashboard\Provider;
 
-use CmsIg\Seal\EngineInterface;
+use CmsIg\Seal\Adapter\AdapterInterface;
+use CmsIg\Seal\Adapter\SearcherInterface;
+use CmsIg\Seal\Engine;
 use CmsIg\Seal\Schema\Field\IdentifierField;
 use CmsIg\Seal\Schema\Field\TextField;
 use CmsIg\Seal\Schema\Index;
@@ -30,17 +32,22 @@ class IndexDocumentCountDataProviderTest extends AbstractTest
         $siteFinder = $this->createStub(SiteFinder::class);
         $siteFinder->method('getAllSites')->willReturn(['main' => $site]);
 
-        $engine = $this->createStub(EngineInterface::class);
-        $engine->method('countDocuments')->willReturn(150);
-
-        $seal = $this->createStub(Seal::class);
-        $seal->method('buildEngineBySite')->willReturn($engine);
-
         $index = new Index(SchemaBuilder::DEFAULT_INDEX, [
             'id' => new IdentifierField('id'),
             'title' => new TextField('title'),
         ]);
         $schema = new Schema([SchemaBuilder::DEFAULT_INDEX => $index]);
+
+        $searcher = $this->createStub(SearcherInterface::class);
+        $searcher->method('count')->willReturn(150);
+
+        $adapter = $this->createStub(AdapterInterface::class);
+        $adapter->method('getSearcher')->willReturn($searcher);
+
+        $engine = new Engine($adapter, $schema);
+
+        $seal = $this->createStub(Seal::class);
+        $seal->method('buildEngineBySite')->willReturn($engine);
 
         $schemaBuilder = $this->createStub(SchemaBuilder::class);
         $schemaBuilder->method('getSchema')->willReturn($schema);
@@ -49,7 +56,7 @@ class IndexDocumentCountDataProviderTest extends AbstractTest
         $items = $subject->getItems();
 
         self::assertCount(1, $items);
-        self::assertSame('main / ' . SchemaBuilder::DEFAULT_INDEX . ' / 150', $items[0]);
+        self::assertSame('main / ' . SchemaBuilder::DEFAULT_INDEX . ' / 150 / ' . $adapter::class, $items[0]);
     }
 
     public function testGetItemsReturnsEmptyArrayWhenNoSitesExist(): void
@@ -79,24 +86,29 @@ class IndexDocumentCountDataProviderTest extends AbstractTest
             'working' => $workingSite,
         ]);
 
-        $workingEngine = $this->createStub(EngineInterface::class);
-        $workingEngine->method('countDocuments')->willReturn(50);
+        $index = new Index(SchemaBuilder::DEFAULT_INDEX, [
+            'id' => new IdentifierField('id'),
+            'title' => new TextField('title'),
+        ]);
+        $schema = new Schema([SchemaBuilder::DEFAULT_INDEX => $index]);
+
+        $searcher = $this->createStub(SearcherInterface::class);
+        $searcher->method('count')->willReturn(50);
+
+        $adapter = $this->createStub(AdapterInterface::class);
+        $adapter->method('getSearcher')->willReturn($searcher);
+
+        $workingEngine = new Engine($adapter, $schema);
 
         $seal = $this->createStub(Seal::class);
         $seal->method('buildEngineBySite')->willReturnCallback(
-            static function (Site $site) use ($workingEngine): EngineInterface {
+            static function (Site $site) use ($workingEngine): Engine {
                 if ($site->getIdentifier() === 'broken') {
                     throw new \RuntimeException('Connection failed');
                 }
                 return $workingEngine;
             },
         );
-
-        $index = new Index(SchemaBuilder::DEFAULT_INDEX, [
-            'id' => new IdentifierField('id'),
-            'title' => new TextField('title'),
-        ]);
-        $schema = new Schema([SchemaBuilder::DEFAULT_INDEX => $index]);
 
         $schemaBuilder = $this->createStub(SchemaBuilder::class);
         $schemaBuilder->method('getSchema')->willReturn($schema);
@@ -110,6 +122,6 @@ class IndexDocumentCountDataProviderTest extends AbstractTest
         self::assertSame('broken / Error / Connection failed', $items[0]);
 
         // Second item: successful entry for the working site
-        self::assertSame('working / ' . SchemaBuilder::DEFAULT_INDEX . ' / 50', $items[1]);
+        self::assertSame('working / ' . SchemaBuilder::DEFAULT_INDEX . ' / 50 / ' . $adapter::class, $items[1]);
     }
 }

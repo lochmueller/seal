@@ -6,6 +6,8 @@ namespace Lochmueller\Seal\Controller;
 
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
+use Lochmueller\Seal\Schema\SchemaBuilder;
+use Lochmueller\Seal\Seal;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -16,6 +18,7 @@ abstract class AbstractSealController extends ActionController
     public function __construct(
         private readonly TagConfigurationParser $tagConfigurationParser,
         private readonly RadiusConfigurationParser $radiusConfigurationParser,
+        private readonly Seal $seal,
     ) {}
 
     /**
@@ -86,6 +89,15 @@ abstract class AbstractSealController extends ActionController
         }
         unset($filterRow);
         return $filterRows;
+    }
+
+    protected function getSearchBuilder()
+    {
+
+        /** @var Site $site */
+        $site = $this->request->getAttribute('site');
+        $engine = $this->seal->buildEngineBySite($site);
+        return $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX);
     }
 
 }

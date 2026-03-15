@@ -46,8 +46,8 @@ class TagCondition implements FilterInterface
         $validValues = array_intersect($selectedValues, $allowedValues);
 
         $conditions = [];
-        foreach ($validValues as $value) {
-            $conditions[] = Condition::equal('tags', $value);
+        if (!empty($validValues)) {
+            $conditions[] = Condition::in('tags', $validValues);
         }
 
         return $conditions;

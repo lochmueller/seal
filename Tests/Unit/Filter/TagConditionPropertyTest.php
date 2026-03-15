@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Tests\Unit\Filter;
 
-use CmsIg\Seal\Search\Condition\EqualCondition;
+use CmsIg\Seal\Search\Condition\InCondition;
 use Lochmueller\Seal\Filter\TagCondition;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
@@ -30,9 +30,9 @@ class TagConditionPropertyTest extends AbstractTest
      * Feature: tag-faceting, Property 3: TagCondition erzeugt Bedingungen nur für gültige ausgewählte Tags
      *
      * For any arbitrary set of configured tags and any arbitrary set of selected values
-     * (including invalid values), the TagCondition shall return exactly as many EqualCondition
-     * objects as there are selected values that are also contained in the configured tags.
-     * Each condition shall target the field `tags` with the corresponding value.
+     * (including invalid values), the TagCondition shall return either an empty array (when
+     * no valid values are selected) or a single InCondition containing exactly the valid
+     * selected values. The condition shall target the field `tags`.
      */
     public function testOnlyValidSelectedTagsProduceConditions(): void
     {
@@ -58,37 +58,42 @@ class TagConditionPropertyTest extends AbstractTest
             // Compute expected valid values (intersection of selected and allowed)
             $expectedValidValues = array_values(array_intersect($selectedValues, $allowedValues));
 
-            // Property: number of conditions equals number of valid selected values
-            self::assertCount(
-                count($expectedValidValues),
-                $conditions,
-                'Number of conditions must equal number of valid selected values (iteration ' . $i . ')'
-                . "\nConfigured tags: " . json_encode($allowedValues)
-                . "\nSelected values: " . json_encode($selectedValues)
-                . "\nExpected valid: " . json_encode($expectedValidValues),
-            );
-
-            foreach ($conditions as $index => $condition) {
-                // Property: each condition is an EqualCondition
-                self::assertInstanceOf(
-                    EqualCondition::class,
-                    $condition,
-                    'Condition ' . $index . ' must be an EqualCondition (iteration ' . $i . ')',
+            if ($expectedValidValues === []) {
+                // Property: no valid values means empty conditions
+                self::assertSame(
+                    [],
+                    $conditions,
+                    'When no valid tags are selected, conditions must be empty (iteration ' . $i . ')',
+                );
+            } else {
+                // Property: exactly one InCondition with all valid values
+                self::assertCount(
+                    1,
+                    $conditions,
+                    'Must return exactly one InCondition (iteration ' . $i . ')'
+                    . "\nConfigured tags: " . json_encode($allowedValues)
+                    . "\nSelected values: " . json_encode($selectedValues)
+                    . "\nExpected valid: " . json_encode($expectedValidValues),
                 );
 
-                // Property: each condition targets the field 'tags'
+                self::assertInstanceOf(
+                    InCondition::class,
+                    $conditions[0],
+                    'Condition must be an InCondition (iteration ' . $i . ')',
+                );
+
                 self::assertSame(
                     'tags',
-                    $condition->field,
-                    'Condition ' . $index . ' must target field "tags" (iteration ' . $i . ')',
+                    $conditions[0]->field,
+                    'Condition must target field "tags" (iteration ' . $i . ')',
                 );
 
-                // Property: each condition value is one of the valid values
-                self::assertContains(
-                    $condition->value,
+                // Property: the InCondition values contain exactly the valid selected values
+                self::assertSame(
                     $expectedValidValues,
-                    'Condition ' . $index . ' value must be a valid selected tag (iteration ' . $i . ')'
-                    . "\nCondition value: " . json_encode($condition->value)
+                    array_values($conditions[0]->values),
+                    'InCondition values must match valid selected tags (iteration ' . $i . ')'
+                    . "\nCondition values: " . json_encode($conditions[0]->values)
                     . "\nExpected valid: " . json_encode($expectedValidValues),
                 );
             }

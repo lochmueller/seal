@@ -35,7 +35,23 @@ class Typo3Searcher implements SearcherInterface
 
         /** @var array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|Condition\GeoDistanceCondition> $searchFilters */
         $searchFilters = $search->filters;
+
         $filters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $queryBuilder->expr());
+
+        // Handle In selection for tags via MM table
+        $hasTagSelection = false;
+        $tagSelectionValue = [];
+        foreach ($searchFilters as $searchFilter) {
+            if ($searchFilter instanceof \CmsIg\Seal\Search\Condition\InCondition && $searchFilter->field === 'tags') {
+                $hasTagSelection = true;
+                $tagSelectionValue = $searchFilter->values;
+            }
+        }
+
+        if ($hasTagSelection) {
+            $queryBuilder->leftJoin('idx', $this->adapterHelper->getTableName($search->index) . '_mm_tag', 'idx_mm_tag', 'idx.uid = idx_mm_tag.uid_local');
+            $queryBuilder->leftJoin('idx_mm_tag', $this->adapterHelper->getTableName($search->index) . '_tag', 'idx_tag', 'idx_tag.uid = idx_mm_tag.uid_foreign AND ' . $queryBuilder->expr()->in('idx_tag.title', \array_map(fn($value) => $this->escapeFilterValue($value), $tagSelectionValue)));
+        }
 
         if (!empty($filters)) {
             $queryBuilder->where($queryBuilder->expr()->and(...$filters));
@@ -43,12 +59,17 @@ class Typo3Searcher implements SearcherInterface
 
         $countQueryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
         $countFilters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $countQueryBuilder->expr());
+
+        if ($hasTagSelection) {
+            $countQueryBuilder->leftJoin('idx', $this->adapterHelper->getTableName($search->index) . '_mm_tag', 'idx_mm_tag', 'idx.uid = idx_mm_tag.uid_local');
+            $countQueryBuilder->leftJoin('idx_mm_tag', $this->adapterHelper->getTableName($search->index) . '_tag', 'idx_tag', 'idx_tag.uid = idx_mm_tag.uid_foreign AND ' . $queryBuilder->expr()->in('idx_tag.title', \array_map(fn($value) => $this->escapeFilterValue($value), $tagSelectionValue)));
+        }
+
         if (!empty($countFilters)) {
             $countQueryBuilder->where($countQueryBuilder->expr()->and(...$countFilters));
         }
         $count = (int) $countQueryBuilder->count('*')->executeQuery()->fetchOne();
 
-        $queryBuilder->select('*');
         if (0 !== $search->offset) {
             $queryBuilder->setFirstResult($search->offset);
         }
@@ -108,6 +129,9 @@ class Typo3Searcher implements SearcherInterface
         $tableAlias = 'idx.';
         $filters = [];
         foreach ($conditions as $filter) {
+            if ($filter instanceof Condition\InCondition && $filter->field === 'tags') {
+                continue;
+            }
             match (true) {
                 $filter instanceof Condition\IdentifierCondition => $filters[] = $expressionBuilder->eq($tableAlias . $index->getIdentifierField()->name, $this->escapeFilterValue($filter->identifier)),
                 $filter instanceof Condition\SearchCondition => $filters[] = $expressionBuilder->or(
@@ -177,6 +201,7 @@ class Typo3Searcher implements SearcherInterface
             default => $this->adapterHelper->getConnection()->quote($value),
         };
     }
+
     /**
      * @param array<int, CountFacet|MinMaxFacet> $facets
      * @param array<int, string|CompositeExpression> $filters

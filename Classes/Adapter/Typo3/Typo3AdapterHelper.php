@@ -20,6 +20,7 @@ class Typo3AdapterHelper
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->getTableName($index));
         $queryBuilder->from($this->getTableName($index), 'idx');
+        $queryBuilder->select('idx.*');
         return $queryBuilder;
     }
 

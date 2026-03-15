@@ -13,7 +13,6 @@ use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Repository\StatRepository;
-use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -33,12 +32,12 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
     public function __construct(
         TagConfigurationParser $tagConfigurationParser,
         RadiusConfigurationParser $radiusConfigurationParser,
-        private readonly Seal $seal,
+        Seal $seal,
         protected ConfigurationLoader $configurationLoader,
         protected Filter $filter,
         private readonly StatRepository $statRepository,
     ) {
-        parent::__construct($tagConfigurationParser, $radiusConfigurationParser);
+        parent::__construct($tagConfigurationParser, $radiusConfigurationParser, $seal);
     }
 
     public function searchAction(): ResponseInterface
@@ -54,8 +53,6 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
 
         $config = $this->configurationLoader->loadBySite($site);
 
-        $engine = $this->seal->buildEngineBySite($site);
-
         $filterRows = iterator_to_array($this->getFilterRowsByContentElementUid($this->getCurrentContentElementRow()['uid']));
 
         $filter = [];
@@ -70,7 +67,7 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
         $filter[] = Condition::equal('site', $site->getIdentifier());
         $filter[] = Condition::equal('language', (string) $language->getLanguageId());
 
-        $searchBuilder = $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX);
+        $searchBuilder = $this->getSearchBuilder();
         foreach ($filter as $condition) {
             $searchBuilder->addFilter($condition);
         }
@@ -82,7 +79,6 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
         $result = $searchBuilder
             ->limit($config->itemsPerPage)
             ->offset(($currentPage - 1) * $config->itemsPerPage)
-            ->highlight(['title'])
             ->getResult();
 
         $parsedBody = $this->request->getParsedBody();
@@ -109,6 +105,7 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
                 'pagination' => $this->getPagination(SimplePagination::class, 6, $paginator),
                 'paginator' => $paginator,
                 'currentPageNumber' => $currentPage,
+                'requestData' => $requestData,
             ],
         );
 

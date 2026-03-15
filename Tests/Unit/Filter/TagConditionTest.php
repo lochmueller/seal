@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Tests\Unit\Filter;
 
-use CmsIg\Seal\Search\Condition\EqualCondition;
+use CmsIg\Seal\Search\Condition\InCondition;
 use Lochmueller\Seal\Filter\TagCondition;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
@@ -42,7 +42,7 @@ class TagConditionTest extends AbstractTest
         self::assertSame([], $conditions);
     }
 
-    public function testValidTagsSelectedProduceEqualConditions(): void
+    public function testValidTagsSelectedProduceInCondition(): void
     {
         $filterItem = [
             'uid' => 42,
@@ -52,15 +52,11 @@ class TagConditionTest extends AbstractTest
         $request = $this->createStubServerRequest(42, ['page', 'file']);
         $conditions = $this->subject->getFilterConfiguration($filterItem, $request);
 
-        self::assertCount(2, $conditions);
+        self::assertCount(1, $conditions);
 
-        self::assertInstanceOf(EqualCondition::class, $conditions[0]);
+        self::assertInstanceOf(InCondition::class, $conditions[0]);
         self::assertSame('tags', $conditions[0]->field);
-        self::assertSame('page', $conditions[0]->value);
-
-        self::assertInstanceOf(EqualCondition::class, $conditions[1]);
-        self::assertSame('tags', $conditions[1]->field);
-        self::assertSame('file', $conditions[1]->value);
+        self::assertSame(['page', 'file'], $conditions[0]->values);
     }
 
     public function testInvalidTagsSelectedReturnsEmptyConditions(): void
@@ -86,15 +82,11 @@ class TagConditionTest extends AbstractTest
         $request = $this->createStubServerRequest(55, ['page', 'invalid', 'news', 'unknown']);
         $conditions = $this->subject->getFilterConfiguration($filterItem, $request);
 
-        self::assertCount(2, $conditions);
+        self::assertCount(1, $conditions);
 
-        self::assertInstanceOf(EqualCondition::class, $conditions[0]);
+        self::assertInstanceOf(InCondition::class, $conditions[0]);
         self::assertSame('tags', $conditions[0]->field);
-        self::assertSame('page', $conditions[0]->value);
-
-        self::assertInstanceOf(EqualCondition::class, $conditions[1]);
-        self::assertSame('tags', $conditions[1]->field);
-        self::assertSame('news', $conditions[1]->value);
+        self::assertSame(['page', 'news'], array_values($conditions[0]->values));
     }
 
     public function testEmptyTagConfigurationReturnsEmptyConditions(): void
