@@ -32,6 +32,22 @@
                 <source>Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN.</source>
                 <target>Konfigurieren Sie den Suchadapter über DSN. Beispiele sind "typo3://" oder "loupe://var/indices/". Bitte prüfen Sie die AdapterFactory der verschiedenen Adapter-Pakete. Wenn ein Adapter-Paket über Composer installiert ist, können Sie den Adapter über DSN erstellen.</target>
             </trans-unit>
+            <trans-unit id="site.sealPaginationClass">
+                <source>Pagination class</source>
+                <target>Paginierungs-Klasse</target>
+            </trans-unit>
+            <trans-unit id="site.sealPaginationClass.description">
+                <source>Fully qualified class name of the pagination implementation. Default is TYPO3\CMS\Core\Pagination\SimplePagination.</source>
+                <target>Vollqualifizierter Klassenname der Paginierungs-Implementierung. Standard ist TYPO3\CMS\Core\Pagination\SimplePagination.</target>
+            </trans-unit>
+            <trans-unit id="site.sealPaginationMaximumNumberOfLinks">
+                <source>Pagination maximum number of links</source>
+                <target>Paginierung maximale Anzahl an Links</target>
+            </trans-unit>
+            <trans-unit id="site.sealPaginationMaximumNumberOfLinks.description">
+                <source>Maximum number of page links shown in the pagination. Default value is 6.</source>
+                <target>Maximale Anzahl an Seitenlinks in der Paginierung. Standardwert ist 6.</target>
+            </trans-unit>
             <trans-unit id="plugin.label">
                 <source>SEAL Search</source>
                 <target>SEAL Suche</target>

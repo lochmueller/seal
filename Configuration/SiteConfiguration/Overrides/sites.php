@@ -34,8 +34,28 @@ $GLOBALS['SiteConfiguration']['site']['columns']['sealItemsPerPage'] = [
     ],
 ];
 
+$GLOBALS['SiteConfiguration']['site']['columns']['sealPaginationClass'] = [
+    'label' => $lll . 'site.sealPaginationClass',
+    'description' => $lll . 'site.sealPaginationClass.description',
+    'config' => [
+        'type' => 'input',
+        'eval' => 'trim',
+        'default' => \TYPO3\CMS\Core\Pagination\SimplePagination::class,
+    ],
+];
+
+$GLOBALS['SiteConfiguration']['site']['columns']['sealPaginationMaximumNumberOfLinks'] = [
+    'label' => $lll . 'site.sealPaginationMaximumNumberOfLinks',
+    'description' => $lll . 'site.sealPaginationMaximumNumberOfLinks.description',
+    'config' => [
+        'type' => 'number',
+        'eval' => 'trim',
+        'default' => '6',
+    ],
+];
+
 $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] = str_replace(
     ', languages,',
-    ', languages, --div--;' . $lll . 'seal, sealSearchDsn, sealAutocompleteMinCharacters,sealItemsPerPage,',
+    ', languages, --div--;' . $lll . 'seal, sealSearchDsn, sealAutocompleteMinCharacters,sealItemsPerPage,sealPaginationClass,sealPaginationMaximumNumberOfLinks,',
     $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'],
 );

@@ -102,7 +102,7 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
             [
                 'filters' => $this->addCalculatedValuesForFilterRows($filterRows, $requestData, $tagFacetCounts),
                 'tagFacets' => $tagFacets,
-                'pagination' => $this->getPagination(SimplePagination::class, 6, $paginator),
+                'pagination' => $this->getPagination($config->paginationClass, $config->paginationMaximumNumberOfLinks, $paginator),
                 'paginator' => $paginator,
                 'currentPageNumber' => $currentPage,
                 'requestData' => $requestData,

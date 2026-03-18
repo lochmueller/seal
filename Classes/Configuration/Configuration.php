@@ -10,6 +10,8 @@ class Configuration
         public readonly string $searchDsn,
         public readonly int $autocompleteMinCharacters,
         public readonly int $itemsPerPage,
+        public readonly string $paginationClass,
+        public readonly int $paginationMaximumNumberOfLinks,
     ) {}
 
     /**
@@ -21,6 +23,8 @@ class Configuration
             searchDsn: (string) ($configuration['sealSearchDsn'] ?? 'typo3://'),
             autocompleteMinCharacters: (int) ($configuration['sealAutocompleteMinCharacters'] ?? 3),
             itemsPerPage: (int) ($configuration['sealItemsPerPage'] ?? 10),
+            paginationClass: (string) ($configuration['sealPaginationClass'] ?? \TYPO3\CMS\Core\Pagination\SimplePagination::class),
+            paginationMaximumNumberOfLinks: (int) ($configuration['sealPaginationMaximumNumberOfLinks'] ?? 6),
         );
     }
 

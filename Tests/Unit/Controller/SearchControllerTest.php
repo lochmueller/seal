@@ -30,6 +30,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\View\ViewInterface;
@@ -264,7 +265,7 @@ class SearchControllerTest extends AbstractTest
         $seal->method('buildEngineBySite')->willReturn($engine);
 
         // Mock ConfigurationLoader
-        $config = new Configuration('typo3://', 3, 10);
+        $config = new Configuration('typo3://', 3, 10, SimplePagination::class, 6);
         $configLoader = $this->createStub(ConfigurationLoader::class);
         $configLoader->method('loadBySite')->willReturn($config);
 

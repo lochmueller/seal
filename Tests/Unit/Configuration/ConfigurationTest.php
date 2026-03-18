@@ -6,6 +6,7 @@ namespace Lochmueller\Seal\Tests\Unit\Configuration;
 
 use Lochmueller\Seal\Configuration\Configuration;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
+use TYPO3\CMS\Core\Pagination\SimplePagination;
 
 class ConfigurationTest extends AbstractTest
 {
@@ -15,11 +16,15 @@ class ConfigurationTest extends AbstractTest
             searchDsn: 'elasticsearch://localhost:9200',
             autocompleteMinCharacters: 5,
             itemsPerPage: 20,
+            paginationClass: SimplePagination::class,
+            paginationMaximumNumberOfLinks: 8,
         );
 
         self::assertSame('elasticsearch://localhost:9200', $configuration->searchDsn);
         self::assertSame(5, $configuration->autocompleteMinCharacters);
         self::assertSame(20, $configuration->itemsPerPage);
+        self::assertSame(SimplePagination::class, $configuration->paginationClass);
+        self::assertSame(8, $configuration->paginationMaximumNumberOfLinks);
     }
 
     public function testCreateByArrayWithFullConfiguration(): void
@@ -28,11 +33,15 @@ class ConfigurationTest extends AbstractTest
             'sealSearchDsn' => 'meilisearch://localhost:7700',
             'sealAutocompleteMinCharacters' => 2,
             'sealItemsPerPage' => 25,
+            'sealPaginationClass' => 'TYPO3\\CMS\\Core\\Pagination\\SlidingWindowPagination',
+            'sealPaginationMaximumNumberOfLinks' => 10,
         ]);
 
         self::assertSame('meilisearch://localhost:7700', $configuration->searchDsn);
         self::assertSame(2, $configuration->autocompleteMinCharacters);
         self::assertSame(25, $configuration->itemsPerPage);
+        self::assertSame('TYPO3\\CMS\\Core\\Pagination\\SlidingWindowPagination', $configuration->paginationClass);
+        self::assertSame(10, $configuration->paginationMaximumNumberOfLinks);
     }
 
     public function testCreateByArrayWithDefaults(): void
@@ -42,6 +51,8 @@ class ConfigurationTest extends AbstractTest
         self::assertSame('typo3://', $configuration->searchDsn);
         self::assertSame(3, $configuration->autocompleteMinCharacters);
         self::assertSame(10, $configuration->itemsPerPage);
+        self::assertSame(SimplePagination::class, $configuration->paginationClass);
+        self::assertSame(6, $configuration->paginationMaximumNumberOfLinks);
     }
 
     public function testCreateByArrayWithPartialConfiguration(): void
@@ -53,6 +64,8 @@ class ConfigurationTest extends AbstractTest
         self::assertSame('loupe://', $configuration->searchDsn);
         self::assertSame(3, $configuration->autocompleteMinCharacters);
         self::assertSame(10, $configuration->itemsPerPage);
+        self::assertSame(SimplePagination::class, $configuration->paginationClass);
+        self::assertSame(6, $configuration->paginationMaximumNumberOfLinks);
     }
 
     public function testCreateByArrayCastsTypes(): void
