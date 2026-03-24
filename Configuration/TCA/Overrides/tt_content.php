@@ -3,17 +3,15 @@
 declare(strict_types=1);
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
-ExtensionManagementUtility::addPlugin(
-    [
-        'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.label',
-        'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.description',
-        'value' => 'seal_search',
-        'icon' => 'ext-seal-icon',
-        'group' => 'Seal',
-    ],
-    'CType',
-    'seal'
+$pluginKey = ExtensionUtility::registerPlugin(
+    'Seal',
+    'Search',
+    'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.label',
+    'ext-seal-icon',
+    'plugins',
+    'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.description',
 );
 
 $newCols = [
@@ -50,6 +48,6 @@ ExtensionManagementUtility::addTCAcolumns('tt_content', $newCols);
 ExtensionManagementUtility::addToAllTCAtypes(
     'tt_content',
     'seal_filter',
-    'seal_search',
+    $pluginKey,
     'after:general'
 );
