@@ -13,13 +13,14 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 class SchemaBuilder
 {
     public const DEFAULT_INDEX = 'default';
+    public const DEFAULT_SCHEMA = 'default';
 
     public function __construct(protected EventDispatcherInterface $eventDispatcher) {}
 
     public function getSchema(): Schema
     {
         $schema = new Schema([
-            self::DEFAULT_INDEX => $this->getPageIndex(),
+            self::DEFAULT_SCHEMA => $this->getPageIndex(),
         ]);
 
         $event = new BuildSchemaEvent($schema);

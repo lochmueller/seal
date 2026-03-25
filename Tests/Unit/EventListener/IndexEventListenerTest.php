@@ -33,6 +33,7 @@ class IndexEventListenerTest extends AbstractTest
         parent::setUp();
 
         $this->sealStub = $this->createStub(Seal::class);
+        $this->sealStub->method('getIndexNameBySite')->willReturn(SchemaBuilder::DEFAULT_INDEX);
         $resourceFactoryStub = $this->createStub(ResourceFactory::class);
         $this->recordSelectionStub = $this->createStub(RecordSelection::class);
 

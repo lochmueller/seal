@@ -6,7 +6,6 @@ namespace Lochmueller\Seal\Controller;
 
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
-use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -97,7 +96,7 @@ abstract class AbstractSealController extends ActionController
         /** @var Site $site */
         $site = $this->request->getAttribute('site');
         $engine = $this->seal->buildEngineBySite($site);
-        return $engine->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX);
+        return $engine->createSearchBuilder($this->seal->getIndexNameBySite($site));
     }
 
 }

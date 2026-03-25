@@ -6,7 +6,6 @@ namespace Lochmueller\Seal\Handler;
 
 use CmsIg\Seal\Search\Condition\Condition;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
-use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -42,7 +41,7 @@ class AutocompleteHandler implements RequestHandlerInterface
         $language = $request->getAttribute('language');
         $filter[] = Condition::equal('language', (string) ($language?->getLanguageId() ?? 0));
 
-        $searchBuilder = $this->seal->buildEngineBySite($site)->createSearchBuilder(SchemaBuilder::DEFAULT_INDEX);
+        $searchBuilder = $this->seal->buildEngineBySite($site)->createSearchBuilder($this->seal->getIndexNameBySite($site));
         foreach ($filter as $condition) {
             $searchBuilder->addFilter($condition);
         }

@@ -9,7 +9,6 @@ use Lochmueller\Index\Event\IndexFileEvent;
 use Lochmueller\Index\Event\IndexPageEvent;
 use Lochmueller\Index\Traversing\RecordSelection;
 use Lochmueller\Seal\Event\BeforeSaveDocumentEvent;
-use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -84,10 +83,10 @@ class IndexEventListener implements LoggerAwareInterface
                 'preview' => $preview,
             ];
 
-            $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, SchemaBuilder::DEFAULT_INDEX);
+            $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, $this->seal->getIndexNameBySite($event->site));
             $this->eventDispatcher->dispatch($beforeSaveEvent);
 
-            $engine->saveDocument(SchemaBuilder::DEFAULT_INDEX, $beforeSaveEvent->document);
+            $engine->saveDocument($beforeSaveEvent->indexName, $beforeSaveEvent->document);
         } catch (\Exception $exception) {
             $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
         }
