@@ -21,7 +21,7 @@
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.84",
     "phpstan/phpstan": "^2.1",
-    "typo3/testing-framework": "^8.0 || ^9.3"
+    "typo3/testing-framework": "^9.3"
   },
   "suggest": {
     "cmsig/seal-algolia-adapter": "An adapter to support algolia in cmsig/seal search abstraction.",
