@@ -4,49 +4,40 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Engine;
 
-use CmsIg\Seal\Adapter\AdapterFactoryInterface;
+use CmsIg\Seal\Adapter\AdapterFactory;
 use CmsIg\Seal\Engine;
 use CmsIg\Seal\EngineInterface;
+use InvalidArgumentException;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\DsnParser;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
 use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 class EngineFactory
 {
     /**
-     * @param iterable<AdapterFactoryInterface> $adapterFactories
+     *
      */
     public function __construct(
-        protected Context                  $context,
         protected EventDispatcherInterface $eventDispatcher,
         protected ConfigurationLoader $configurationLoader,
         protected SchemaBuilder            $schemaBuilder,
         protected DsnParser            $dsnParser,
-        #[AutowireIterator('seal.adapter_factory')]
-        protected iterable                 $adapterFactories,
+        protected AdapterFactory           $adapterFactory,
     ) {}
 
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
         $configuration = $this->configurationLoader->loadBySite($site);
         $dsn = $this->dsnParser->parse($configuration->searchDsn);
-        $adapter = null;
-
-        foreach ($this->adapterFactories as $adapterFactory) {
-            if ($dsn->scheme === $adapterFactory::getName()) {
-                /** @var array{scheme: string, host: string, port?: int, user?: string, pass?: string, path?: string, query: array<string, array<string>|string>, fragment?: string} $dsnArray */
-                $dsnArray = $dsn->toArray();
-                $adapter = $adapterFactory->createAdapter($dsnArray);
-                break;
-            }
+        try {
+            $adapter = $this->adapterFactory->createAdapter($configuration->searchDsn);
+        } catch (InvalidArgumentException) {
+            $adapter = null;
         }
-
         $resolveAdapterEvent = new ResolveAdapterEvent($dsn, $site, $adapter);
         $this->eventDispatcher->dispatch($resolveAdapterEvent);
 

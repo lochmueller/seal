@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Tests\Unit\Engine;
 
+use CmsIg\Seal\Adapter\AdapterFactory;
 use CmsIg\Seal\Adapter\AdapterFactoryInterface;
 use CmsIg\Seal\Adapter\AdapterInterface;
 use CmsIg\Seal\EngineInterface;
@@ -20,13 +21,10 @@ use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 class EngineFactoryTest extends AbstractTest
 {
-    private Context $contextStub;
-
     private ConfigurationLoader $configurationLoaderStub;
 
     private SchemaBuilder $schemaBuilderStub;
@@ -37,7 +35,6 @@ class EngineFactoryTest extends AbstractTest
     {
         parent::setUp();
 
-        $this->contextStub = $this->createStub(Context::class);
         $this->configurationLoaderStub = $this->createStub(ConfigurationLoader::class);
         $this->schemaBuilderStub = $this->createStub(SchemaBuilder::class);
         $this->schemaBuilderStub->method('getSchema')->willReturn(new Schema([
@@ -57,13 +54,14 @@ class EngineFactoryTest extends AbstractTest
         $this->dsnParserStub->method('parse')->willReturn($dsn);
 
         $adapter = $this->createStub(AdapterInterface::class);
-
-        $adapterFactory = $this->createStub(AdapterFactoryInterface::class);
-        $adapterFactory->method('createAdapter')->willReturn($adapter);
-
-        // Use a concrete class to provide getName() as a static method
         $adapterFactory = new class ($adapter) implements AdapterFactoryInterface {
-            public function __construct(private readonly AdapterInterface $adapter) {}
+            private AdapterInterface $adapter;
+            public array $dsn = [];
+
+            public function __construct(AdapterInterface $adapter)
+            {
+                $this->adapter = $adapter;
+            }
 
             public static function getName(): string
             {
@@ -72,6 +70,7 @@ class EngineFactoryTest extends AbstractTest
 
             public function createAdapter(array $dsn): AdapterInterface
             {
+                $this->dsn = $dsn;
                 return $this->adapter;
             }
         };
@@ -81,12 +80,13 @@ class EngineFactoryTest extends AbstractTest
             ->willReturnCallback(fn(ResolveAdapterEvent $event): ResolveAdapterEvent => $event);
 
         $subject = new EngineFactory(
-            $this->contextStub,
             $eventDispatcher,
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
-            [$adapterFactory],
+            new AdapterFactory([
+                'elasticsearch' => $adapterFactory,
+            ]),
         );
 
         $site = $this->createStub(SiteInterface::class);
@@ -95,6 +95,12 @@ class EngineFactoryTest extends AbstractTest
         $result = $subject->buildEngineBySite($site);
 
         self::assertInstanceOf(EngineInterface::class, $result);
+
+        // Verify AdapterFactory was called with correct DSN
+        self::assertNotEmpty($adapterFactory->dsn);
+        self::assertEquals('elasticsearch', $adapterFactory->dsn['scheme']);
+        self::assertEquals('localhost', $adapterFactory->dsn['host']);
+        self::assertEquals(9200, $adapterFactory->dsn['port']);
     }
 
     public function testBuildEngineBySiteThrowsExceptionWhenNoAdapterFound(): void
@@ -110,12 +116,11 @@ class EngineFactoryTest extends AbstractTest
             ->willReturnCallback(fn(ResolveAdapterEvent $event): ResolveAdapterEvent => $event);
 
         $subject = new EngineFactory(
-            $this->contextStub,
             $eventDispatcher,
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
-            [],
+            new AdapterFactory([]),
         );
 
         $site = $this->createStub(SiteInterface::class);
@@ -147,59 +152,11 @@ class EngineFactoryTest extends AbstractTest
             });
 
         $subject = new EngineFactory(
-            $this->contextStub,
             $eventDispatcher,
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
-            [],
-        );
-
-        $site = $this->createStub(SiteInterface::class);
-        $site->method('getIdentifier')->willReturn('main');
-
-        $result = $subject->buildEngineBySite($site);
-
-        self::assertInstanceOf(EngineInterface::class, $result);
-    }
-
-    public function testBuildEngineBySiteSkipsNonMatchingAdapterFactories(): void
-    {
-        $dsn = new DsnDto(scheme: 'loupe');
-        $config = new Configuration('loupe://', 3, 10);
-
-        $this->configurationLoaderStub->method('loadBySite')->willReturn($config);
-        $this->dsnParserStub->method('parse')->willReturn($dsn);
-
-        $nonMatchingFactory = new class implements AdapterFactoryInterface {
-            public static function getName(): string
-            {
-                return 'elasticsearch';
-            }
-
-            public function createAdapter(array $dsn): AdapterInterface
-            {
-                throw new \RuntimeException('Should not be called');
-            }
-        };
-
-        $adapter = $this->createStub(AdapterInterface::class);
-
-        // Event listener provides the adapter
-        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
-        $eventDispatcher->method('dispatch')
-            ->willReturnCallback(function (ResolveAdapterEvent $event) use ($adapter): ResolveAdapterEvent {
-                $event->adapter = $adapter;
-                return $event;
-            });
-
-        $subject = new EngineFactory(
-            $this->contextStub,
-            $eventDispatcher,
-            $this->configurationLoaderStub,
-            $this->schemaBuilderStub,
-            $this->dsnParserStub,
-            [$nonMatchingFactory],
+            new AdapterFactory([]),
         );
 
         $site = $this->createStub(SiteInterface::class);
@@ -222,12 +179,11 @@ class EngineFactoryTest extends AbstractTest
         $eventDispatcher->method('dispatch')->willReturnArgument(0);
 
         $subject = new EngineFactory(
-            $this->contextStub,
             $eventDispatcher,
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
-            [],
+            new AdapterFactory([]),
         );
 
         $site = $this->createStub(SiteInterface::class);
