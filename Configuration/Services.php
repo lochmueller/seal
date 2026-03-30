@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use CmsIg\Seal\Adapter\AdapterFactory;
 use CmsIg\Seal\Adapter\Elasticsearch\ElasticsearchAdapterFactory;
 use CmsIg\Seal\Adapter\Loupe\LoupeAdapterFactory;
 use CmsIg\Seal\Adapter\Meilisearch\MeilisearchAdapterFactory;
@@ -17,6 +18,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\Reference;
 use TYPO3\CMS\Backend\View\BackendViewFactory;
 use TYPO3\CMS\Dashboard\Widgets\ListWidget;
+use Lochmueller\Seal\Adapter\Typo3\Typo3AdapterFactory;
 use Lochmueller\Seal\Dashboard\Provider\IndexDocumentCountDataProvider;
 use Lochmueller\Seal\Dashboard\Provider\LatestSearchesDataProvider;
 use Lochmueller\Seal\Dashboard\Provider\TopSearchesDataProvider;
@@ -36,7 +38,10 @@ return function (ContainerConfigurator $container): void {
         MultiAdapterFactory::class,
         ReadWriteAdapterFactory::class,
         SolrAdapterFactory::class,
+        Typo3AdapterFactory::class,
     ];
+
+    $adapterFactories = [];
 
     foreach ($checkedFactories as $factory) {
         if (class_exists($factory)) {
@@ -45,8 +50,13 @@ return function (ContainerConfigurator $container): void {
                 ->autowire()
                 ->autoconfigure()
                 ->tag('seal.adapter_factory');
+            $adapterFactories[$factory::getName()] = new Reference($factory);
         }
     }
+
+    // Configure the AdapterFactory with available adapters
+    $services->set(AdapterFactory::class)
+        ->arg('$factories', $adapterFactories);
 
     if (class_exists(ListWidget::class)) {
         $services->set('dashboard.widget.seal.latestSearches')
