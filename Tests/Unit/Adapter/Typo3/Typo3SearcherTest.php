@@ -394,8 +394,11 @@ class Typo3SearcherTest extends AbstractTest
         $queryBuilder->method('setMaxResults')->willReturnSelf();
         $queryBuilder->method('executeQuery')->willReturn($doctrineResult);
 
+        $connection = $this->createStub(Connection::class);
+        $connection->method('quoteIdentifier')->willReturnCallback(static fn(string $v): string => $v);
+
         $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
-        $adapterHelper->method('getConnection')->willReturn($this->createStub(Connection::class));
+        $adapterHelper->method('getConnection')->willReturn($connection);
         $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
         $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
 
@@ -447,8 +450,11 @@ class Typo3SearcherTest extends AbstractTest
         $queryBuilder->method('setMaxResults')->willReturnSelf();
         $queryBuilder->method('executeQuery')->willReturn($doctrineResult);
 
+        $connection = $this->createStub(Connection::class);
+        $connection->method('quoteIdentifier')->willReturnCallback(static fn(string $v): string => $v);
+
         $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
-        $adapterHelper->method('getConnection')->willReturn($this->createStub(Connection::class));
+        $adapterHelper->method('getConnection')->willReturn($connection);
         $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
         $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
 
@@ -506,8 +512,11 @@ class Typo3SearcherTest extends AbstractTest
             },
         );
 
+        $connection = $this->createStub(Connection::class);
+        $connection->method('quoteIdentifier')->willReturnCallback(static fn(string $v): string => $v);
+
         $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
-        $adapterHelper->method('getConnection')->willReturn($this->createStub(Connection::class));
+        $adapterHelper->method('getConnection')->willReturn($connection);
         $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
         $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
 

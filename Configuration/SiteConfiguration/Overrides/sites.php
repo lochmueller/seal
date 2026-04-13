@@ -54,8 +54,18 @@ $GLOBALS['SiteConfiguration']['site']['columns']['sealPaginationMaximumNumberOfL
     ],
 ];
 
-$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] = str_replace(
-    ', languages,',
-    ', languages, --div--;' . $lll . 'seal, sealSearchDsn, sealAutocompleteMinCharacters,sealItemsPerPage,sealPaginationClass,sealPaginationMaximumNumberOfLinks,',
-    $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'],
-);
+$showitem = $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] ?? '';
+$sealFields = '--div--;' . $lll . 'seal, sealSearchDsn, sealAutocompleteMinCharacters, sealItemsPerPage, sealPaginationClass, sealPaginationMaximumNumberOfLinks';
+
+if (str_contains($showitem, 'languages')) {
+    $showitem = (string) preg_replace(
+        '/\blanguages\b,?/',
+        '$0, ' . $sealFields . ',',
+        $showitem,
+        1,
+    );
+} else {
+    $showitem = rtrim($showitem, ', ') . ', ' . $sealFields;
+}
+
+$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] = $showitem;

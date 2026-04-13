@@ -10,6 +10,6 @@ use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 final class ResolveAdapterEvent
 {
-    public function __construct(public DsnDto $searchDsn, public SiteInterface $site, public ?AdapterInterface $adapter = null) {}
+    public function __construct(public readonly DsnDto $searchDsn, public readonly SiteInterface $site, public ?AdapterInterface $adapter = null) {}
 
 }

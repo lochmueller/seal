@@ -42,7 +42,7 @@ class Typo3Searcher implements SearcherInterface
         $hasTagSelection = false;
         $tagSelectionValue = [];
         foreach ($searchFilters as $searchFilter) {
-            if ($searchFilter instanceof \CmsIg\Seal\Search\Condition\InCondition && $searchFilter->field === 'tags') {
+            if ($searchFilter instanceof Condition\InCondition && $searchFilter->field === 'tags') {
                 $hasTagSelection = true;
                 $tagSelectionValue = $searchFilter->values;
             }
@@ -62,7 +62,7 @@ class Typo3Searcher implements SearcherInterface
 
         if ($hasTagSelection) {
             $countQueryBuilder->leftJoin('idx', $this->adapterHelper->getTableName($search->index) . '_mm_tag', 'idx_mm_tag', 'idx.uid = idx_mm_tag.uid_local');
-            $countQueryBuilder->leftJoin('idx_mm_tag', $this->adapterHelper->getTableName($search->index) . '_tag', 'idx_tag', 'idx_tag.uid = idx_mm_tag.uid_foreign AND ' . $queryBuilder->expr()->in('idx_tag.title', \array_map(fn($value) => $this->escapeFilterValue($value), $tagSelectionValue)));
+            $countQueryBuilder->leftJoin('idx_mm_tag', $this->adapterHelper->getTableName($search->index) . '_tag', 'idx_tag', 'idx_tag.uid = idx_mm_tag.uid_foreign AND ' . $countQueryBuilder->expr()->in('idx_tag.title', \array_map(fn($value) => $this->escapeFilterValue($value), $tagSelectionValue)));
         }
 
         if (!empty($countFilters)) {
@@ -85,7 +85,7 @@ class Typo3Searcher implements SearcherInterface
         return new Result(
             $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
             $count,
-            $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet), $this->adapterHelper->getTableName($search->index), $filters), // @todo add result information
+            $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet), $this->adapterHelper->getTableName($search->index), $filters),
         );
 
     }
@@ -168,16 +168,17 @@ class Typo3Searcher implements SearcherInterface
      * between the search point and stored coordinates, returning only
      * documents within the specified radius.
      */
-    private function buildGeoDistanceExpression(Condition\GeoDistanceCondition $condition, ExpressionBuilder $expressionBuilder, string $tableAlias = ''): CompositeExpression
+    private function buildGeoDistanceExpression(Condition\GeoDistanceCondition $condition, ExpressionBuilder $expressionBuilder, string $tableAlias = ''): string
     {
-        $prefix = $tableAlias !== '' ? $tableAlias . '.' : '';
-        $latField = $prefix . $condition->field . '_latitude';
-        $lngField = $prefix . $condition->field . '_longitude';
+        $connection = $this->adapterHelper->getConnection();
+        $prefix = $tableAlias !== '' ? $connection->quoteIdentifier($tableAlias) . '.' : '';
+        $latField = $prefix . $connection->quoteIdentifier($condition->field . '_latitude');
+        $lngField = $prefix . $connection->quoteIdentifier($condition->field . '_longitude');
         $lat = (float) $condition->latitude;
         $lng = (float) $condition->longitude;
         $distance = (float) $condition->distance;
 
-        return $expressionBuilder->and(\sprintf(
+        return \sprintf(
             '6371000 * ACOS('
             . 'COS(RADIANS(%F)) * COS(RADIANS(%s))'
             . ' * COS(RADIANS(%s) - RADIANS(%F))'
@@ -190,7 +191,7 @@ class Typo3Searcher implements SearcherInterface
             $lat,
             $latField,
             $distance,
-        ));
+        );
     }
 
     private function escapeFilterValue(mixed $value): string
@@ -214,10 +215,42 @@ class Typo3Searcher implements SearcherInterface
         foreach ($facets as $facet) {
             if ($facet instanceof CountFacet) {
                 $formatted[$facet->field]['count'] = $this->computeCountFacet($facet->field, $tableName, $filters);
+            } elseif ($facet instanceof MinMaxFacet) {
+                $formatted[$facet->field] = $this->computeMinMaxFacet($facet->field, $tableName, $filters);
             }
         }
 
         return $formatted;
+    }
+
+    /**
+     * @param array<int, string|CompositeExpression> $filters
+     * @return array{min: float|null, max: float|null}
+     */
+    private function computeMinMaxFacet(string $field, string $tableName, array $filters): array
+    {
+        $connection = $this->adapterHelper->getConnection();
+
+        $qb = $connection->createQueryBuilder();
+        $quotedField = $connection->quoteIdentifier('idx') . '.' . $connection->quoteIdentifier($field);
+        $qb->addSelectLiteral('MIN(' . $quotedField . ') AS min_value')
+            ->addSelectLiteral('MAX(' . $quotedField . ') AS max_value')
+            ->from($tableName, 'idx');
+
+        if (!empty($filters)) {
+            $qb->where($qb->expr()->and(...$filters));
+        }
+
+        $row = $qb->executeQuery()->fetchAssociative();
+
+        if ($row === false) {
+            return ['min' => null, 'max' => null];
+        }
+
+        return [
+            'min' => isset($row['min_value']) ? (float) $row['min_value'] : null,
+            'max' => isset($row['max_value']) ? (float) $row['max_value'] : null,
+        ];
     }
 
     /**

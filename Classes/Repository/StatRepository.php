@@ -60,7 +60,7 @@ class StatRepository
      */
     public function findTopSearchesOfCurrentMonth(int $limit = 10): array
     {
-        $firstDayOfMonth = (int) strtotime('first day of this month midnight');
+        $firstDayOfMonth = (new \DateTimeImmutable('first day of this month 00:00:00'))->getTimestamp();
 
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable(self::TABLE_NAME);
 
