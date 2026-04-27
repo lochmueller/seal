@@ -2,6 +2,8 @@
 
 SEAL Search - Flexible integration of the Search Engine Abstraction Layer ([SEAL](https://php-cmsig.github.io/search/index.html)) project into TYPO3. Different index configurations and multiple possibilities. Use it with TYPO3 or for example with Meilisearch, Solr, Loupe, Typesense - without changing the integration. Have fun.
 
+This extension was funded by the [TYPO3 Association](https://typo3.org): [community ideas I](https://typo3.org/article/members-have-selected-five-ideas-to-be-funded-in-quarter-3-2025) / [community idea II](https://talk.typo3.org/t/ext-seal-ecosystem-expansion-advanced-search-ai-vector-integration-tim-lochmuller/6594) & [first blogpost](https://typo3.org/article/typo3-meets-seal-a-breath-of-fresh-air-for-search) / second blogpost (WIP)
+
 ## Requirements
 
 - PHP 8.3+
