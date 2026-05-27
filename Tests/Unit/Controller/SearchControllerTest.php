@@ -17,6 +17,7 @@ use CmsIg\Seal\Search\SearchBuilder;
 use Lochmueller\Seal\Configuration\Configuration;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Controller\SearchController;
+use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
 use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
@@ -24,11 +25,12 @@ use Lochmueller\Seal\Repository\StatRepository;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
-use Psr\Log\LoggerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Pagination\SimplePagination;
 use TYPO3\CMS\Core\Site\Entity\Site;
@@ -220,12 +222,36 @@ class SearchControllerTest extends AbstractTest
         self::assertInstanceOf(ResponseInterface::class, $response);
     }
 
+    public function testSearchActionDispatchesEventToModifySearchBuilderBeforeExecution(): void
+    {
+        $eventDispatcher = new class implements EventDispatcherInterface {
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof ModifySearchBuilderEvent) {
+                    $event->searchBuilder->highlight(['title', 'content']);
+                }
+
+                return $event;
+            }
+        };
+
+        $subject = $this->buildController(
+            [['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1]],
+            [],
+            eventDispatcher: $eventDispatcher,
+        );
+        $subject->searchAction();
+
+        self::assertNotNull($this->capturedSearch, 'Search should have been executed');
+        self::assertSame(['title', 'content'], $this->capturedSearch->highlightFields);
+    }
+
     /**
      * @param array<int, array<string, mixed>> $filterRows
      * @param array<string, mixed> $facetData
      * @param array<string, mixed>|null $parsedBody
      */
-    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null, ?StatRepository $statRepository = null): SearchController
+    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null, ?StatRepository $statRepository = null, ?EventDispatcherInterface $eventDispatcher = null): SearchController
     {
         $this->capturedSearch = null;
         $this->capturedViewVariables = [];
@@ -337,6 +363,12 @@ class SearchControllerTest extends AbstractTest
 
         $subject->injectResponseFactory($responseFactory);
         $subject->injectStreamFactory($streamFactory);
+        $subject->injectEventDispatcher($eventDispatcher ?? new class implements EventDispatcherInterface {
+            public function dispatch(object $event): object
+            {
+                return $event;
+            }
+        });
 
         return $subject;
     }

@@ -8,6 +8,7 @@ use CmsIg\Seal\Search\Condition\Condition;
 use CmsIg\Seal\Search\Facet\Facet;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
+use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
 use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
@@ -76,10 +77,14 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
             $searchBuilder->addFacet(Facet::count('tags'));
         }
 
-        $result = $searchBuilder
+        $searchBuilder = $searchBuilder
             ->limit($config->itemsPerPage)
-            ->offset(($currentPage - 1) * $config->itemsPerPage)
-            ->getResult();
+            ->offset(($currentPage - 1) * $config->itemsPerPage);
+
+        $modifySearchBuilderEvent = new ModifySearchBuilderEvent($searchBuilder, $site, $language, $config);
+        $this->eventDispatcher->dispatch($modifySearchBuilderEvent);
+
+        $result = $modifySearchBuilderEvent->searchBuilder->getResult();
 
         $parsedBody = $this->request->getParsedBody();
         $searchTerm = is_array($parsedBody) ? (string) ($parsedBody['tx_seal_search']['search'] ?? '') : '';
@@ -126,5 +131,4 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
         }
         return GeneralUtility::makeInstance(SimplePagination::class, $paginator);
     }
-
 }
