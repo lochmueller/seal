@@ -66,7 +66,12 @@ class IndexEventListener implements LoggerAwareInterface
                     $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
                 }
             } elseif ($event instanceof IndexPageEvent && $uri === '' && $event->site instanceof Site) {
-                $uri = (string) $event->site->getRouter()->generateUri($event->pageUid);
+                $arguments = [];
+                try {
+                    $language = $event->site->getLanguageById($event->language);
+                    $arguments['_language'] = $language;
+                } catch (\InvalidArgumentException $e) {}
+                $uri = (string) $event->site->getRouter()->generateUri($event->pageUid, $arguments);
             }
 
             $document = [
