@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\EventListener;
 
-use Lochmueller\Index\Event\DeletePageEvent;
+use Lochmueller\Index\Event\DeIndexDocumentEvent;
 use Lochmueller\Seal\Event\BeforePageDeleteEvent;
 use Lochmueller\Seal\Seal;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -12,7 +12,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 
-final class DeleteDocumentEventListener implements LoggerAwareInterface
+final class DeIndexDocumentEventListener implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -21,8 +21,8 @@ final class DeleteDocumentEventListener implements LoggerAwareInterface
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {}
 
-    #[AsEventListener('seal-delete-page-from-index')]
-    public function __invoke(DeletePageEvent $event): void
+    #[AsEventListener('seal-deindex-document')]
+    public function __invoke(DeIndexDocumentEvent $event): void
     {
         try {
             $engine = $this->seal->buildEngineBySite($event->site);
