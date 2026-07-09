@@ -14,7 +14,15 @@ class StartController extends AbstractSealController
 {
     public function startAction(): ResponseInterface
     {
-        $filterRows = iterator_to_array($this->getFilterRowsByContentElementUid($this->getCurrentContentElementRow()['uid']));
+        $currentContentElementData = $this->getCurrentContentElementRow();
+
+        if (
+            isset($currentContentElementData['seal_show_initial_results']) &&
+            (bool)$currentContentElementData['seal_show_initial_results'] === true) {
+            return $this->redirect('search', 'Search');
+        }
+
+        $filterRows = iterator_to_array($this->getFilterRowsByContentElementUid($currentContentElementData['uid']));
 
         $hasTagCondition = false;
         foreach ($filterRows as $filterItem) {

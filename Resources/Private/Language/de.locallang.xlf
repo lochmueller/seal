@@ -56,6 +56,22 @@
                 <source>SEAL Search plugin with advanced index and filter features.</source>
                 <target>SEAL Such-Plugin mit erweiterten Index- und Filterfunktionen.</target>
             </trans-unit>
+            <trans-unit id="plugin.tab.search">
+				<source>SEAL Search Settings</source>
+				<target>SEAL-Sucheinstellungen</target>
+			</trans-unit>
+			<trans-unit id="plugin.field.seal_show_initial_results.title">
+				<source>Show initial results</source>
+				<target>Ergebnisse beim ersten Laden anzeigen</target>
+			</trans-unit>
+			<trans-unit id="plugin.field.seal_show_initial_results.description">
+				<source>If enabled, search results will be displayed on the initial page load even when no search query is entered.</source>
+				<target>Wenn diese Option aktiviert ist, werden die Suchergebnisse bereits beim ersten Laden der Seite angezeigt, auch wenn keine Suchanfrage eingegeben wurde.</target>
+			</trans-unit>
+			<trans-unit id="plugin.field.seal_filter.title">
+				<source>Search Filter</source>
+				<target>Suchfilter</target>
+			</trans-unit>
             <trans-unit id="tx_seal_domain_model_configuration">
                 <source>Configuration</source>
                 <target>Konfiguration</target>

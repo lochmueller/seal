@@ -43,6 +43,18 @@
             <trans-unit id="plugin.description">
                 <source>SEAL Search plugin with advanced index and filter features.</source>
             </trans-unit>
+            <trans-unit id="plugin.tab.search">
+                <source>SEAL Search Settings</source>
+            </trans-unit>
+            <trans-unit id="plugin.field.seal_show_initial_results.title">
+                <source>Show initial results</source>
+            </trans-unit>
+            <trans-unit id="plugin.field.seal_show_initial_results.description">
+                <source>If enabled, search results will be displayed on the initial page load even when no search query is entered.</source>
+            </trans-unit>
+            <trans-unit id="plugin.field.seal_filter.title">
+                <source>Search Filter</source>
+            </trans-unit>
             <trans-unit id="tx_seal_domain_model_configuration">
                 <source>Configuration</source>
             </trans-unit>
