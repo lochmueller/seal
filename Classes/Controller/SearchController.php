@@ -100,6 +100,10 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
         $tagFacetCounts = $tagFacets['count'] ?? [];
 
         $requestData = is_array($parsedBody) ? ($parsedBody['tx_seal_search'] ?? []) : [];
+        if (empty($requestData)) {
+            $queryParams = $this->request->getQueryParams();
+            $requestData = isset($queryParams['tx_seal_search']) && \is_array($queryParams['tx_seal_search']) ? $queryParams['tx_seal_search'] : [];
+        }
 
         $paginator = new SearchResultArrayPaginator($result, $currentPage, $config->itemsPerPage);
 
