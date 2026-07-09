@@ -15,8 +15,21 @@ $pluginKey = ExtensionUtility::registerPlugin(
 );
 
 $newCols = [
+    'seal_show_initial_results' => [
+        'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.field.seal_show_initial_results.title',
+        'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.field.seal_show_initial_results.description',
+        'config' => [
+            'type' => 'check',
+            'renderType' => 'checkboxToggle',
+            'items' => [
+                [
+                    'label' => '',
+                ],
+            ],
+        ],
+    ],
     'seal_filter' => [
-        'label' => 'Search Filter',
+        'label' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.field.seal_filter.title',
         'config' => [
             'type' => 'inline',
             'allowed' => 'tx_seal_domain_model_filter',
@@ -47,7 +60,7 @@ ExtensionManagementUtility::addTCAcolumns('tt_content', $newCols);
 
 ExtensionManagementUtility::addToAllTCAtypes(
     'tt_content',
-    'seal_filter',
+    '--div--;LLL:EXT:seal/Resources/Private/Language/locallang.xlf:plugin.tab.search,seal_show_initial_results,seal_filter',
     $pluginKey,
     'after:general'
 );
