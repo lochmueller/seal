@@ -25,6 +25,13 @@ class SearchCondition implements FilterInterface
         if ($request instanceof ServerRequestInterface) {
             $parsedBody = $request->getParsedBody();
             $search = is_array($parsedBody) ? ($parsedBody['tx_seal_search']['search'] ?? '') : '';
+
+            if ($search === '') {
+                $queryParams = $request->getQueryParams();
+                $search = is_string($queryParams['tx_seal_search']['search'] ?? null)
+                    ? $queryParams['tx_seal_search']['search']
+                    : '';
+            }
         }
         if ($search === '') {
             return [];
