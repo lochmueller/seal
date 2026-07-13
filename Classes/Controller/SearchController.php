@@ -14,6 +14,7 @@ use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Repository\StatRepository;
+use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -37,6 +38,7 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
         protected ConfigurationLoader $configurationLoader,
         protected Filter $filter,
         private readonly StatRepository $statRepository,
+        protected SearchRequestDataResolver $searchRequestDataResolver,
     ) {
         parent::__construct($tagConfigurationParser, $radiusConfigurationParser, $seal);
     }
@@ -99,12 +101,7 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
         $tagFacets = $facets['tags'] ?? [];
         $tagFacetCounts = $tagFacets['count'] ?? [];
 
-        $requestData = is_array($parsedBody) ? ($parsedBody['tx_seal_search'] ?? []) : [];
-        if (empty($requestData)) {
-            $queryParams = $this->request->getQueryParams();
-            $requestData = isset($queryParams['tx_seal_search']) && \is_array($queryParams['tx_seal_search']) ? $queryParams['tx_seal_search'] : [];
-        }
-
+        $requestData = $this->searchRequestDataResolver->resolve($this->request);
         $paginator = new SearchResultArrayPaginator($result, $currentPage, $config->itemsPerPage);
 
         $this->view->assignMultiple(

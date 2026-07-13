@@ -5,11 +5,18 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\Filter;
 
 use CmsIg\Seal\Search\Condition\Condition;
+use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class SearchCondition implements FilterInterface
 {
+    public function __construct(
+        protected SearchRequestDataResolver $searchRequestDataResolver,
+    )
+    {
+    }
+
     public function getType(): string
     {
         return 'searchCondition';
@@ -23,15 +30,8 @@ class SearchCondition implements FilterInterface
     {
         $search = '';
         if ($request instanceof ServerRequestInterface) {
-            $parsedBody = $request->getParsedBody();
-            $search = is_array($parsedBody) ? ($parsedBody['tx_seal_search']['search'] ?? '') : '';
-
-            if ($search === '') {
-                $queryParams = $request->getQueryParams();
-                $search = is_string($queryParams['tx_seal_search']['search'] ?? null)
-                    ? $queryParams['tx_seal_search']['search']
-                    : '';
-            }
+            $searchData = $this->searchRequestDataResolver->resolve($request);
+            $search = $searchData['search'] ?? '';
         }
         if ($search === '') {
             return [];
