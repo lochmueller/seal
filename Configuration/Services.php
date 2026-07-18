@@ -16,6 +16,8 @@ use CmsIg\Seal\Adapter\Solr\SolrAdapterFactory;
 use CmsIg\Seal\Adapter\Typesense\TypesenseAdapterFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 use TYPO3\CMS\Backend\View\BackendViewFactory;
 use TYPO3\CMS\Dashboard\Widgets\ListWidget;
 use Lochmueller\Seal\Adapter\Typo3\Typo3AdapterFactory;
@@ -41,8 +43,6 @@ return function (ContainerConfigurator $container): void {
         Typo3AdapterFactory::class,
     ];
 
-    $adapterFactories = [];
-
     foreach ($checkedFactories as $factory) {
         if (class_exists($factory)) {
             $services
@@ -50,13 +50,15 @@ return function (ContainerConfigurator $container): void {
                 ->autowire()
                 ->autoconfigure()
                 ->tag('seal.adapter_factory');
-            $adapterFactories[$factory::getName()] = new Reference($factory);
         }
     }
 
-    // Configure the AdapterFactory with available adapters
+    // Collect every tagged factory rather than a fixed list, so adapters shipped by
+    // other extensions (e.g. EXT:seal_ai's "ai://") register themselves. Keyed by the
+    // static AdapterFactoryInterface::getName(), which is the key AdapterFactory
+    // looks up the DSN scheme by.
     $services->set(AdapterFactory::class)
-        ->arg('$factories', $adapterFactories);
+        ->arg('$factories', tagged_iterator('seal.adapter_factory', null, 'getName'));
 
     if (class_exists(ListWidget::class)) {
         $services->set('dashboard.widget.seal.latestSearches')
