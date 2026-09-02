@@ -81,7 +81,7 @@ class IndexEventListener implements LoggerAwareInterface
                 'uri' => $uri,
                 'indexdate' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM),
                 'title' => $event->title,
-                'content' => (string) preg_replace('/\\s+/', ' ', strip_tags($event->content)),
+                'content' => $this->toPlainText($event->content),
                 'tags' => $this->getTags($event),
                 'size' => $size,
                 'extension' => $extension,
@@ -101,6 +101,23 @@ class IndexEventListener implements LoggerAwareInterface
     /**
      * @return array<int, string>
      */
+    /**
+     * Block-level elements separate words. strip_tags() alone would glue
+     * "<h1>Title</h1><p>Text</p>" into "TitleText", so a space is inserted
+     * after every closing block tag (and after <br>/<hr>) before the tags
+     * are removed. Whitespace is collapsed afterwards as before.
+     */
+    protected function toPlainText(string $html): string
+    {
+        $html = (string) preg_replace(
+            '#</(?:p|div|h[1-6]|li|ul|ol|dl|dt|dd|td|th|tr|table|thead|tbody|blockquote|pre|section|article|header|footer|nav|aside|figure|figcaption|address)>|<(?:br|hr)\s*/?>#i',
+            '$0 ',
+            $html,
+        );
+
+        return trim((string) preg_replace('/\s+/', ' ', strip_tags($html)));
+    }
+
     protected function getTags(IndexFileEvent|IndexPageEvent $event): array
     {
         $tags = [];
