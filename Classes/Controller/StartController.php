@@ -17,8 +17,8 @@ class StartController extends AbstractSealController
         $currentContentElementData = $this->getCurrentContentElementRow();
 
         if (
-            isset($currentContentElementData['seal_show_initial_results']) &&
-            (bool)$currentContentElementData['seal_show_initial_results'] === true) {
+            isset($currentContentElementData['seal_show_initial_results'])
+            && (bool) $currentContentElementData['seal_show_initial_results'] === true) {
             return $this->redirect('search', 'Search');
         }
 

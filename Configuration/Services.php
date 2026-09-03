@@ -16,14 +16,14 @@ use CmsIg\Seal\Adapter\Solr\SolrAdapterFactory;
 use CmsIg\Seal\Adapter\Typesense\TypesenseAdapterFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 use TYPO3\CMS\Backend\View\BackendViewFactory;
 use TYPO3\CMS\Dashboard\Widgets\ListWidget;
 use Lochmueller\Seal\Adapter\Typo3\Typo3AdapterFactory;
 use Lochmueller\Seal\Dashboard\Provider\IndexDocumentCountDataProvider;
 use Lochmueller\Seal\Dashboard\Provider\LatestSearchesDataProvider;
 use Lochmueller\Seal\Dashboard\Provider\TopSearchesDataProvider;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
 return function (ContainerConfigurator $container): void {
     $services = $container->services();

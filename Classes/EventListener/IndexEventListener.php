@@ -70,7 +70,8 @@ class IndexEventListener implements LoggerAwareInterface
                 try {
                     $language = $event->site->getLanguageById($event->language);
                     $arguments['_language'] = $language;
-                } catch (\InvalidArgumentException $e) {}
+                } catch (\InvalidArgumentException $e) {
+                }
                 $uri = (string) $event->site->getRouter()->generateUri($event->pageUid, $arguments);
             }
 

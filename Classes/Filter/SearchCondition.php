@@ -13,9 +13,7 @@ class SearchCondition implements FilterInterface
 {
     public function __construct(
         protected SearchRequestDataResolver $searchRequestDataResolver,
-    )
-    {
-    }
+    ) {}
 
     public function getType(): string
     {

@@ -40,7 +40,7 @@ final class DeIndexDocumentEventListener implements LoggerAwareInterface
             if ($beforePageDeleteEvent->deletePage) {
                 $engine->deleteDocument($beforePageDeleteEvent->indexName, $beforePageDeleteEvent->documentIdentifier);
             }
-        }  catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
         }
     }

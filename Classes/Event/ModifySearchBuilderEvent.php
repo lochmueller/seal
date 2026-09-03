@@ -16,6 +16,5 @@ final class ModifySearchBuilderEvent
         public readonly SiteInterface $site,
         public readonly SiteLanguage $language,
         public readonly Configuration $configuration,
-    ) {
-    }
+    ) {}
 }

@@ -92,7 +92,6 @@ abstract class AbstractSealController extends ActionController
 
     protected function getSearchBuilder()
     {
-
         /** @var Site $site */
         $site = $this->request->getAttribute('site');
         $engine = $this->seal->buildEngineBySite($site);
