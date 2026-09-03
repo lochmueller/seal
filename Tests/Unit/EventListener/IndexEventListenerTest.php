@@ -252,4 +252,36 @@ class IndexEventListenerTest extends AbstractTest
 
         ($this->subject)($event);
     }
+
+    public function testInvokeKeepsWordBoundariesBetweenAdjacentBlocks(): void
+    {
+        $site = $this->createStub(SiteInterface::class);
+        $site->method('getIdentifier')->willReturn('main');
+
+        $event = new IndexPageEvent(
+            site: $site,
+            technology: IndexTechnology::Database,
+            type: IndexType::Full,
+            indexConfigurationRecordId: 1,
+            indexProcessId: 'proc-1',
+            language: 0,
+            title: 'HTML Page',
+            content: '<h1>Title</h1><p>First paragraph</p><ul><li>One</li><li>Two</li></ul><p>Line<br>break</p>',
+            pageUid: 1,
+            accessGroups: [],
+            uri: 'https://example.com',
+        );
+
+        $engine = $this->createMock(EngineInterface::class);
+        $this->sealStub->method('buildEngineBySite')->willReturn($engine);
+
+        $engine->expects(self::once())
+            ->method('saveDocument')
+            ->with(
+                SchemaBuilder::DEFAULT_INDEX,
+                self::callback(fn(array $doc): bool => $doc['content'] === 'Title First paragraph One Two Line break'),
+            );
+
+        ($this->subject)($event);
+    }
 }
