@@ -15,8 +15,8 @@
     "php": "^8.3",
     "cmsig/seal": "^0.12",
     "lochmueller/index": "^2.3",
-    "typo3/cms-core": "^13.4 || ^14.2",
-    "typo3/cms-extbase": "^13.4 || ^14.2"
+    "typo3/cms-core": "^13.4 || ^14.3",
+    "typo3/cms-extbase": "^13.4 || ^14.3"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.84",
@@ -56,6 +56,9 @@
     "vendor-dir": ".Build/vendor"
   },
   "extra": {
+    "branch-alias": {
+      "dev-main": "1.3.x-dev"
+    },
     "typo3/cms": {
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
       "extension-key": "seal",
