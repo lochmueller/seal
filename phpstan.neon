@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - Classes
+
+    # Loads stubs for the optional integrations of EXT:seal (see the bootstrap file).
+    bootstrapFiles:
+        - Build/phpstan-bootstrap.php

@@ -10,7 +10,10 @@ use TYPO3\CMS\Core\Pagination\AbstractPaginator;
 class SearchResultArrayPaginator extends AbstractPaginator
 {
     public int $localItemsPerPage = 0;
-    private ?iterable $resultCached = null;
+    /**
+     * @var array<int, array<string, mixed>>|null
+     */
+    private ?array $resultCached = null;
 
     public function __construct(
         protected Result $result,

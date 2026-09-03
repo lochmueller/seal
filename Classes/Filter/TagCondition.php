@@ -21,7 +21,7 @@ class TagCondition implements FilterInterface
 
     /**
      * @param array<string, mixed> $filterItem
-     * @return array<int, \CmsIg\Seal\Search\Condition\EqualCondition|\CmsIg\Seal\Search\Condition\SearchCondition|\CmsIg\Seal\Search\Condition\GeoDistanceCondition>
+     * @return array<int, \CmsIg\Seal\Search\Condition\EqualCondition|\CmsIg\Seal\Search\Condition\InCondition|\CmsIg\Seal\Search\Condition\SearchCondition|\CmsIg\Seal\Search\Condition\GeoDistanceCondition>
      */
     public function getFilterConfiguration(array $filterItem, RequestInterface $request): array
     {
@@ -43,7 +43,8 @@ class TagCondition implements FilterInterface
             $selectedValues = [];
         }
 
-        $validValues = array_intersect($selectedValues, $allowedValues);
+        // Only scalar strings of the request are usable and Condition::in() expects a list.
+        $validValues = array_values(array_intersect(array_filter($selectedValues, is_string(...)), $allowedValues));
 
         $conditions = [];
         if (!empty($validValues)) {

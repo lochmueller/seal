@@ -41,7 +41,7 @@ class IndexEventListener implements LoggerAwareInterface
             $extension = '';
             $uri = $event->uri;
 
-            if ($event instanceof IndexFileEvent && isset($event->fileIdentifier)) {
+            if ($event instanceof IndexFileEvent && $event->fileIdentifier !== '') {
 
                 try {
                     $file = $this->resourceFactory->getFileObjectFromCombinedIdentifier($event->fileIdentifier);
@@ -119,6 +119,9 @@ class IndexEventListener implements LoggerAwareInterface
         return trim((string) preg_replace('/\s+/', ' ', strip_tags($html)));
     }
 
+    /**
+     * @return array<int, string>
+     */
     protected function getTags(IndexFileEvent|IndexPageEvent $event): array
     {
         $tags = [];

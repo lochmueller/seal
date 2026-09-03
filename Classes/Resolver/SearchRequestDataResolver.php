@@ -10,6 +10,9 @@ class SearchRequestDataResolver
 {
     private const string PARAM_KEY = 'tx_seal_search';
 
+    /**
+     * @return array<string, mixed>
+     */
     public function resolve(ServerRequestInterface $request): array
     {
         $body = $request->getParsedBody();
