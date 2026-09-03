@@ -54,18 +54,47 @@ $GLOBALS['SiteConfiguration']['site']['columns']['sealPaginationMaximumNumberOfL
     ],
 ];
 
-$showitem = $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] ?? '';
-$sealFields = '--div--;' . $lll . 'seal, sealSearchDsn, sealAutocompleteMinCharacters, sealItemsPerPage, sealPaginationClass, sealPaginationMaximumNumberOfLinks';
+$GLOBALS['SiteConfiguration']['site']['columns']['sealHighlighting'] = [
+    'label' => $lll . 'site.sealHighlighting',
+    'description' => $lll . 'site.sealHighlighting.description',
+    'config' => [
+        'type' => 'check',
+        'renderType' => 'checkboxToggle',
+        'default' => 1,
+        'items' => [
+            [
+                'label' => '',
+            ],
+        ],
+    ],
+];
 
-if (str_contains($showitem, 'languages')) {
-    $showitem = (string) preg_replace(
-        '/\blanguages\b,?/',
-        '$0, ' . $sealFields . ',',
-        $showitem,
-        1,
-    );
-} else {
-    $showitem = rtrim($showitem, ', ') . ', ' . $sealFields;
+$GLOBALS['SiteConfiguration']['site']['columns']['sealHighlightingFields'] = [
+    'label' => $lll . 'site.sealHighlightingFields',
+    'description' => $lll . 'site.sealHighlightingFields.description',
+    'config' => [
+        'type' => 'input',
+        'eval' => 'trim',
+        'default' => 'title,content',
+    ],
+];
+
+$showitem = $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] ?? '';
+$sealFields = '--div--;' . $lll . 'seal, sealSearchDsn, sealAutocompleteMinCharacters, sealItemsPerPage, sealPaginationClass, sealPaginationMaximumNumberOfLinks, sealHighlighting, sealHighlightingFields';
+
+// Add the SEAL fields as own tab right after the languages tab. The word boundary must not match
+// the "languages" part of the tab label (e.g. "...tca.xlf:site.tab.languages"), otherwise the
+// languages field would lose its own tab and end up below the SEAL fields.
+$showitem = (string) preg_replace(
+    '/(?<![\w.\-:])languages(?![\w.\-])\s*,/',
+    '$0 ' . $sealFields . ',',
+    $showitem,
+    1,
+    $count,
+);
+
+if (!$count) {
+    $showitem = rtrim($showitem, ", \n\r\t") . ', ' . $sealFields;
 }
 
 $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] = $showitem;

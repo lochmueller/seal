@@ -10,3 +10,9 @@ services:
 
   Lochmueller\Seal\:
     resource: '../Classes/*'
+
+  # ViewHelpers with constructor injection have to be public, so that the
+  # ViewHelperResolver is able to fetch them from the container.
+  Lochmueller\Seal\ViewHelpers\:
+    resource: '../Classes/ViewHelpers/*'
+    public: true

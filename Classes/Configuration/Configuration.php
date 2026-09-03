@@ -12,6 +12,8 @@ class Configuration
         public readonly int $itemsPerPage = 10,
         public readonly string $paginationClass = \TYPO3\CMS\Core\Pagination\SimplePagination::class,
         public readonly int $paginationMaximumNumberOfLinks = 6,
+        public readonly bool $highlighting = true,
+        public readonly string $highlightingFields = 'title,content',
     ) {}
 
     /**
@@ -25,7 +27,16 @@ class Configuration
             itemsPerPage: (int) ($configuration['sealItemsPerPage'] ?? 10),
             paginationClass: (string) ($configuration['sealPaginationClass'] ?? \TYPO3\CMS\Core\Pagination\SimplePagination::class),
             paginationMaximumNumberOfLinks: (int) ($configuration['sealPaginationMaximumNumberOfLinks'] ?? 6),
+            highlighting: (bool) ($configuration['sealHighlighting'] ?? true),
+            highlightingFields: (string) ($configuration['sealHighlightingFields'] ?? 'title,content'),
         );
     }
 
+    /**
+     * @return array<int, string>
+     */
+    public function getHighlightingFields(): array
+    {
+        return array_values(array_filter(array_map(trim(...), explode(',', $this->highlightingFields)), static fn(string $field): bool => $field !== ''));
+    }
 }

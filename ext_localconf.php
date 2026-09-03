@@ -25,6 +25,8 @@ $GLOBALS['TYPO3_CONF_VARS']['LOG']['Lochmueller']['Seal']['writerConfiguration']
     ],
 ];
 
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['fluid']['namespaces']['seal'][] = 'Lochmueller\\Seal\\ViewHelpers';
+
 ExtensionUtility::configurePlugin(
     'Seal',
     'Search',

@@ -28,6 +28,22 @@ The extension is configured via the TYPO3 site configuration. The following opti
 | `sealSearchDsn`                 | `typo3://` | DSN for the search adapter          |
 | `sealAutocompleteMinCharacters` | `3`        | Minimum characters for autocomplete |
 | `sealItemsPerPage`              | `10`       | Items per page in search results    |
+| `sealHighlighting`              | `1`        | Highlight the search words in the result list |
+| `sealHighlightingFields`        | `title,content` | Comma separated index fields that should be highlighted |
+
+### Keyword Highlighting
+
+If `sealHighlighting` is enabled, the configured fields are requested with the SEAL highlighting API
+and rendered with the `<seal:highlight>` ViewHelper:
+
+```html
+<seal:highlight item="{item}" field="title"/>
+<seal:highlight item="{item}" field="content" crop="300"/>
+```
+
+The ViewHelper escapes the indexed value and renders the matches as `<mark>` elements, so no
+unescaped HTML from the index ends up in the frontend. With `crop` the text is shortened around the
+first match. Every field without a match falls back to the raw value of the document.
 
 ### DSN Examples
 
@@ -81,9 +97,11 @@ vendor/bin/typo3 seal:schema
 | `Exception/`     | Custom exceptions                           |
 | `Filter/`        | Search filter implementations               |
 | `Handler/`       | Request handlers (e.g., autocomplete)       |
+| `Highlight/`     | Rendering of the keyword highlighting       |
 | `Middleware/`    | PSR-15 middleware stack                     |
 | `Pagination/`    | Fluid pagination based on SEAL Generator    |
 | `Schema/`        | Schema structure management                 |
+| `ViewHelpers/`   | Fluid ViewHelpers of EXT:seal               |
 
 ## Development
 

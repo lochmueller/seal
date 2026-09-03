@@ -37,6 +37,18 @@
             <trans-unit id="site.sealPaginationMaximumNumberOfLinks.description">
                 <source>Maximum number of page links shown in the pagination. Default value is 6.</source>
             </trans-unit>
+            <trans-unit id="site.sealHighlighting">
+                <source>Keyword highlighting</source>
+            </trans-unit>
+            <trans-unit id="site.sealHighlighting.description">
+                <source>Highlight the search words within the result list. Enabled by default.</source>
+            </trans-unit>
+            <trans-unit id="site.sealHighlightingFields">
+                <source>Keyword highlighting fields</source>
+            </trans-unit>
+            <trans-unit id="site.sealHighlightingFields.description">
+                <source>Comma separated list of the index fields that should be highlighted. Only searchable fields are useful here. Default value is "title,content".</source>
+            </trans-unit>
             <trans-unit id="plugin.label">
                 <source>SEAL Search</source>
             </trans-unit>

@@ -48,6 +48,22 @@
                 <source>Maximum number of page links shown in the pagination. Default value is 6.</source>
                 <target>Maximale Anzahl an Seitenlinks in der Paginierung. Standardwert ist 6.</target>
             </trans-unit>
+            <trans-unit id="site.sealHighlighting">
+                <source>Keyword highlighting</source>
+                <target>Suchwort-Hervorhebung</target>
+            </trans-unit>
+            <trans-unit id="site.sealHighlighting.description">
+                <source>Highlight the search words within the result list. Enabled by default.</source>
+                <target>Hebt die Suchwörter in der Ergebnisliste hervor. Standardmäßig aktiviert.</target>
+            </trans-unit>
+            <trans-unit id="site.sealHighlightingFields">
+                <source>Keyword highlighting fields</source>
+                <target>Felder für die Suchwort-Hervorhebung</target>
+            </trans-unit>
+            <trans-unit id="site.sealHighlightingFields.description">
+                <source>Comma separated list of the index fields that should be highlighted. Only searchable fields are useful here. Default value is "title,content".</source>
+                <target>Kommaseparierte Liste der Index-Felder, die hervorgehoben werden sollen. Sinnvoll sind nur durchsuchbare Felder. Standardwert ist "title,content".</target>
+            </trans-unit>
             <trans-unit id="plugin.label">
                 <source>SEAL Search</source>
                 <target>SEAL Suche</target>

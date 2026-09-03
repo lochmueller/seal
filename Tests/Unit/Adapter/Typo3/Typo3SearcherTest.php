@@ -367,6 +367,153 @@ class Typo3SearcherTest extends AbstractTest
         self::assertSame('doc-1', $documents[0]['id']);
     }
 
+    public function testSearchAddsHighlightingForMatchingFields(): void
+    {
+        $subject = $this->createSearcherWithHits([
+            ['id' => 'doc-1', 'title' => 'The TYPO3 homepage', 'content' => 'All about typo3 and search'],
+        ]);
+
+        $search = new Search(
+            $this->index,
+            [new Condition\SearchCondition('TYPO3')],
+            highlightFields: ['title', 'content'],
+            highlightPreTag: '[[hl]]',
+            highlightPostTag: '[[/hl]]',
+        );
+
+        $documents = iterator_to_array($subject->search($search));
+
+        self::assertSame('The [[hl]]TYPO3[[/hl]] homepage', $documents[0]['_formatted']['title']);
+        self::assertSame('All about [[hl]]typo3[[/hl]] and search', $documents[0]['_formatted']['content']);
+        self::assertSame('The TYPO3 homepage', $documents[0]['title'], 'The raw value has to stay untouched');
+    }
+
+    public function testSearchReturnsNullHighlightForFieldsWithoutMatch(): void
+    {
+        $subject = $this->createSearcherWithHits([
+            ['id' => 'doc-1', 'title' => 'The TYPO3 homepage', 'content' => 'Nothing to see here'],
+        ]);
+
+        $search = new Search(
+            $this->index,
+            [new Condition\SearchCondition('TYPO3')],
+            highlightFields: ['title', 'content'],
+        );
+
+        $documents = iterator_to_array($subject->search($search));
+
+        self::assertSame('The <mark>TYPO3</mark> homepage', $documents[0]['_formatted']['title']);
+        self::assertNull($documents[0]['_formatted']['content']);
+    }
+
+    public function testSearchHighlightsEveryTermOfTheSearchCondition(): void
+    {
+        $subject = $this->createSearcherWithHits([
+            ['id' => 'doc-1', 'title' => 'TYPO3 search extension', 'content' => 'content'],
+        ]);
+
+        $search = new Search(
+            $this->index,
+            [new Condition\SearchCondition('TYPO3 search')],
+            highlightFields: ['title'],
+        );
+
+        $documents = iterator_to_array($subject->search($search));
+
+        self::assertSame('<mark>TYPO3</mark> <mark>search</mark> extension', $documents[0]['_formatted']['title']);
+    }
+
+    public function testSearchCollectsSearchTermsFromNestedConditions(): void
+    {
+        $subject = $this->createSearcherWithHits([
+            ['id' => 'doc-1', 'title' => 'The TYPO3 homepage', 'content' => 'content'],
+        ]);
+
+        $search = new Search(
+            $this->index,
+            [new Condition\AndCondition(new Condition\SearchCondition('TYPO3'), new Condition\EqualCondition('id', 'doc-1'))],
+            highlightFields: ['title'],
+        );
+
+        $documents = iterator_to_array($subject->search($search));
+
+        self::assertSame('The <mark>TYPO3</mark> homepage', $documents[0]['_formatted']['title']);
+    }
+
+    public function testSearchWithoutHighlightFieldsDoesNotAddFormattedKey(): void
+    {
+        $subject = $this->createSearcherWithHits([
+            ['id' => 'doc-1', 'title' => 'The TYPO3 homepage', 'content' => 'content'],
+        ]);
+
+        $documents = iterator_to_array($subject->search(new Search($this->index, [new Condition\SearchCondition('TYPO3')])));
+
+        self::assertArrayNotHasKey('_formatted', $documents[0]);
+    }
+
+    public function testSearchWithoutSearchConditionReturnsNullHighlights(): void
+    {
+        $subject = $this->createSearcherWithHits([
+            ['id' => 'doc-1', 'title' => 'The TYPO3 homepage', 'content' => 'content'],
+        ]);
+
+        $search = new Search(
+            $this->index,
+            [new Condition\EqualCondition('id', 'doc-1')],
+            highlightFields: ['title', 'content'],
+        );
+
+        $documents = iterator_to_array($subject->search($search));
+
+        self::assertNull($documents[0]['_formatted']['title']);
+        self::assertNull($documents[0]['_formatted']['content']);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $hits
+     */
+    private function createSearcherWithHits(array $hits): Typo3Searcher
+    {
+        $expressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $expressionBuilder->method('eq')->willReturn('field = value');
+        $expressionBuilder->method('like')->willReturn('field LIKE value');
+        $expressionBuilder->method('literal')->willReturnCallback(static fn(string $input): string => "'" . $input . "'");
+        $expressionBuilder->method('and')->willReturn(CompositeExpression::and('1=1'));
+        $expressionBuilder->method('or')->willReturn(CompositeExpression::or('1=1'));
+
+        $countResult = $this->createStub(DoctrineResult::class);
+        $countResult->method('fetchOne')->willReturn(\count($hits));
+
+        $hitsResult = $this->createStub(DoctrineResult::class);
+        $hitsResult->method('iterateAssociative')->willReturn(new \ArrayIterator($hits));
+
+        $callCount = 0;
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->method('from')->willReturnSelf();
+        $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('count')->willReturnSelf();
+        $queryBuilder->method('setFirstResult')->willReturnSelf();
+        $queryBuilder->method('setMaxResults')->willReturnSelf();
+        $queryBuilder->method('addOrderBy')->willReturnSelf();
+        $queryBuilder->method('executeQuery')->willReturnCallback(
+            static function () use (&$callCount, $countResult, $hitsResult): DoctrineResult {
+                return ++$callCount <= 1 ? $countResult : $hitsResult;
+            },
+        );
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('quote')->willReturnCallback(static fn(string $value): string => "'" . addslashes($value) . "'");
+
+        $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
+        $adapterHelper->method('getConnection')->willReturn($connection);
+        $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
+        $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
+
+        return new Typo3Searcher($adapterHelper);
+    }
+
     public function testGeoDistanceConditionGeneratesCorrectSqlWhereClause(): void
     {
         $capturedWhere = null;

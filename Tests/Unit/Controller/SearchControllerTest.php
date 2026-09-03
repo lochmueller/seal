@@ -21,6 +21,7 @@ use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
 use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
+use Lochmueller\Seal\Highlight\Highlighting;
 use Lochmueller\Seal\Repository\StatRepository;
 use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Lochmueller\Seal\Schema\SchemaBuilder;
@@ -248,11 +249,77 @@ class SearchControllerTest extends AbstractTest
     }
 
     /**
+     * Test: Highlighting wird mit den konfigurierten Feldern und den neutralen Sentinel-Tags gesetzt
+     */
+    public function testSearchActionAppliesHighlightingFromConfiguration(): void
+    {
+        $subject = $this->buildController(
+            [['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1]],
+            [],
+            ['tx_seal_search' => ['search' => 'TYPO3']],
+        );
+        $subject->searchAction();
+
+        self::assertNotNull($this->capturedSearch, 'Search should have been executed');
+        self::assertSame(['title', 'content'], $this->capturedSearch->highlightFields);
+        self::assertSame(Highlighting::PRE_TAG, $this->capturedSearch->highlightPreTag);
+        self::assertSame(Highlighting::POST_TAG, $this->capturedSearch->highlightPostTag);
+    }
+
+    /**
+     * Test: Deaktiviertes Highlighting in der Site-Konfiguration → keine Highlight-Felder
+     */
+    public function testSearchActionSkipsHighlightingWhenDisabled(): void
+    {
+        $subject = $this->buildController(
+            [['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1]],
+            [],
+            configuration: new Configuration('typo3://', 3, 10, SimplePagination::class, 6, false),
+        );
+        $subject->searchAction();
+
+        self::assertNotNull($this->capturedSearch, 'Search should have been executed');
+        self::assertSame([], $this->capturedSearch->highlightFields);
+    }
+
+    /**
+     * Test: Leere Feldliste → keine Highlight-Felder
+     */
+    public function testSearchActionSkipsHighlightingWithoutConfiguredFields(): void
+    {
+        $subject = $this->buildController(
+            [['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1]],
+            [],
+            configuration: new Configuration('typo3://', 3, 10, SimplePagination::class, 6, true, ''),
+        );
+        $subject->searchAction();
+
+        self::assertNotNull($this->capturedSearch, 'Search should have been executed');
+        self::assertSame([], $this->capturedSearch->highlightFields);
+    }
+
+    /**
+     * Test: Nur konfigurierte Felder werden hervorgehoben
+     */
+    public function testSearchActionUsesConfiguredHighlightingFields(): void
+    {
+        $subject = $this->buildController(
+            [['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1]],
+            [],
+            configuration: new Configuration('typo3://', 3, 10, SimplePagination::class, 6, true, 'title'),
+        );
+        $subject->searchAction();
+
+        self::assertNotNull($this->capturedSearch, 'Search should have been executed');
+        self::assertSame(['title'], $this->capturedSearch->highlightFields);
+    }
+
+    /**
      * @param array<int, array<string, mixed>> $filterRows
      * @param array<string, mixed> $facetData
      * @param array<string, mixed>|null $parsedBody
      */
-    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null, ?StatRepository $statRepository = null, ?EventDispatcherInterface $eventDispatcher = null): SearchController
+    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null, ?StatRepository $statRepository = null, ?EventDispatcherInterface $eventDispatcher = null, ?Configuration $configuration = null): SearchController
     {
         $this->capturedSearch = null;
         $this->capturedViewVariables = [];
@@ -292,7 +359,7 @@ class SearchControllerTest extends AbstractTest
         $seal->method('buildEngineBySite')->willReturn($engine);
 
         // Mock ConfigurationLoader
-        $config = new Configuration('typo3://', 3, 10, SimplePagination::class, 6);
+        $config = $configuration ?? new Configuration('typo3://', 3, 10, SimplePagination::class, 6);
         $configLoader = $this->createStub(ConfigurationLoader::class);
         $configLoader->method('loadBySite')->willReturn($config);
 

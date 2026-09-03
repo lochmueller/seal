@@ -9,9 +9,9 @@
         </div>
         <div class="col-md-8">
             <div class="card-body">
-                <h3 class="card-title"><a href="{item.uri}"><f:format.raw>{item.title}</f:format.raw></a></h3>
+                <h3 class="card-title"><a href="{item.uri}"><seal:highlight item="{item}" field="title"/></a></h3>
                 <p class="card-text">
-                    {item.content}
+                    <seal:highlight item="{item}" field="content" crop="300"/>
                 </p>
                 <a href="{item.uri}" class="card-link btn btn-secondary">open</a>
             </div>

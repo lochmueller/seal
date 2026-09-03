@@ -12,6 +12,7 @@ use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
 use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
+use Lochmueller\Seal\Highlight\Highlighting;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Repository\StatRepository;
 use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
@@ -77,6 +78,11 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
 
         if ($hasTagCondition) {
             $searchBuilder->addFacet(Facet::count('tags'));
+        }
+
+        $highlightingFields = $config->getHighlightingFields();
+        if ($config->highlighting && $highlightingFields !== []) {
+            $searchBuilder->highlight($highlightingFields, Highlighting::PRE_TAG, Highlighting::POST_TAG);
         }
 
         $searchBuilder = $searchBuilder

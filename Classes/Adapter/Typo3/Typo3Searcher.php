@@ -17,6 +17,11 @@ use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 
 class Typo3Searcher implements SearcherInterface
 {
+    /**
+     * Key the highlighting information is stored in, defined by the SEAL adapter contract.
+     */
+    private const string HIGHLIGHT_KEY = '_formatted';
+
     private readonly FlattenMarshaller $marshaller;
 
     public function __construct(private Typo3AdapterHelper $adapterHelper)
@@ -83,7 +88,7 @@ class Typo3Searcher implements SearcherInterface
         }
 
         return new Result(
-            $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative()),
+            $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative(), $search),
             $count,
             $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet), $this->adapterHelper->getTableName($search->index), $filters),
         );
@@ -96,8 +101,10 @@ class Typo3Searcher implements SearcherInterface
      *
      * @return \Generator<int, array<string, mixed>>
      */
-    private function hitsDocuments(Index $index, iterable $hits): \Generator
+    private function hitsDocuments(Index $index, iterable $hits, Search $search): \Generator
     {
+        $highlightTerms = $this->getHighlightTerms($search);
+
         foreach ($hits as $hit) {
             if (isset($hit['location_latitude']) || isset($hit['location_longitude'])) {
                 $hit['location'] = [
@@ -107,8 +114,90 @@ class Typo3Searcher implements SearcherInterface
                 unset($hit['location_latitude'], $hit['location_longitude']);
             }
 
-            yield $this->marshaller->unmarshall($index->fields, $hit);
+            // The marshaller only knows the configured index fields, so the highlighting
+            // information has to be added afterwards - same behaviour as in the other adapters.
+            yield $this->highlightDocument($this->marshaller->unmarshall($index->fields, $hit), $search, $highlightTerms);
         }
+    }
+
+    /**
+     * Collects the terms of every search condition of the current search.
+     *
+     * @return array<int, string>
+     */
+    private function getHighlightTerms(Search $search): array
+    {
+        if ([] === $search->highlightFields) {
+            return [];
+        }
+
+        $queries = $this->recursiveResolveSearchQueries($search->filters);
+        $terms = preg_split('/\s+/u', implode(' ', $queries), -1, PREG_SPLIT_NO_EMPTY);
+
+        return array_values(array_unique($terms === false ? [] : $terms));
+    }
+
+    /**
+     * @param array<int, object> $conditions
+     * @return array<int, string>
+     */
+    private function recursiveResolveSearchQueries(array $conditions): array
+    {
+        $queries = [];
+        foreach ($conditions as $condition) {
+            if ($condition instanceof Condition\SearchCondition) {
+                $queries[] = $condition->query;
+            } elseif ($condition instanceof Condition\AndCondition || $condition instanceof Condition\OrCondition) {
+                $queries = [...$queries, ...$this->recursiveResolveSearchQueries($condition->conditions)];
+            }
+        }
+
+        return $queries;
+    }
+
+    /**
+     * @param array<string, mixed> $document
+     * @param array<int, string> $terms
+     * @return array<string, mixed>
+     */
+    private function highlightDocument(array $document, Search $search, array $terms): array
+    {
+        if ([] === $search->highlightFields) {
+            return $document;
+        }
+
+        $formatted = [];
+        foreach ($search->highlightFields as $highlightField) {
+            $value = $document[$highlightField] ?? null;
+            $formatted[$highlightField] = \is_string($value)
+                ? $this->highlightValue($value, $terms, $search->highlightPreTag, $search->highlightPostTag)
+                : null;
+        }
+
+        $document[self::HIGHLIGHT_KEY] = $formatted;
+
+        return $document;
+    }
+
+    /**
+     * Returns the value including the highlight tags or null if none of the terms matched.
+     *
+     * @param array<int, string> $terms
+     */
+    private function highlightValue(string $value, array $terms, string $preTag, string $postTag): ?string
+    {
+        if ([] === $terms || '' === $value) {
+            return null;
+        }
+
+        $pattern = '/(' . implode('|', array_map(static fn(string $term): string => preg_quote($term, '/'), $terms)) . ')/iu';
+        $highlighted = preg_replace($pattern, $preTag . '$1' . $postTag, $value);
+
+        if (!\is_string($highlighted) || !str_contains($highlighted, $preTag)) {
+            return null;
+        }
+
+        return $highlighted;
     }
 
     public function count(Index $index): int
