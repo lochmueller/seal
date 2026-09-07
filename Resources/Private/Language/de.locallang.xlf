@@ -29,8 +29,8 @@
                 <target>Suchadapter-DSN</target>
             </trans-unit>
             <trans-unit id="site.sealSearchDsn.description">
-                <source>Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN.</source>
-                <target>Konfigurieren Sie den Suchadapter über DSN. Beispiele sind "typo3://" oder "loupe://var/indices/". Bitte prüfen Sie die AdapterFactory der verschiedenen Adapter-Pakete. Wenn ein Adapter-Paket über Composer installiert ist, können Sie den Adapter über DSN erstellen.</target>
+                <source>Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN. Relative Loupe paths are resolved against the project path, "loupe://" stores the index in "var/loupe".</source>
+                <target>Konfigurieren Sie den Suchadapter über DSN. Beispiele sind "typo3://" oder "loupe://var/indices/". Bitte prüfen Sie die AdapterFactory der verschiedenen Adapter-Pakete. Wenn ein Adapter-Paket über Composer installiert ist, können Sie den Adapter über DSN erstellen. Relative Loupe-Pfade werden gegen den Projektpfad aufgelöst, "loupe://" legt den Index in "var/loupe" ab.</target>
             </trans-unit>
             <trans-unit id="site.sealPaginationClass">
                 <source>Pagination class</source>
@@ -255,6 +255,74 @@
             <trans-unit id="searchword.help">
                 <source>Searchword for the fulltext search.</source>
                 <target>Suchwort für die Volltextsuche.</target>
+            </trans-unit>
+            <trans-unit id="search.form.label">
+                <source>Site search</source>
+                <target>Website-Suche</target>
+            </trans-unit>
+            <trans-unit id="results.region">
+                <source>Search results</source>
+                <target>Suchergebnisse</target>
+            </trans-unit>
+            <trans-unit id="results.no.headline">
+                <source>No results</source>
+                <target>Keine Ergebnisse</target>
+            </trans-unit>
+            <trans-unit id="results.status">
+                <source>Showing results %s to %s of %s.</source>
+                <target>Zeige Ergebnisse %s bis %s von %s.</target>
+            </trans-unit>
+            <trans-unit id="result.open">
+                <source>Open</source>
+                <target>Öffnen</target>
+            </trans-unit>
+            <trans-unit id="result.meta.indexed">
+                <source>Indexed at</source>
+                <target>Indexiert am</target>
+            </trans-unit>
+            <trans-unit id="result.meta.dateFormat">
+                <source>d.m.Y H:i</source>
+                <target>d.m.Y H:i</target>
+            </trans-unit>
+            <trans-unit id="result.meta.type">
+                <source>Type</source>
+                <target>Typ</target>
+            </trans-unit>
+            <trans-unit id="result.meta.size">
+                <source>Size</source>
+                <target>Größe</target>
+            </trans-unit>
+            <trans-unit id="result.meta.score">
+                <source>Score</source>
+                <target>Relevanz</target>
+            </trans-unit>
+            <trans-unit id="filter.tag.legend">
+                <source>Filter by tag</source>
+                <target>Nach Schlagwort filtern</target>
+            </trans-unit>
+            <trans-unit id="filter.geo.legend">
+                <source>Filter by distance</source>
+                <target>Nach Entfernung filtern</target>
+            </trans-unit>
+            <trans-unit id="search.page.number">
+                <source>Page</source>
+                <target>Seite</target>
+            </trans-unit>
+            <trans-unit id="search.page.current">
+                <source>Current page</source>
+                <target>Aktuelle Seite</target>
+            </trans-unit>
+            <trans-unit id="search.page.previous">
+                <source>Previous page</source>
+                <target>Vorherige Seite</target>
+            </trans-unit>
+            <trans-unit id="search.page.next">
+                <source>Next page</source>
+                <target>Nächste Seite</target>
+            </trans-unit>
+            <trans-unit id="geo.status.locating">
+                <source>Determining location…</source>
+                <target>Standort wird ermittelt …</target>
             </trans-unit>
         </body>
     </file>

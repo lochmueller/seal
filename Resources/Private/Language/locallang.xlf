@@ -23,7 +23,7 @@
                 <source>Search Adapter DSN</source>
             </trans-unit>
             <trans-unit id="site.sealSearchDsn.description">
-                <source>Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN.</source>
+                <source>Configure the search adapter via DSN. Examples are "typo3://" or "loupe://var/indices/". Please check the AdapterFactory of the different adapter packages. If a adapter package is installed via composer your could create the adapter via DSN. Relative Loupe paths are resolved against the project path, "loupe://" stores the index in "var/loupe".</source>
             </trans-unit>
             <trans-unit id="site.sealPaginationClass">
                 <source>Pagination class</source>
@@ -192,6 +192,57 @@
             </trans-unit>
             <trans-unit id="searchword.help">
                 <source>Searchword for the fulltext search.</source>
+            </trans-unit>
+            <trans-unit id="search.form.label">
+                <source>Site search</source>
+            </trans-unit>
+            <trans-unit id="results.region">
+                <source>Search results</source>
+            </trans-unit>
+            <trans-unit id="results.no.headline">
+                <source>No results</source>
+            </trans-unit>
+            <trans-unit id="results.status">
+                <source>Showing results %s to %s of %s.</source>
+            </trans-unit>
+            <trans-unit id="result.open">
+                <source>Open</source>
+            </trans-unit>
+            <trans-unit id="result.meta.indexed">
+                <source>Indexed at</source>
+            </trans-unit>
+            <trans-unit id="result.meta.dateFormat">
+                <source>d.m.Y H:i</source>
+            </trans-unit>
+            <trans-unit id="result.meta.type">
+                <source>Type</source>
+            </trans-unit>
+            <trans-unit id="result.meta.size">
+                <source>Size</source>
+            </trans-unit>
+            <trans-unit id="result.meta.score">
+                <source>Score</source>
+            </trans-unit>
+            <trans-unit id="filter.tag.legend">
+                <source>Filter by tag</source>
+            </trans-unit>
+            <trans-unit id="filter.geo.legend">
+                <source>Filter by distance</source>
+            </trans-unit>
+            <trans-unit id="search.page.number">
+                <source>Page</source>
+            </trans-unit>
+            <trans-unit id="search.page.current">
+                <source>Current page</source>
+            </trans-unit>
+            <trans-unit id="search.page.previous">
+                <source>Previous page</source>
+            </trans-unit>
+            <trans-unit id="search.page.next">
+                <source>Next page</source>
+            </trans-unit>
+            <trans-unit id="geo.status.locating">
+                <source>Determining location…</source>
             </trans-unit>
         </body>
     </file>

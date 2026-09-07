@@ -1,37 +1,60 @@
-<div class="mb-3 seal-geo-distance">
-    <label class="form-label">{filter.title}</label>
+<f:comment>
+    Fieldset + legend instead of an unassociated label, so the radius select and the
+    "locate me" button are announced as one group (WCAG 1.3.1).
+</f:comment>
+<fieldset class="mb-3 seal-filter seal-filter--geo seal-geo-distance">
+    <legend class="form-label seal-filter__legend">
+        <f:if condition="{filter.title}">
+            <f:then>{filter.title}</f:then>
+            <f:else><f:translate key="filter.geo.legend"/></f:else>
+        </f:if>
+    </legend>
 
-    <f:form.hidden id="seal_search_{filter.uid}_lat"
+    <f:comment>
+        The coordinates are restored from the request, so an already determined position
+        survives pagination and a second search (WCAG 2.2 - 3.3.7 Redundant Entry).
+    </f:comment>
+    <f:form.hidden id="{sealId}-geo-{filter.uid}-lat"
                    name="geo_position_lat"
-                   value="" />
-    <f:form.hidden id="seal_search_{filter.uid}_lng"
+                   value="{requestData.geo_position_lat}"/>
+    <f:form.hidden id="{sealId}-geo-{filter.uid}-lng"
                    name="geo_position_lng"
-                   value="" />
+                   value="{requestData.geo_position_lng}"/>
 
     <div class="mb-2">
-        <label for="seal_search_{filter.uid}_radius" class="form-label">
+        <label for="{sealId}-geo-{filter.uid}-radius" class="form-label">
             <f:translate key="distance"/>
         </label>
-        <f:form.select id="seal_search_{filter.uid}_radius"
+        <f:form.select id="{sealId}-geo-{filter.uid}-radius"
                        name="geo_position_radius"
-                       class="form-control"
+                       class="form-select"
                        options="{filter.parsedRadii}"
                        value="{requestData.geo_position_radius}"
                        optionValueField="value"
-                       optionLabelField="label" />
+                       optionLabelField="label"/>
     </div>
 
     <button type="button"
             class="btn btn-secondary seal-geo-locate-btn"
-            data-lat-field="seal_search_{filter.uid}_lat"
-            data-lng-field="seal_search_{filter.uid}_lng">
+            data-lat-field="{sealId}-geo-{filter.uid}-lat"
+            data-lng-field="{sealId}-geo-{filter.uid}-lng"
+            data-status-field="{sealId}-geo-{filter.uid}-status"
+            aria-describedby="{sealId}-geo-{filter.uid}-status">
         <f:translate key="geo.locate"/>
     </button>
-    <span class="seal-geo-status" style="display:none;"
+    <f:comment>
+        The status element stays in the DOM permanently (it collapses while empty) so that
+        the live region is registered before the first message is written into it
+        (WCAG 4.1.3 Status Messages).
+    </f:comment>
+    <span id="{sealId}-geo-{filter.uid}-status"
+          class="seal-geo-status"
+          role="status"
           data-msg-unavailable="{f:translate(key: 'geo.status.unavailable')}"
+          data-msg-locating="{f:translate(key: 'geo.status.locating')}"
           data-msg-located="{f:translate(key: 'geo.status.located')}"
           data-msg-denied="{f:translate(key: 'geo.status.denied')}"></span>
-</div>
+</fieldset>
 
 <f:asset.script identifier="seal-geo-distance"
-                src="EXT:seal/Resources/Public/JavaScript/GeoDistanceCondition.js" />
+                src="EXT:seal/Resources/Public/JavaScript/GeoDistanceCondition.js"/>

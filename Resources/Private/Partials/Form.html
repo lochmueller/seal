@@ -1,6 +1,18 @@
-<f:form action="search" controller="Search" class="mb-3">
+<f:comment>
+    role="search" turns the form into a search landmark, aria-label names it so that
+    multiple landmarks on one page stay distinguishable (WCAG 1.3.1 / 2.4.1).
+    "section" appends the anchor of the result headline to the action URI, so that the
+    browser jumps to (and focuses) the results after submitting (WCAG 2.4.3).
+</f:comment>
+<f:form action="search"
+        controller="Search"
+        section="{sealId}-results"
+        class="seal-form mb-3"
+        role="search"
+        aria-label="{f:translate(key: 'search.form.label')}">
     <f:for each="{filters}" as="filter">
-        <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}" arguments="{filter:filter, requestData:requestData}"/>
+        <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}"
+                  arguments="{filter: filter, requestData: requestData, sealId: sealId}"/>
     </f:for>
-    <f:form.submit value="{f:translate(key: 'search.submit')}" class="btn btn-primary"/>
+    <f:form.submit value="{f:translate(key: 'search.submit')}" class="btn btn-primary seal-form__submit"/>
 </f:form>

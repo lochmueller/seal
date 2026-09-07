@@ -57,7 +57,8 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
 
         $config = $this->configurationLoader->loadBySite($site);
 
-        $filterRows = iterator_to_array($this->getFilterRowsByContentElementUid($this->getCurrentContentElementRow()['uid']));
+        $contentElementUid = (int) $this->getCurrentContentElementRow()['uid'];
+        $filterRows = iterator_to_array($this->getFilterRowsByContentElementUid($contentElementUid));
 
         $filter = [];
         $hasTagCondition = false;
@@ -112,6 +113,7 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
 
         $this->view->assignMultiple(
             [
+                'sealId' => $this->buildSealId($contentElementUid),
                 'filters' => $this->addCalculatedValuesForFilterRows($filterRows, $requestData, $tagFacetCounts),
                 'tagFacets' => $tagFacets,
                 'pagination' => $this->getPagination($config->paginationClass, $config->paginationMaximumNumberOfLinks, $paginator),

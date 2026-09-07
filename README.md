@@ -45,6 +45,35 @@ The ViewHelper escapes the indexed value and renders the matches as `<mark>` ele
 unescaped HTML from the index ends up in the frontend. With `crop` the text is shortened around the
 first match. Every field without a match falls back to the raw value of the document.
 
+### Accessibility (WCAG 2.2)
+
+The shipped Fluid templates are built to pass a WCAG 2.2 AA audit out of the box:
+
+- **Search landmark** – the form is rendered with `role="search"` and an `aria-label`.
+- **Grouped filters** – tag and geo filters use `<fieldset>`/`<legend>` instead of an
+  unassociated `<label>` (1.3.1).
+- **Unique DOM ids** – every id is prefixed with a `sealId` derived from the content element
+  uid, so multiple search plugins on one page keep their `for` and `aria-describedby`
+  references intact (1.3.1 / 4.1.2).
+- **Result semantics** – results are an ordered list of `<article>` elements, numbered
+  continuously across pages, with a machine readable `<time datetime="…">` for the index date.
+- **No redundant links** – the preview image link is removed from the accessibility tree
+  (technique H2) and the "open" button carries the result title for assistive technology (2.4.4).
+- **Pagination** – `aria-current="page"`, `rel="prev"`/`rel="next"`, previous/next links,
+  page numbers with a hidden "Page" prefix and an ellipsis for windowed paginations.
+- **Status messages** – the result count and the geolocation status are live regions (4.1.3).
+- **Redundant entry** – search word, radius and determined coordinates are restored after
+  every submit (WCAG 2.2 – 3.3.7).
+- **Focus handling** – submitting the form and following a pagination link jumps to the
+  focusable result headline (2.4.3), which has `scroll-margin-top` so it is not obscured by
+  sticky headers (WCAG 2.2 – 2.4.11).
+- **Target size** – `Resources/Public/Css/Seal.css` guarantees the 24x24 px minimum for
+  pagination and filter controls (WCAG 2.2 – 2.5.8) and ships the `.seal-visually-hidden`
+  helper, so the templates stay accessible without Bootstrap.
+
+All labels are translatable via `Resources/Private/Language/locallang.xlf`; there is no
+hard coded English left in the templates.
+
 ### DSN Examples
 
 ```

@@ -1,17 +1,95 @@
 <f:if condition="{pagination.allPageNumbers -> f:count()} > 1">
-    <nav aria-label="{f:translate(key: 'search.page.navigation')}">
+    <f:variable name="firstVisiblePage" value="{pagination.allPageNumbers.0}"/>
+
+    <nav class="seal-pagination" aria-label="{f:translate(key: 'search.page.navigation')}">
         <ul class="pagination justify-content-center m-3">
-            <f:for each="{pagination.allPageNumbers}" as="page">
+
+            <f:if condition="{pagination.previousPageNumber}">
                 <li class="page-item">
-                    <f:link.action
-                            arguments="{currentPageNumber:page}"
-                            addQueryString="1"
-                            class="page-link {f:if(condition:'{currentPageNumber}=={page}',then:'active')}">
-                        {page}
+                    <f:link.action class="page-link"
+                                   rel="prev"
+                                   section="{sealId}-results"
+                                   arguments="{currentPageNumber: pagination.previousPageNumber}"
+                                   addQueryString="1">
+                        <span aria-hidden="true">&#8592;</span>
+                        <f:translate key="search.page.previous"/>
                     </f:link.action>
                 </li>
+            </f:if>
+
+            <f:comment>
+                Windowed paginations (SlidingWindowPagination, NumberedPagination) only expose
+                the current window, so the first and the last page get an explicit link and the
+                gap an ellipsis that is hidden from assistive technology.
+            </f:comment>
+            <f:if condition="{firstVisiblePage} > {pagination.firstPageNumber}">
+                <li class="page-item">
+                    <f:link.action class="page-link"
+                                   section="{sealId}-results"
+                                   arguments="{currentPageNumber: pagination.firstPageNumber}"
+                                   addQueryString="1">
+                        <span class="seal-visually-hidden"><f:translate key="search.page.number"/> </span>{pagination.firstPageNumber}
+                    </f:link.action>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link" aria-hidden="true">&#8230;</span>
+                </li>
+            </f:if>
+
+            <f:for each="{pagination.allPageNumbers}" as="page" iteration="pageIteration">
+                <f:if condition="{page} == {paginator.currentPageNumber}">
+                    <f:then>
+                        <f:comment>
+                            aria-current marks the active page for assistive technology; the CSS
+                            class alone conveys it by presentation only (WCAG 1.3.1 / 4.1.2).
+                            The current page is rendered as text instead of a link to itself.
+                        </f:comment>
+                        <li class="page-item active">
+                            <span class="page-link" aria-current="page">
+                                <span class="seal-visually-hidden"><f:translate key="search.page.current"/> </span>{page}
+                            </span>
+                        </li>
+                    </f:then>
+                    <f:else>
+                        <li class="page-item">
+                            <f:link.action class="page-link"
+                                           section="{sealId}-results"
+                                           arguments="{currentPageNumber: page}"
+                                           addQueryString="1">
+                                <span class="seal-visually-hidden"><f:translate key="search.page.number"/> </span>{page}
+                            </f:link.action>
+                        </li>
+                    </f:else>
+                </f:if>
+
+                <f:if condition="{pageIteration.isLast} && {pagination.lastPageNumber} > {page}">
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&#8230;</span>
+                    </li>
+                    <li class="page-item">
+                        <f:link.action class="page-link"
+                                       section="{sealId}-results"
+                                       arguments="{currentPageNumber: pagination.lastPageNumber}"
+                                       addQueryString="1">
+                            <span class="seal-visually-hidden"><f:translate key="search.page.number"/> </span>{pagination.lastPageNumber}
+                        </f:link.action>
+                    </li>
+                </f:if>
             </f:for>
+
+            <f:if condition="{pagination.nextPageNumber} && {pagination.lastPageNumber} >= {pagination.nextPageNumber}">
+                <li class="page-item">
+                    <f:link.action class="page-link"
+                                   rel="next"
+                                   section="{sealId}-results"
+                                   arguments="{currentPageNumber: pagination.nextPageNumber}"
+                                   addQueryString="1">
+                        <f:translate key="search.page.next"/>
+                        <span aria-hidden="true">&#8594;</span>
+                    </f:link.action>
+                </li>
+            </f:if>
+
         </ul>
     </nav>
 </f:if>
-

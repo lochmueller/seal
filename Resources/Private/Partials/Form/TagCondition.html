@@ -1,18 +1,34 @@
-<div class="mb-3">
-    <label class="form-label">{filter.title}</label>
-    <f:for each="{filter.parsedTags}" as="tag">
+<f:comment>
+    A group of related checkboxes needs a fieldset with a legend. A plain label element
+    without a "for" attribute is not associated with anything and is ignored by screen readers
+    (WCAG 1.3.1 / 3.3.2).
+</f:comment>
+<fieldset class="mb-3 seal-filter seal-filter--tags">
+    <legend class="form-label seal-filter__legend">
+        <f:if condition="{filter.title}">
+            <f:then>{filter.title}</f:then>
+            <f:else><f:translate key="filter.tag.legend"/></f:else>
+        </f:if>
+    </legend>
+    <f:for each="{filter.parsedTags}" as="tag" iteration="tagIteration">
         <div class="form-check">
-            <f:form.checkbox
-                id="seal_tag_{filter.uid}_{tag.value}"
-                name="field_{filter.uid}"
-                value="{tag.value}"
-                checked="{tag.selected}"
-                class="form-check-input"
-                multiple="1"
-            />
-            <label class="form-check-label" for="seal_tag_{filter.uid}_{tag.value}">
-                {tag.label} <f:if condition="{tag.count}">({tag.count})</f:if>
+            <f:form.checkbox id="{sealId}-tag-{filter.uid}-{tagIteration.index}"
+                             name="field_{filter.uid}"
+                             value="{tag.value}"
+                             checked="{tag.selected}"
+                             class="form-check-input"
+                             multiple="1"/>
+            <label class="form-check-label" for="{sealId}-tag-{filter.uid}-{tagIteration.index}">
+                {tag.label}
+                <f:if condition="{tag.count}">
+                    <f:comment>
+                        The bare "(12)" is meaningless without its visual context, so it is
+                        hidden from assistive technology and replaced by a full sentence.
+                    </f:comment>
+                    <span class="seal-filter__count" aria-hidden="true">({tag.count})</span>
+                    <span class="seal-visually-hidden"><f:translate key="results" arguments="{0: tag.count}"/></span>
+                </f:if>
             </label>
         </div>
     </f:for>
-</div>
+</fieldset>

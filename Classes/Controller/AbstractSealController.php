@@ -33,6 +33,17 @@ abstract class AbstractSealController extends ActionController
     }
 
     /**
+     * Unique, stable prefix for every DOM id that is rendered by the plugin templates.
+     *
+     * Multiple SEAL plugins on the same page would otherwise produce duplicated ids and
+     * break the "for"/"aria-describedby" references of the rendered form controls.
+     */
+    protected function buildSealId(int $contentElementUid): string
+    {
+        return 'seal-' . ($contentElementUid > 0 ? (string) $contentElementUid : 'plugin');
+    }
+
+    /**
      * @return iterable<array<string, mixed>>
      */
     protected function getFilterRowsByContentElementUid(int $uid): iterable

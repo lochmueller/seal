@@ -1,15 +1,27 @@
+<f:asset.css identifier="seal-accessibility" href="EXT:seal/Resources/Public/Css/Seal.css"/>
+
 <f:render partial="Form" arguments="{_all}"/>
 
-<f:if condition="{paginator.totalAmountOfItems}">
-    <f:then>
-        <h1>
-            <f:translate key="results" arguments="{0: paginator.totalAmountOfItems}"/>
-        </h1>
-        <f:render partial="Result/List" arguments="{paginator: paginator, pagination: pagination}"/>
-        <!-- @TODO PAGINATION for active search -->
-        <f:render partial="Result/Pagination" arguments="{_all}"/>
-    </f:then>
-    <f:else>
-        <f:translate key="results.no"/>
-    </f:else>
-</f:if>
+<section class="seal-results" aria-label="{f:translate(key: 'results.region')}">
+    <f:if condition="{paginator.totalAmountOfItems}">
+        <f:then>
+            <h2 id="{sealId}-results" class="seal-results__headline" tabindex="-1">
+                <f:translate key="results" arguments="{0: paginator.totalAmountOfItems}"/>
+            </h2>
+            <p class="seal-visually-hidden" role="status">
+                <f:translate key="results.status"
+                             arguments="{0: pagination.startRecordNumber, 1: pagination.endRecordNumber, 2: paginator.totalAmountOfItems}"/>
+            </p>
+            <f:render partial="Result/List" arguments="{_all}"/>
+            <f:render partial="Result/Pagination" arguments="{_all}"/>
+        </f:then>
+        <f:else>
+            <h2 id="{sealId}-results" class="seal-results__headline" tabindex="-1">
+                <f:translate key="results.no.headline"/>
+            </h2>
+            <p class="seal-results__empty" role="status">
+                <f:translate key="results.no"/>
+            </p>
+        </f:else>
+    </f:if>
+</section>

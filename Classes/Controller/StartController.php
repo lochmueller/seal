@@ -54,6 +54,7 @@ class StartController extends AbstractSealController
         $tagFacetCounts = $tagFacets['count'] ?? [];
 
         $this->view->assignMultiple([
+            'sealId' => $this->buildSealId((int) $currentContentElementData['uid']),
             'filters' => $this->addCalculatedValuesForFilterRows(
                 $filterRows,
                 tagFacetCounts: $tagFacetCounts

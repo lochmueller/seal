@@ -1,0 +1,83 @@
+/*
+ * Minimal accessibility helper styles for EXT:seal.
+ *
+ * The default templates are written for a Bootstrap 5 based frontend, but the
+ * rules below are intentionally framework independent so that the templates stay
+ * accessible even without Bootstrap.
+ */
+
+/* Content that is only exposed to assistive technology (WCAG 1.3.1 / 2.4.4). */
+.seal-visually-hidden:not(:focus):not(:active) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* WCAG 2.2 - 2.4.7 Focus Visible / 2.4.13 Focus Appearance */
+.seal-form :focus-visible,
+.seal-results :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* The result headline is the target of the form/pagination anchors.
+   WCAG 2.2 - 2.4.11 Focus Not Obscured (Minimum): keep it clear of sticky headers. */
+.seal-results__headline {
+    scroll-margin-top: 6rem;
+}
+
+.seal-results__headline:focus {
+    outline: none;
+}
+
+.seal-results__list {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+/* WCAG 2.2 - 2.5.8 Target Size (Minimum): at least 24x24 CSS pixels. */
+.seal-pagination .page-link,
+.seal-filter .form-check-label,
+.seal-geo-locate-btn {
+    min-height: 24px;
+}
+
+.seal-pagination .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Enough spacing between adjacent checkbox targets. */
+.seal-filter .form-check {
+    padding-block: 0.125rem;
+}
+
+/* WCAG 1.4.11 / 1.4.3: highlighting must not rely on a low contrast colour alone. */
+.seal-result mark,
+.seal-result__meta mark {
+    background-color: #fff2a8;
+    color: #1a1a1a;
+    padding: 0 0.15em;
+    border-radius: 2px;
+}
+
+/* The image link is hidden from the accessibility tree (redundant with the title
+   link), so make sure it cannot be reached by pointer focus rings either. */
+.seal-result__preview-link:focus {
+    outline: none;
+}
+
+.seal-geo-status:empty {
+    display: none;
+}

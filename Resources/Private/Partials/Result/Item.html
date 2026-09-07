@@ -1,36 +1,70 @@
-<div class="card mb-4">
+<article class="card mb-4 seal-result" aria-labelledby="{sealId}-result-{itemIteration.index}-title">
     <div class="row g-0">
-        <div class="col-md-4">
-            <f:if condition="{item.preview}">
-                <a href="{item.uri}">
-                    <img src="{item.preview}" alt="{item.title}" class="img-fluid rounded-start" />
+        <f:if condition="{item.preview}">
+            <div class="col-md-4">
+                <f:comment>
+                    The preview image links to the same target as the title right below it.
+                    Following WCAG technique H2 the redundant link is removed from the
+                    accessibility tree instead of getting its own (duplicated) name, so that
+                    there are no two adjacent links with the same purpose (WCAG 2.4.4 / 4.1.2).
+                </f:comment>
+                <a href="{item.uri}" class="seal-result__preview-link" tabindex="-1" aria-hidden="true">
+                    <img src="{item.preview}" alt="" loading="lazy" class="img-fluid rounded-start"/>
                 </a>
-            </f:if>
-        </div>
+            </div>
+        </f:if>
         <div class="col-md-8">
             <div class="card-body">
-                <h3 class="card-title"><a href="{item.uri}"><seal:highlight item="{item}" field="title"/></a></h3>
+                <h3 class="card-title" id="{sealId}-result-{itemIteration.index}-title">
+                    <a href="{item.uri}" class="seal-result__link"><seal:highlight item="{item}" field="title"/></a>
+                </h3>
                 <p class="card-text">
                     <seal:highlight item="{item}" field="content" crop="300"/>
                 </p>
-                <a href="{item.uri}" class="card-link btn btn-secondary">open</a>
+                <f:comment>
+                    "Open" alone is not a descriptive link text. The title is appended for
+                    assistive technology only, so the visible button stays short (WCAG 2.4.4).
+                </f:comment>
+                <a href="{item.uri}" class="card-link btn btn-secondary seal-result__open">
+                    <f:translate key="result.open"/>
+                    <span class="seal-visually-hidden">: {item.title}</span>
+                </a>
             </div>
         </div>
     </div>
 
     <div class="card-footer text-muted p-2">
-        <small class="text-body-secondary">
-            Indexed at
-            <f:format.date date="{item.indexdate}" format="d.m.Y H:i"></f:format.date>
+        <ul class="list-inline seal-result__meta small text-body-secondary mb-0">
+            <f:if condition="{item.indexdate}">
+                <li class="list-inline-item">
+                    <span class="seal-result__meta-label"><f:translate key="result.meta.indexed"/></span>
+                    <f:comment>
+                        A machine readable date next to the localised, human readable one
+                        (WCAG 1.3.1).
+                    </f:comment>
+                    <time datetime="{item.indexdate -> f:format.date(format: 'c')}">
+                        <f:format.date date="{item.indexdate}" format="{f:translate(key: 'result.meta.dateFormat')}"/>
+                    </time>
+                </li>
+            </f:if>
             <f:if condition="{item.extension}">
-                | Type: {item.extension}
+                <li class="list-inline-item">
+                    <span class="seal-result__meta-label"><f:translate key="result.meta.type"/></span>
+                    {item.extension}
+                </li>
             </f:if>
             <f:if condition="{item.size}">
-                | Size: {item.size -> f:format.bytes()}
+                <li class="list-inline-item">
+                    <span class="seal-result__meta-label"><f:translate key="result.meta.size"/></span>
+                    {item.size -> f:format.bytes()}
+                </li>
             </f:if>
             <f:if condition="{item.score}">
-                | Score: {item.score}
+                <li class="list-inline-item">
+                    <span class="seal-result__meta-label"><f:translate key="result.meta.score"/></span>
+                    {item.score}
+                </li>
             </f:if>
-        </small>
+        </ul>
     </div>
-</div>
+</article>
