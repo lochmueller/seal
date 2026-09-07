@@ -9,6 +9,7 @@ use CmsIg\Seal\Engine;
 use CmsIg\Seal\EngineInterface;
 use InvalidArgumentException;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
+use Lochmueller\Seal\DsnNormalizer;
 use Lochmueller\Seal\DsnParser;
 use Lochmueller\Seal\Event\ResolveAdapterEvent;
 use Lochmueller\Seal\Exception\AdapterNotFoundException;
@@ -26,15 +27,17 @@ class EngineFactory
         protected ConfigurationLoader $configurationLoader,
         protected SchemaBuilder            $schemaBuilder,
         protected DsnParser            $dsnParser,
+        protected DsnNormalizer        $dsnNormalizer,
         protected AdapterFactory           $adapterFactory,
     ) {}
 
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
         $configuration = $this->configurationLoader->loadBySite($site);
-        $dsn = $this->dsnParser->parse($configuration->searchDsn);
+        $searchDsn = $this->dsnNormalizer->normalize($configuration->searchDsn);
+        $dsn = $this->dsnParser->parse($searchDsn);
         try {
-            $adapter = $this->adapterFactory->createAdapter($configuration->searchDsn);
+            $adapter = $this->adapterFactory->createAdapter($searchDsn);
         } catch (InvalidArgumentException) {
             $adapter = null;
         }

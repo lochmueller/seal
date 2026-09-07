@@ -13,6 +13,7 @@ use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Schema\Schema;
 use Lochmueller\Seal\Configuration\Configuration;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
+use Lochmueller\Seal\DsnNormalizer;
 use Lochmueller\Seal\DsnParser;
 use Lochmueller\Seal\Dto\DsnDto;
 use Lochmueller\Seal\Engine\EngineFactory;
@@ -21,6 +22,7 @@ use Lochmueller\Seal\Exception\AdapterNotFoundException;
 use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 class EngineFactoryTest extends AbstractTest
@@ -84,6 +86,7 @@ class EngineFactoryTest extends AbstractTest
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
+            new DsnNormalizer(),
             new AdapterFactory([
                 'elasticsearch' => $adapterFactory,
             ]),
@@ -103,6 +106,63 @@ class EngineFactoryTest extends AbstractTest
         self::assertEquals(9200, $adapterFactory->dsn['port']);
     }
 
+    public function testBuildEngineBySitePassesNormalizedLoupeDsnToAdapterFactory(): void
+    {
+        $dsn = new DsnDto(scheme: 'loupe');
+        $config = new Configuration('loupe://', 3, 10);
+
+        $this->configurationLoaderStub->method('loadBySite')->willReturn($config);
+        $this->dsnParserStub->method('parse')->willReturn($dsn);
+
+        $adapter = $this->createStub(AdapterInterface::class);
+        $adapterFactory = new class ($adapter) implements AdapterFactoryInterface {
+            private AdapterInterface $adapter;
+            public array $dsn = [];
+
+            public function __construct(AdapterInterface $adapter)
+            {
+                $this->adapter = $adapter;
+            }
+
+            public static function getName(): string
+            {
+                return 'loupe';
+            }
+
+            public function createAdapter(array $dsn): AdapterInterface
+            {
+                $this->dsn = $dsn;
+                return $this->adapter;
+            }
+        };
+
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
+        $eventDispatcher->method('dispatch')->willReturnArgument(0);
+
+        $subject = new EngineFactory(
+            $eventDispatcher,
+            $this->configurationLoaderStub,
+            $this->schemaBuilderStub,
+            $this->dsnParserStub,
+            new DsnNormalizer(),
+            new AdapterFactory([
+                'loupe' => $adapterFactory,
+            ]),
+        );
+
+        $site = $this->createStub(SiteInterface::class);
+        $site->method('getIdentifier')->willReturn('main');
+
+        $subject->buildEngineBySite($site);
+
+        // The Loupe adapter builds its directory out of host and path and resolves a relative
+        // one against the current working directory, which differs between CLI and frontend.
+        self::assertSame(
+            Environment::getProjectPath() . '/' . DsnNormalizer::LOUPE_DEFAULT_DIRECTORY,
+            ($adapterFactory->dsn['host'] ?? '') . ($adapterFactory->dsn['path'] ?? ''),
+        );
+    }
+
     public function testBuildEngineBySiteThrowsExceptionWhenNoAdapterFound(): void
     {
         $dsn = new DsnDto(scheme: 'unknown');
@@ -120,6 +180,7 @@ class EngineFactoryTest extends AbstractTest
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
+            new DsnNormalizer(),
             new AdapterFactory([]),
         );
 
@@ -156,6 +217,7 @@ class EngineFactoryTest extends AbstractTest
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
+            new DsnNormalizer(),
             new AdapterFactory([]),
         );
 
@@ -183,6 +245,7 @@ class EngineFactoryTest extends AbstractTest
             $this->configurationLoaderStub,
             $this->schemaBuilderStub,
             $this->dsnParserStub,
+            new DsnNormalizer(),
             new AdapterFactory([]),
         );
 
