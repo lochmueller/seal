@@ -7,6 +7,7 @@ namespace Lochmueller\Seal\Tests\Unit\Filter;
 use CmsIg\Seal\Search\Condition\InCondition;
 use Lochmueller\Seal\Filter\TagCondition;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
+use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,7 +22,7 @@ class TagConditionTest extends AbstractTest
     protected function setUp(): void
     {
         parent::setUp();
-        $this->subject = new TagCondition(new TagConfigurationParser());
+        $this->subject = new TagCondition(new TagConfigurationParser(), new SearchRequestDataResolver());
     }
 
     public function testGetTypeReturnsTagCondition(): void

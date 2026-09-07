@@ -45,6 +45,40 @@ The ViewHelper escapes the indexed value and renders the matches as `<mark>` ele
 unescaped HTML from the index ends up in the frontend. With `crop` the text is shortened around the
 first match. Every field without a match falls back to the raw value of the document.
 
+### Search Form, URLs and Caching
+
+The search form is submitted via **GET**, so the complete search state (search word, tag
+filters, geo coordinates, page) lives in the URL. Results are bookmarkable and shareable, the
+back button works without a "resend form?" dialog, and the pagination is able to reproduce the
+search in the first place.
+
+Three things follow from that and are worth knowing when you override the templates:
+
+- **The form is plain HTML, not `<f:form>`.** `f:form` always renders five `__referrer[...]`
+  fields plus `__trustedProperties`; with `method="get"` that HMAC blob would end up in the
+  query string of every result URL. Instead the field names carry the plugin namespace
+  explicitly, e.g. `name="{pluginNamespace}[search]"`. `action` and `controller` are hidden
+  fields, because a browser discards the query string of the action URL on a GET submit.
+- **The plugin namespace is excluded from the cacheHash** in `ext_localconf.php`
+  (`$GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = '^tx_seal_search'`).
+  Without it a form submit would hit a missing/invalid cHash. The `search` action itself is
+  already registered as non-cacheable.
+- **Links use `<seal:uri.search>`, not `addQueryString`.** `addQueryString="1"` only keeps the
+  *route* arguments of a request (`PageLinkBuilder::getQueryArguments()`), so it would silently
+  drop the search from page 2 onwards, and `"untrusted"` would forward every unrelated query
+  parameter. `Lochmueller\Seal\Uri\SearchUriBuilder` rebuilds the search state instead:
+
+  ```html
+  <a href="{seal:uri.search(page: 2, section: 'seal-12-results')}">Page 2</a>
+  ```
+
+  Page 1 is omitted from the URI, and empty fields the browser submitted anyway are stripped,
+  so one search always has one canonical URL. Use the same ViewHelper for your own links
+  (sorting, facets) so they keep the current search.
+
+Search statistics are only written for the first result page, otherwise paging through the
+results would log the same term over and over.
+
 ### Accessibility (WCAG 2.2)
 
 The shipped Fluid templates are built to pass a WCAG 2.2 AA audit out of the box:
@@ -62,8 +96,8 @@ The shipped Fluid templates are built to pass a WCAG 2.2 AA audit out of the box
 - **Pagination** – `aria-current="page"`, `rel="prev"`/`rel="next"`, previous/next links,
   page numbers with a hidden "Page" prefix and an ellipsis for windowed paginations.
 - **Status messages** – the result count and the geolocation status are live regions (4.1.3).
-- **Redundant entry** – search word, radius and determined coordinates are restored after
-  every submit (WCAG 2.2 – 3.3.7).
+- **Redundant entry** – search word, radius and determined coordinates are restored from the
+  URL after every submit and survive pagination (WCAG 2.2 – 3.3.7).
 - **Focus handling** – submitting the form and following a pagination link jumps to the
   focusable result headline (2.4.3), which has `scroll-margin-top` so it is not obscured by
   sticky headers (WCAG 2.2 – 2.4.11).
@@ -130,6 +164,7 @@ vendor/bin/typo3 seal:schema
 | `Middleware/`    | PSR-15 middleware stack                     |
 | `Pagination/`    | Fluid pagination based on SEAL Generator    |
 | `Schema/`        | Schema structure management                 |
+| `Uri/`           | URI building that keeps the search state    |
 | `ViewHelpers/`   | Fluid ViewHelpers of EXT:seal               |
 
 ## Development

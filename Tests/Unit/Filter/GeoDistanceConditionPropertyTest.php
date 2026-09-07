@@ -7,6 +7,7 @@ namespace Lochmueller\Seal\Tests\Unit\Filter;
 use CmsIg\Seal\Search\Condition\GeoDistanceCondition as SealGeoDistanceCondition;
 use Lochmueller\Seal\Filter\GeoDistanceCondition;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
+use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -23,7 +24,7 @@ class GeoDistanceConditionPropertyTest extends AbstractTest
     {
         parent::setUp();
         $this->parser = new RadiusConfigurationParser();
-        $this->subject = new GeoDistanceCondition($this->parser);
+        $this->subject = new GeoDistanceCondition($this->parser, new SearchRequestDataResolver());
     }
 
     /**

@@ -14,24 +14,27 @@
         The coordinates are restored from the request, so an already determined position
         survives pagination and a second search (WCAG 2.2 - 3.3.7 Redundant Entry).
     </f:comment>
-    <f:form.hidden id="{sealId}-geo-{filter.uid}-lat"
-                   name="geo_position_lat"
-                   value="{requestData.geo_position_lat}"/>
-    <f:form.hidden id="{sealId}-geo-{filter.uid}-lng"
-                   name="geo_position_lng"
-                   value="{requestData.geo_position_lng}"/>
+    <input type="hidden"
+           id="{sealId}-geo-{filter.uid}-lat"
+           name="{pluginNamespace}[geo_position_lat]"
+           value="{requestData.geo_position_lat}"/>
+    <input type="hidden"
+           id="{sealId}-geo-{filter.uid}-lng"
+           name="{pluginNamespace}[geo_position_lng]"
+           value="{requestData.geo_position_lng}"/>
 
     <div class="mb-2">
         <label for="{sealId}-geo-{filter.uid}-radius" class="form-label">
             <f:translate key="distance"/>
         </label>
-        <f:form.select id="{sealId}-geo-{filter.uid}-radius"
-                       name="geo_position_radius"
-                       class="form-select"
-                       options="{filter.parsedRadii}"
-                       value="{requestData.geo_position_radius}"
-                       optionValueField="value"
-                       optionLabelField="label"/>
+        <select id="{sealId}-geo-{filter.uid}-radius"
+                name="{pluginNamespace}[geo_position_radius]"
+                class="form-select">
+            <f:for each="{filter.parsedRadii}" as="radius">
+                <option value="{radius.value}"
+                        {f:if(condition: '{requestData.geo_position_radius} == {radius.value}', then: 'selected')}>{radius.label}</option>
+            </f:for>
+        </select>
     </div>
 
     <button type="button"

@@ -95,25 +95,32 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
 
         $result = $modifySearchBuilderEvent->searchBuilder->getResult();
 
-        $parsedBody = $this->request->getParsedBody();
-        $searchTerm = is_array($parsedBody) ? (string) ($parsedBody['tx_seal_search']['search'] ?? '') : '';
+        $requestData = $this->searchRequestDataResolver->resolve($this->request);
 
-        try {
-            $this->statRepository->logSearchQuery($searchTerm, $site->getIdentifier(), $language->getLanguageId());
-        } catch (\Exception $exception) {
-            $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
+        // The form is submitted via GET, so the search term is part of the URL and reaches
+        // this action again on every pagination click. Only the first page counts as a new
+        // search, otherwise paging through the results would inflate the statistics.
+        if ($currentPage === 1) {
+            $searchTermValue = $requestData['search'] ?? '';
+            $searchTerm = is_scalar($searchTermValue) ? (string) $searchTermValue : '';
+
+            try {
+                $this->statRepository->logSearchQuery($searchTerm, $site->getIdentifier(), $language->getLanguageId());
+            } catch (\Exception $exception) {
+                $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
+            }
         }
 
         $facets = $result->facets();
         $tagFacets = $facets['tags'] ?? [];
         $tagFacetCounts = $tagFacets['count'] ?? [];
 
-        $requestData = $this->searchRequestDataResolver->resolve($this->request);
         $paginator = new SearchResultArrayPaginator($result, $currentPage, $config->itemsPerPage);
 
         $this->view->assignMultiple(
             [
                 'sealId' => $this->buildSealId($contentElementUid),
+                'pluginNamespace' => SearchRequestDataResolver::PARAM_KEY,
                 'filters' => $this->addCalculatedValuesForFilterRows($filterRows, $requestData, $tagFacetCounts),
                 'tagFacets' => $tagFacets,
                 'pagination' => $this->getPagination($config->paginationClass, $config->paginationMaximumNumberOfLinks, $paginator),

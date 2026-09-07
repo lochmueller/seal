@@ -12,12 +12,12 @@
     </legend>
     <f:for each="{filter.parsedTags}" as="tag" iteration="tagIteration">
         <div class="form-check">
-            <f:form.checkbox id="{sealId}-tag-{filter.uid}-{tagIteration.index}"
-                             name="field_{filter.uid}"
-                             value="{tag.value}"
-                             checked="{tag.selected}"
-                             class="form-check-input"
-                             multiple="1"/>
+            <input type="checkbox"
+                   id="{sealId}-tag-{filter.uid}-{tagIteration.index}"
+                   name="{pluginNamespace}[field_{filter.uid}][]"
+                   value="{tag.value}"
+                   class="form-check-input"
+                   {f:if(condition: tag.selected, then: 'checked')}/>
             <label class="form-check-label" for="{sealId}-tag-{filter.uid}-{tagIteration.index}">
                 {tag.label}
                 <f:if condition="{tag.count}">

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\Filter;
 
 use CmsIg\Seal\Search\Condition\Condition;
+use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -12,6 +13,7 @@ class TagCondition implements FilterInterface
 {
     public function __construct(
         private readonly TagConfigurationParser $parser,
+        private readonly SearchRequestDataResolver $searchRequestDataResolver,
     ) {}
 
     public function getType(): string
@@ -35,8 +37,9 @@ class TagCondition implements FilterInterface
         $filterName = 'field_' . $filterItem['uid'];
         $selectedValues = [];
         if ($request instanceof ServerRequestInterface) {
-            $parsedBody = $request->getParsedBody();
-            $selectedValues = is_array($parsedBody) ? ($parsedBody['tx_seal_search'][$filterName] ?? []) : [];
+            // Resolved instead of read from the parsed body: the search form is submitted via
+            // GET, so the selected tags arrive as query parameters.
+            $selectedValues = $this->searchRequestDataResolver->resolve($request)[$filterName] ?? [];
         }
 
         if (!is_array($selectedValues)) {

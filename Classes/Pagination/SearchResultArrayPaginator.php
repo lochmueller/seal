@@ -28,15 +28,22 @@ class SearchResultArrayPaginator extends AbstractPaginator
     }
 
     /**
-     * @return iterable<array<string, mixed>>
+     * Returns an array and not a generator on purpose: Fluid's f:for ViewHelper calls count()
+     * on the value as soon as the "iteration" argument is used, and a generator is not
+     * Countable. Caching alone does not help there, because a generator function hands out a
+     * fresh - and still uncountable - Generator on every call.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getPaginatedItems(): iterable
     {
         if ($this->resultCached === null) {
-            $this->resultCached = iterator_to_array($this->result);
+            // Not preserving the keys: the documents are a result list, and an adapter that
+            // yields its own keys would otherwise be able to overwrite entries.
+            $this->resultCached = iterator_to_array($this->result, false);
         }
 
-        yield from $this->resultCached;
+        return $this->resultCached;
     }
 
 

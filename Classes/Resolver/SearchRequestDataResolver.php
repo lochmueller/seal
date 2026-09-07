@@ -8,7 +8,11 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class SearchRequestDataResolver
 {
-    private const string PARAM_KEY = 'tx_seal_search';
+    /**
+     * Plugin namespace of the search plugin. Every form field and every link argument is
+     * nested below this key.
+     */
+    public const string PARAM_KEY = 'tx_seal_search';
 
     /**
      * @return array<string, mixed>

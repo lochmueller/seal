@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\Filter;
 
 use CmsIg\Seal\Search\Condition\Condition;
+use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -12,6 +13,7 @@ class GeoDistanceCondition implements FilterInterface
 {
     public function __construct(
         private readonly RadiusConfigurationParser $parser,
+        private readonly SearchRequestDataResolver $searchRequestDataResolver,
     ) {}
 
     public function getType(): string
@@ -29,12 +31,9 @@ class GeoDistanceCondition implements FilterInterface
             return [];
         }
 
-        $parsedBody = $request->getParsedBody();
-        $searchData = is_array($parsedBody) ? ($parsedBody['tx_seal_search'] ?? []) : [];
-
-        if (!is_array($searchData)) {
-            return [];
-        }
+        // Resolved instead of read from the parsed body: the search form is submitted via
+        // GET, so the coordinates and the radius arrive as query parameters.
+        $searchData = $this->searchRequestDataResolver->resolve($request);
 
         $lat = (float) ($searchData['geo_position_lat'] ?? 0.0);
         $lng = (float) ($searchData['geo_position_lng'] ?? 0.0);

@@ -27,6 +27,12 @@ $GLOBALS['TYPO3_CONF_VARS']['LOG']['Lochmueller']['Seal']['writerConfiguration']
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['fluid']['namespaces']['seal'][] = 'Lochmueller\\Seal\\ViewHelpers';
 
+// The search form is submitted via GET, so the whole search state travels in the URL.
+// Without this the parameters would either be part of the cHash (a wrong/missing cHash on a
+// form submit results in a 404 or a dropped search) or would have to be entered manually by
+// the visitor on every page. "^" means "starts with", see CacheHashConfiguration.
+$GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = '^tx_seal_search';
+
 ExtensionUtility::configurePlugin(
     'Seal',
     'Search',
@@ -35,6 +41,7 @@ ExtensionUtility::configurePlugin(
         SearchController::class => 'search',
     ],
     [
+        StartController::class => 'start',
         SearchController::class => 'search',
     ],
     ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT

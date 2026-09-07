@@ -1,18 +1,34 @@
 <f:comment>
-    role="search" turns the form into a search landmark, aria-label names it so that
-    multiple landmarks on one page stay distinguishable (WCAG 1.3.1 / 2.4.1).
-    "section" appends the anchor of the result headline to the action URI, so that the
-    browser jumps to (and focuses) the results after submitting (WCAG 2.4.3).
+    The form is submitted via GET, so the complete search state lives in the URL: results stay
+    bookmarkable and shareable, the back button works without a "resend form?" dialog, and the
+    pagination links are able to reproduce the search at all.
+
+    Deliberately NOT f:form: that ViewHelper always renders five __referrer[...] fields plus
+    __trustedProperties, which with method="get" would end up in the query string of every
+    result URL and would be dragged along by every link built from it.
+
+    "action" and "controller" have to be hidden fields because a browser discards the query
+    string of the action URL when submitting a GET form. The fragment is kept, so the anchor
+    to the result headline survives (WCAG 2.4.3).
+
+    role="search" turns the form into a search landmark, aria-label names it so that multiple
+    landmarks on one page stay distinguishable (WCAG 1.3.1 / 2.4.1).
 </f:comment>
-<f:form action="search"
-        controller="Search"
-        section="{sealId}-results"
-        class="seal-form mb-3"
-        role="search"
-        aria-label="{f:translate(key: 'search.form.label')}">
+<form method="get"
+      action="{f:uri.action(action: 'search', controller: 'Search', section: '{sealId}-results')}"
+      class="seal-form mb-3"
+      role="search"
+      aria-label="{f:translate(key: 'search.form.label')}">
+
+    <input type="hidden" name="{pluginNamespace}[action]" value="search"/>
+    <input type="hidden" name="{pluginNamespace}[controller]" value="Search"/>
+
     <f:for each="{filters}" as="filter">
         <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}"
-                  arguments="{filter: filter, requestData: requestData, sealId: sealId}"/>
+                  arguments="{filter: filter, requestData: requestData, sealId: sealId, pluginNamespace: pluginNamespace}"/>
     </f:for>
-    <f:form.submit value="{f:translate(key: 'search.submit')}" class="btn btn-primary seal-form__submit"/>
-</f:form>
+
+    <button type="submit" class="btn btn-primary seal-form__submit">
+        <f:translate key="search.submit"/>
+    </button>
+</form>

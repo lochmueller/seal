@@ -1,19 +1,24 @@
 <f:if condition="{pagination.allPageNumbers -> f:count()} > 1">
     <f:variable name="firstVisiblePage" value="{pagination.allPageNumbers.0}"/>
+    <f:variable name="resultsAnchor" value="{sealId}-results"/>
 
+    <f:comment>
+        The links are built by seal:uri.search, which re-creates the complete search state
+        from the current request. f:link.action with addQueryString="1" would NOT work here:
+        it only keeps the route arguments of the request (PageLinkBuilder::getQueryArguments()),
+        so the search word and all filters would be silently dropped from page 2 onwards.
+    </f:comment>
     <nav class="seal-pagination" aria-label="{f:translate(key: 'search.page.navigation')}">
         <ul class="pagination justify-content-center m-3">
 
             <f:if condition="{pagination.previousPageNumber}">
                 <li class="page-item">
-                    <f:link.action class="page-link"
-                                   rel="prev"
-                                   section="{sealId}-results"
-                                   arguments="{currentPageNumber: pagination.previousPageNumber}"
-                                   addQueryString="1">
+                    <a class="page-link"
+                       rel="prev"
+                       href="{seal:uri.search(page: pagination.previousPageNumber, section: resultsAnchor)}">
                         <span aria-hidden="true">&#8592;</span>
                         <f:translate key="search.page.previous"/>
-                    </f:link.action>
+                    </a>
                 </li>
             </f:if>
 
@@ -24,12 +29,9 @@
             </f:comment>
             <f:if condition="{firstVisiblePage} > {pagination.firstPageNumber}">
                 <li class="page-item">
-                    <f:link.action class="page-link"
-                                   section="{sealId}-results"
-                                   arguments="{currentPageNumber: pagination.firstPageNumber}"
-                                   addQueryString="1">
+                    <a class="page-link" href="{seal:uri.search(page: pagination.firstPageNumber, section: resultsAnchor)}">
                         <span class="seal-visually-hidden"><f:translate key="search.page.number"/> </span>{pagination.firstPageNumber}
-                    </f:link.action>
+                    </a>
                 </li>
                 <li class="page-item disabled">
                     <span class="page-link" aria-hidden="true">&#8230;</span>
@@ -52,12 +54,9 @@
                     </f:then>
                     <f:else>
                         <li class="page-item">
-                            <f:link.action class="page-link"
-                                           section="{sealId}-results"
-                                           arguments="{currentPageNumber: page}"
-                                           addQueryString="1">
+                            <a class="page-link" href="{seal:uri.search(page: page, section: resultsAnchor)}">
                                 <span class="seal-visually-hidden"><f:translate key="search.page.number"/> </span>{page}
-                            </f:link.action>
+                            </a>
                         </li>
                     </f:else>
                 </f:if>
@@ -67,26 +66,21 @@
                         <span class="page-link" aria-hidden="true">&#8230;</span>
                     </li>
                     <li class="page-item">
-                        <f:link.action class="page-link"
-                                       section="{sealId}-results"
-                                       arguments="{currentPageNumber: pagination.lastPageNumber}"
-                                       addQueryString="1">
+                        <a class="page-link" href="{seal:uri.search(page: pagination.lastPageNumber, section: resultsAnchor)}">
                             <span class="seal-visually-hidden"><f:translate key="search.page.number"/> </span>{pagination.lastPageNumber}
-                        </f:link.action>
+                        </a>
                     </li>
                 </f:if>
             </f:for>
 
             <f:if condition="{pagination.nextPageNumber} && {pagination.lastPageNumber} >= {pagination.nextPageNumber}">
                 <li class="page-item">
-                    <f:link.action class="page-link"
-                                   rel="next"
-                                   section="{sealId}-results"
-                                   arguments="{currentPageNumber: pagination.nextPageNumber}"
-                                   addQueryString="1">
+                    <a class="page-link"
+                       rel="next"
+                       href="{seal:uri.search(page: pagination.nextPageNumber, section: resultsAnchor)}">
                         <f:translate key="search.page.next"/>
                         <span aria-hidden="true">&#8594;</span>
-                    </f:link.action>
+                    </a>
                 </li>
             </f:if>
 

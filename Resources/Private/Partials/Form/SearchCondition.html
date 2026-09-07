@@ -6,19 +6,19 @@
         </f:if>
     </label>
     <f:comment>
-        The help text id is scoped to the plugin and the filter row, otherwise multiple
-        search plugins (or filters) on one page would produce duplicated ids and break
-        the aria-describedby reference (WCAG 1.3.1 / 4.1.2).
-        The value is pre-filled again after submitting, so the search word never has to
-        be entered twice (WCAG 2.2 - 3.3.7 Redundant Entry).
+        The help text id is scoped to the plugin and the filter row, otherwise multiple search
+        plugins (or filters) on one page would produce duplicated ids and break the
+        aria-describedby reference (WCAG 1.3.1 / 4.1.2).
+        The value is pre-filled again from the request, so the search word never has to be
+        entered twice (WCAG 2.2 - 3.3.7 Redundant Entry).
     </f:comment>
-    <f:form.textfield id="{sealId}-search-{filter.uid}"
-                      type="search"
-                      name="search"
-                      class="form-control"
-                      value="{requestData.search}"
-                      enterkeyhint="search"
-                      aria-describedby="{sealId}-search-{filter.uid}-help"/>
+    <input type="search"
+           id="{sealId}-search-{filter.uid}"
+           name="{pluginNamespace}[search]"
+           class="form-control"
+           value="{requestData.search}"
+           enterkeyhint="search"
+           aria-describedby="{sealId}-search-{filter.uid}-help"/>
     <p id="{sealId}-search-{filter.uid}-help" class="form-text">
         <f:translate key="searchword.help"/>
     </p>
