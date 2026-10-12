@@ -17,8 +17,9 @@ class TopSearchesDataProviderTest extends AbstractTest
     public function testGetItemsTransformsRepositoryDataCorrectly(): void
     {
         $repositoryData = [
-            ['search_term' => 'popular', 'count' => 42],
-            ['search_term' => 'less popular', 'count' => 10],
+            ['search_term' => 'popular', 'site' => 'main', 'count' => 42],
+            ['search_term' => 'popular', 'site' => 'shop', 'count' => 12],
+            ['search_term' => 'less popular', 'site' => 'main', 'count' => 10],
         ];
 
         $statRepository = $this->createStub(StatRepository::class);
@@ -27,9 +28,10 @@ class TopSearchesDataProviderTest extends AbstractTest
         $subject = new TopSearchesDataProvider($statRepository);
         $items = $subject->getItems();
 
-        self::assertCount(2, $items);
-        self::assertSame('popular / 42', $items[0]);
-        self::assertSame('less popular / 10', $items[1]);
+        self::assertCount(3, $items);
+        self::assertSame('popular / main / 42', $items[0]);
+        self::assertSame('popular / shop / 12', $items[1]);
+        self::assertSame('less popular / main / 10', $items[2]);
     }
 
     public function testGetItemsReturnsEmptyArrayWhenNoData(): void

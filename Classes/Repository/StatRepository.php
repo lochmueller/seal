@@ -61,6 +61,7 @@ class StatRepository
 
     /**
      * Returns the $limit most frequent search terms of the current calendar month.
+     * The terms are counted per site, otherwise identical terms of different sites would be merged.
      *
      * @return list<array<string, mixed>>
      */
@@ -71,13 +72,13 @@ class StatRepository
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable(self::TABLE_NAME);
 
         return $queryBuilder
-            ->select('search_term')
+            ->select('search_term', 'site')
             ->addSelectLiteral('COUNT(*) AS count')
             ->from(self::TABLE_NAME)
             ->where(
                 $queryBuilder->expr()->gte('crdate', $queryBuilder->createNamedParameter($firstDayOfMonth, \Doctrine\DBAL\ParameterType::INTEGER))
             )
-            ->groupBy('search_term')
+            ->groupBy('search_term', 'site')
             ->orderBy('count', 'DESC')
             ->setMaxResults($limit)
             ->executeQuery()

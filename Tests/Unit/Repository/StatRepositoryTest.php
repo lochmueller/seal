@@ -146,4 +146,31 @@ class StatRepositoryTest extends AbstractTest
 
         self::assertSame($expectedRows, $rows);
     }
+
+    public function testFindTopSearchesOfCurrentMonthCountsPerSite(): void
+    {
+        $result = $this->createStub(Result::class);
+        $result->method('fetchAllAssociative')->willReturn([]);
+
+        $expressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $expressionBuilder->method('gte')->willReturn('crdate >= :param');
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())->method('select')->with('search_term', 'site')->willReturn($queryBuilder);
+        $queryBuilder->method('addSelectLiteral')->willReturn($queryBuilder);
+        $queryBuilder->method('from')->willReturn($queryBuilder);
+        $queryBuilder->method('where')->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())->method('groupBy')->with('search_term', 'site')->willReturn($queryBuilder);
+        $queryBuilder->method('orderBy')->willReturn($queryBuilder);
+        $queryBuilder->method('setMaxResults')->willReturn($queryBuilder);
+        $queryBuilder->method('executeQuery')->willReturn($result);
+        $queryBuilder->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->method('createNamedParameter')->willReturn(':param');
+
+        $connectionPool = $this->createStub(ConnectionPool::class);
+        $connectionPool->method('getQueryBuilderForTable')->willReturn($queryBuilder);
+
+        $subject = new StatRepository($connectionPool);
+        $subject->findTopSearchesOfCurrentMonth();
+    }
 }

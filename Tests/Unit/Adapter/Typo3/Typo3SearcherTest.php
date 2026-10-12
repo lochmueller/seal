@@ -9,6 +9,7 @@ use CmsIg\Seal\Schema\Field\IdentifierField;
 use CmsIg\Seal\Schema\Field\TextField;
 use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Search\Condition;
+use CmsIg\Seal\Search\Facet\Facet;
 use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
@@ -241,7 +242,7 @@ class Typo3SearcherTest extends AbstractTest
         $queryBuilder->method('setFirstResult')->willReturnSelf();
         $queryBuilder->method('setMaxResults')->willReturnSelf();
         $queryBuilder->method('executeQuery')->willReturn($doctrineResult);
-        $queryBuilder->expects(self::once())->method('addOrderBy')->with('title', 'asc')->willReturnSelf();
+        $queryBuilder->expects(self::once())->method('addOrderBy')->with('idx.title', 'asc')->willReturnSelf();
 
         $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
         $adapterHelper->method('getConnection')->willReturn($this->createStub(Connection::class));
@@ -706,5 +707,146 @@ class Typo3SearcherTest extends AbstractTest
 
         self::assertStringContainsString('6371000 * ACOS(MIN(1, MAX(-1, ', $sql);
         self::assertStringNotContainsString('LEAST', $sql);
+    }
+
+    /**
+     * @param array<int, array<int, mixed>> $capturedWheres
+     */
+    private function createTagSearcher(array &$capturedWheres): Typo3Searcher
+    {
+        $expressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $expressionBuilder->method('eq')->willReturn('field = value');
+        $expressionBuilder->method('and')->willReturnCallback(
+            static function () use (&$capturedWheres): CompositeExpression {
+                $capturedWheres[] = func_get_args();
+                return CompositeExpression::and(...func_get_args());
+            },
+        );
+
+        $doctrineResult = $this->createStub(DoctrineResult::class);
+        $doctrineResult->method('fetchOne')->willReturn(0);
+        $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::never())->method('leftJoin');
+        $queryBuilder->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->method('from')->willReturnSelf();
+        $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('count')->willReturnSelf();
+        $queryBuilder->method('executeQuery')->willReturn($doctrineResult);
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('quoteIdentifier')->willReturnCallback(static fn(string $v): string => $v);
+        $connection->method('quote')->willReturnCallback(static fn(string $v): string => "'" . $v . "'");
+
+        $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
+        $adapterHelper->method('getConnection')->willReturn($connection);
+        $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
+        $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
+
+        return new Typo3Searcher($adapterHelper);
+    }
+
+    public function testTagConditionFiltersViaSubselectInsteadOfJoin(): void
+    {
+        $capturedWheres = [];
+        $subject = $this->createTagSearcher($capturedWheres);
+
+        $subject->search(new Search($this->index, filters: [
+            Condition\Condition::in('tags', ['News', 'Event']),
+            Condition\Condition::equal('site', 'main'),
+        ]));
+
+        // Result query and count query must both be restricted by the tag selection.
+        self::assertCount(2, $capturedWheres);
+        foreach ($capturedWheres as $where) {
+            self::assertSame(
+                'idx.uid IN (SELECT mm.uid_local FROM tx_seal_domain_model_index_default_mm_tag mm'
+                . ' INNER JOIN tx_seal_domain_model_index_default_tag tag ON tag.uid = mm.uid_foreign'
+                . " WHERE tag.title IN ('News', 'Event'))",
+                (string) $where[0],
+            );
+            self::assertSame('field = value', (string) $where[1]);
+        }
+    }
+
+    public function testNestedTagConditionIsResolved(): void
+    {
+        $capturedWheres = [];
+        $subject = $this->createTagSearcher($capturedWheres);
+
+        $subject->search(new Search($this->index, filters: [
+            Condition\Condition::and(Condition\Condition::in('tags', ['News'])),
+        ]));
+
+        // The nested AND is resolved first, so its arguments are captured before the outer one.
+        self::assertStringContainsString("WHERE tag.title IN ('News')", (string) $capturedWheres[0][0]);
+    }
+
+    public function testFacetsIgnoreTagSelection(): void
+    {
+        $capturedFacetWhere = null;
+
+        $facetExpressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $facetExpressionBuilder->method('and')->willReturnCallback(
+            static function () use (&$capturedFacetWhere): CompositeExpression {
+                $capturedFacetWhere = func_get_args();
+                return CompositeExpression::and(...func_get_args());
+            },
+        );
+
+        $facetResult = $this->createStub(DoctrineResult::class);
+        $facetResult->method('iterateAssociative')->willReturn(new \ArrayIterator([['title' => 'News', 'cnt' => 3]]));
+
+        $facetQueryBuilder = $this->createStub(QueryBuilder::class);
+        $facetQueryBuilder->method('expr')->willReturn($facetExpressionBuilder);
+        $facetQueryBuilder->method('select')->willReturnSelf();
+        $facetQueryBuilder->method('addSelectLiteral')->willReturnSelf();
+        $facetQueryBuilder->method('from')->willReturnSelf();
+        $facetQueryBuilder->method('join')->willReturnSelf();
+        $facetQueryBuilder->method('where')->willReturnSelf();
+        $facetQueryBuilder->method('groupBy')->willReturnSelf();
+        $facetQueryBuilder->method('executeQuery')->willReturn($facetResult);
+
+        $expressionBuilder = $this->createStub(ExpressionBuilder::class);
+        $expressionBuilder->method('eq')->willReturn('field = value');
+        $expressionBuilder->method('and')->willReturn(CompositeExpression::and('1=1'));
+
+        $doctrineResult = $this->createStub(DoctrineResult::class);
+        $doctrineResult->method('fetchOne')->willReturn(0);
+        $doctrineResult->method('iterateAssociative')->willReturn(new \EmptyIterator());
+
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->method('from')->willReturnSelf();
+        $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('count')->willReturnSelf();
+        $queryBuilder->method('executeQuery')->willReturn($doctrineResult);
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('quoteIdentifier')->willReturnCallback(static fn(string $v): string => $v);
+        $connection->method('quote')->willReturnCallback(static fn(string $v): string => "'" . $v . "'");
+        $connection->method('createQueryBuilder')->willReturn($facetQueryBuilder);
+
+        $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
+        $adapterHelper->method('getConnection')->willReturn($connection);
+        $adapterHelper->method('getTableName')->willReturn('tx_seal_domain_model_index_default');
+        $adapterHelper->method('getQueryBuilder')->willReturn($queryBuilder);
+
+        $subject = new Typo3Searcher($adapterHelper);
+        $result = $subject->search(new Search(
+            $this->index,
+            filters: [
+                Condition\Condition::in('tags', ['News']),
+                Condition\Condition::equal('site', 'main'),
+            ],
+            facets: [Facet::count('tags')],
+        ));
+
+        self::assertSame(['tags' => ['count' => ['News' => 3]]], $result->facets());
+        // Only the site filter restricts the facet, the tag selection is left out.
+        self::assertSame(['field = value'], $capturedFacetWhere);
     }
 }

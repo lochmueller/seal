@@ -26,7 +26,11 @@ class TopSearchesDataProvider implements ListDataProviderInterface
 
         $items = [];
         foreach ($rows as $row) {
-            $items[] = $row['search_term'] . ' / ' . $row['count'];
+            $items[] = implode(' / ', [
+                (string) $row['search_term'],
+                (string) $row['site'],
+                (string) $row['count'],
+            ]);
         }
 
         return $items;

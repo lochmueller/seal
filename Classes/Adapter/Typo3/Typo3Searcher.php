@@ -44,32 +44,12 @@ class Typo3Searcher implements SearcherInterface
 
         $filters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $queryBuilder->expr());
 
-        // Handle In selection for tags via MM table
-        $hasTagSelection = false;
-        $tagSelectionValue = [];
-        foreach ($searchFilters as $searchFilter) {
-            if ($searchFilter instanceof Condition\InCondition && $searchFilter->field === 'tags') {
-                $hasTagSelection = true;
-                $tagSelectionValue = $searchFilter->values;
-            }
-        }
-
-        if ($hasTagSelection) {
-            $queryBuilder->leftJoin('idx', $this->adapterHelper->getTableName($search->index) . '_mm_tag', 'idx_mm_tag', 'idx.uid = idx_mm_tag.uid_local');
-            $queryBuilder->leftJoin('idx_mm_tag', $this->adapterHelper->getTableName($search->index) . '_tag', 'idx_tag', 'idx_tag.uid = idx_mm_tag.uid_foreign AND ' . $queryBuilder->expr()->in('idx_tag.title', \array_map(fn($value) => $this->escapeFilterValue($value), $tagSelectionValue)));
-        }
-
         if (!empty($filters)) {
             $queryBuilder->where($queryBuilder->expr()->and(...$filters));
         }
 
         $countQueryBuilder = $this->adapterHelper->getQueryBuilder($search->index);
         $countFilters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $countQueryBuilder->expr());
-
-        if ($hasTagSelection) {
-            $countQueryBuilder->leftJoin('idx', $this->adapterHelper->getTableName($search->index) . '_mm_tag', 'idx_mm_tag', 'idx.uid = idx_mm_tag.uid_local');
-            $countQueryBuilder->leftJoin('idx_mm_tag', $this->adapterHelper->getTableName($search->index) . '_tag', 'idx_tag', 'idx_tag.uid = idx_mm_tag.uid_foreign AND ' . $countQueryBuilder->expr()->in('idx_tag.title', \array_map(fn($value) => $this->escapeFilterValue($value), $tagSelectionValue)));
-        }
 
         if (!empty($countFilters)) {
             $countQueryBuilder->where($countQueryBuilder->expr()->and(...$countFilters));
@@ -85,13 +65,18 @@ class Typo3Searcher implements SearcherInterface
         }
 
         foreach ($search->sortBys as $field => $direction) {
-            $queryBuilder->addOrderBy($field, $direction);
+            // Prefixed with the alias of the index table, so the field cannot clash with a joined column.
+            $queryBuilder->addOrderBy('idx.' . $field, $direction);
         }
+
+        // The facets ignore the tag selection on purpose, so every configured tag keeps its
+        // count and further tags can still be added to the selection.
+        $facetFilters = $this->recursiveResolveFilterConditions($search->index, $searchFilters, $queryBuilder->expr(), false);
 
         return new Result(
             $this->hitsDocuments($search->index, $queryBuilder->executeQuery()->iterateAssociative(), $search),
             $count,
-            $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet), $this->adapterHelper->getTableName($search->index), $filters),
+            $this->formatFacets(array_filter($search->facets, static fn($f) => $f instanceof CountFacet || $f instanceof MinMaxFacet), $this->adapterHelper->getTableName($search->index), $facetFilters),
         );
 
     }
@@ -214,12 +199,15 @@ class Typo3Searcher implements SearcherInterface
      * @param array<int, Condition\AndCondition|Condition\OrCondition|Condition\EqualCondition|Condition\NotEqualCondition|Condition\GreaterThanCondition|Condition\GreaterThanEqualCondition|Condition\LessThanCondition|Condition\LessThanEqualCondition|Condition\InCondition|Condition\NotInCondition|Condition\IdentifierCondition|Condition\SearchCondition|Condition\GeoDistanceCondition|object> $conditions
      * @return array<int, string|CompositeExpression>
      */
-    private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder): array
+    private function recursiveResolveFilterConditions(Index $index, array $conditions, ExpressionBuilder $expressionBuilder, bool $withTagFilter = true): array
     {
         $tableAlias = 'idx.';
         $filters = [];
         foreach ($conditions as $filter) {
             if ($filter instanceof Condition\InCondition && $filter->field === 'tags') {
+                if ($withTagFilter) {
+                    $filters[] = $this->buildTagExpression($index, $filter);
+                }
                 continue;
             }
             match (true) {
@@ -236,14 +224,43 @@ class Typo3Searcher implements SearcherInterface
                 $filter instanceof Condition\LessThanEqualCondition => $filters[] = $expressionBuilder->lte($tableAlias . $filter->field, $this->escapeFilterValue($filter->value)),
                 $filter instanceof Condition\InCondition => $filters[] = $expressionBuilder->in($tableAlias . $filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
                 $filter instanceof Condition\NotInCondition => $filters[] = $expressionBuilder->notIn($tableAlias . $filter->field, \array_map(fn($value) => $this->escapeFilterValue($value), $filter->values)),
-                $filter instanceof Condition\AndCondition => $filters[] = $expressionBuilder->and(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
-                $filter instanceof Condition\OrCondition => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder)),
+                $filter instanceof Condition\AndCondition => $filters[] = $expressionBuilder->and(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder, $withTagFilter)),
+                $filter instanceof Condition\OrCondition => $filters[] = $expressionBuilder->or(...$this->recursiveResolveFilterConditions($index, $filter->conditions, $expressionBuilder, $withTagFilter)),
                 $filter instanceof Condition\GeoDistanceCondition => $filters[] = $this->buildGeoDistanceExpression($filter, $expressionBuilder, 'idx'),
                 default => throw new \LogicException('Unsupported filter condition type: ' . $filter::class),
             };
         }
 
         return $filters;
+    }
+
+    /**
+     * Builds a subselect on the MM relation of the tags. A join would return one row per
+     * matching tag, so documents would be duplicated and the total count would be wrong.
+     */
+    private function buildTagExpression(Index $index, Condition\InCondition $condition): string
+    {
+        if ($condition->values === []) {
+            return '1 = 0';
+        }
+
+        $connection = $this->adapterHelper->getConnection();
+        $tableName = $this->adapterHelper->getTableName($index);
+        $quote = $connection->quoteIdentifier(...);
+
+        return \sprintf(
+            '%s IN (SELECT %s FROM %s %s INNER JOIN %s %s ON %s = %s WHERE %s IN (%s))',
+            $quote('idx.uid'),
+            $quote('mm.uid_local'),
+            $quote($tableName . '_mm_tag'),
+            $quote('mm'),
+            $quote($tableName . '_tag'),
+            $quote('tag'),
+            $quote('tag.uid'),
+            $quote('mm.uid_foreign'),
+            $quote('tag.title'),
+            implode(', ', array_map(fn(mixed $value): string => $this->escapeFilterValue($value), $condition->values)),
+        );
     }
 
     private function escapeLikeValue(string $value): string
