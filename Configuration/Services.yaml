@@ -10,6 +10,8 @@ services:
 
   Lochmueller\Seal\:
     resource: '../Classes/*'
+    # Widgets depend on the optional EXT:dashboard and are registered in Services.php
+    exclude: '../Classes/Dashboard/Widget/*'
 
   # ViewHelpers with constructor injection have to be public, so that the
   # ViewHelperResolver is able to fetch them from the container.

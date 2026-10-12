@@ -262,6 +262,33 @@
             <trans-unit id="dashboard.widget.indexDocumentCount.description">
                 <source>Shows the number of documents in the SEAL indexes per site</source>
             </trans-unit>
+            <trans-unit id="dashboard.widget.noData">
+                <source>No data available</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.searchTerm">
+                <source>Search term</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.site">
+                <source>Site</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.language">
+                <source>Language</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.date">
+                <source>Date</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.count">
+                <source>Count</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.index">
+                <source>Index</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.documents">
+                <source>Documents</source>
+            </trans-unit>
+            <trans-unit id="dashboard.column.adapter">
+                <source>Adapter</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

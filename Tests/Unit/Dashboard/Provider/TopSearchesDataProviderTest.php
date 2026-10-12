@@ -8,13 +8,9 @@ use Lochmueller\Seal\Dashboard\Provider\TopSearchesDataProvider;
 use Lochmueller\Seal\Repository\StatRepository;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 
-if (!interface_exists(\TYPO3\CMS\Dashboard\Widgets\ListDataProviderInterface::class)) {
-    require_once __DIR__ . '/Fixtures/ListDataProviderInterface.php';
-}
-
 class TopSearchesDataProviderTest extends AbstractTest
 {
-    public function testGetItemsTransformsRepositoryDataCorrectly(): void
+    public function testGetRowsTransformsRepositoryDataCorrectly(): void
     {
         $repositoryData = [
             ['search_term' => 'popular', 'site' => 'main', 'count' => 42],
@@ -26,21 +22,21 @@ class TopSearchesDataProviderTest extends AbstractTest
         $statRepository->method('findTopSearchesOfCurrentMonth')->willReturn($repositoryData);
 
         $subject = new TopSearchesDataProvider($statRepository);
-        $items = $subject->getItems();
+        $rows = $subject->getRows();
 
-        self::assertCount(3, $items);
-        self::assertSame('popular / main / 42', $items[0]);
-        self::assertSame('popular / shop / 12', $items[1]);
-        self::assertSame('less popular / main / 10', $items[2]);
+        self::assertCount(3, $rows);
+        self::assertSame(['popular', 'main', '42'], $rows[0]);
+        self::assertSame(['popular', 'shop', '12'], $rows[1]);
+        self::assertSame(['less popular', 'main', '10'], $rows[2]);
     }
 
-    public function testGetItemsReturnsEmptyArrayWhenNoData(): void
+    public function testGetRowsReturnsEmptyArrayWhenNoData(): void
     {
         $statRepository = $this->createStub(StatRepository::class);
         $statRepository->method('findTopSearchesOfCurrentMonth')->willReturn([]);
 
         $subject = new TopSearchesDataProvider($statRepository);
 
-        self::assertSame([], $subject->getItems());
+        self::assertSame([], $subject->getRows());
     }
 }

@@ -18,13 +18,9 @@ use Lochmueller\Seal\Tests\Unit\AbstractTest;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 
-if (!interface_exists(\TYPO3\CMS\Dashboard\Widgets\ListDataProviderInterface::class)) {
-    require_once __DIR__ . '/Fixtures/ListDataProviderInterface.php';
-}
-
 class IndexDocumentCountDataProviderTest extends AbstractTest
 {
-    public function testGetItemsTransformsSiteAndIndexDataCorrectly(): void
+    public function testGetRowsTransformsSiteAndIndexDataCorrectly(): void
     {
         $site = $this->createStub(Site::class);
         $site->method('getIdentifier')->willReturn('main');
@@ -53,13 +49,13 @@ class IndexDocumentCountDataProviderTest extends AbstractTest
         $schemaBuilder->method('getSchema')->willReturn($schema);
 
         $subject = new IndexDocumentCountDataProvider($seal, $siteFinder, $schemaBuilder);
-        $items = $subject->getItems();
+        $rows = $subject->getRows();
 
-        self::assertCount(1, $items);
-        self::assertSame('main / ' . SchemaBuilder::DEFAULT_INDEX . ' / 150 / ' . $adapter::class, $items[0]);
+        self::assertCount(1, $rows);
+        self::assertSame(['main', SchemaBuilder::DEFAULT_INDEX, '150', (new \ReflectionClass($adapter))->getShortName()], $rows[0]);
     }
 
-    public function testGetItemsReturnsEmptyArrayWhenNoSitesExist(): void
+    public function testGetRowsReturnsEmptyArrayWhenNoSitesExist(): void
     {
         $siteFinder = $this->createStub(SiteFinder::class);
         $siteFinder->method('getAllSites')->willReturn([]);
@@ -69,10 +65,10 @@ class IndexDocumentCountDataProviderTest extends AbstractTest
 
         $subject = new IndexDocumentCountDataProvider($seal, $siteFinder, $schemaBuilder);
 
-        self::assertSame([], $subject->getItems());
+        self::assertSame([], $subject->getRows());
     }
 
-    public function testGetItemsCatchesEngineErrorAndContinuesWithOtherSites(): void
+    public function testGetRowsCatchesEngineErrorAndContinuesWithOtherSites(): void
     {
         $failingSite = $this->createStub(Site::class);
         $failingSite->method('getIdentifier')->willReturn('broken');
@@ -114,14 +110,14 @@ class IndexDocumentCountDataProviderTest extends AbstractTest
         $schemaBuilder->method('getSchema')->willReturn($schema);
 
         $subject = new IndexDocumentCountDataProvider($seal, $siteFinder, $schemaBuilder);
-        $items = $subject->getItems();
+        $rows = $subject->getRows();
 
-        self::assertCount(2, $items);
+        self::assertCount(2, $rows);
 
         // First item: error entry for the broken site
-        self::assertSame('broken / Error / Connection failed', $items[0]);
+        self::assertSame(['broken', '-', 'Error: Connection failed', '-'], $rows[0]);
 
         // Second item: successful entry for the working site
-        self::assertSame('working / ' . SchemaBuilder::DEFAULT_INDEX . ' / 50 / ' . $adapter::class, $items[1]);
+        self::assertSame(['working', SchemaBuilder::DEFAULT_INDEX, '50', (new \ReflectionClass($adapter))->getShortName()], $rows[1]);
     }
 }

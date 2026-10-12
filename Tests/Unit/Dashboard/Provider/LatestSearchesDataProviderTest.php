@@ -8,13 +8,9 @@ use Lochmueller\Seal\Dashboard\Provider\LatestSearchesDataProvider;
 use Lochmueller\Seal\Repository\StatRepository;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 
-if (!interface_exists(\TYPO3\CMS\Dashboard\Widgets\ListDataProviderInterface::class)) {
-    require_once __DIR__ . '/Fixtures/ListDataProviderInterface.php';
-}
-
 class LatestSearchesDataProviderTest extends AbstractTest
 {
-    public function testGetItemsTransformsRepositoryDataCorrectly(): void
+    public function testGetRowsTransformsRepositoryDataCorrectly(): void
     {
         $repositoryData = [
             ['search_term' => 'TYPO3', 'site' => 'main', 'language' => '0', 'crdate' => 1717200000],
@@ -25,20 +21,20 @@ class LatestSearchesDataProviderTest extends AbstractTest
         $statRepository->method('findLatest')->willReturn($repositoryData);
 
         $subject = new LatestSearchesDataProvider($statRepository);
-        $items = $subject->getItems();
+        $rows = $subject->getRows();
 
-        self::assertCount(2, $items);
-        self::assertSame('TYPO3 / main / 0 / ' . date('Y-m-d H:i', 1717200000), $items[0]);
-        self::assertSame('SEAL / portal / 1 / ' . date('Y-m-d H:i', 1717113600), $items[1]);
+        self::assertCount(2, $rows);
+        self::assertSame(['TYPO3', 'main', '0', date('Y-m-d H:i', 1717200000)], $rows[0]);
+        self::assertSame(['SEAL', 'portal', '1', date('Y-m-d H:i', 1717113600)], $rows[1]);
     }
 
-    public function testGetItemsReturnsEmptyArrayWhenNoData(): void
+    public function testGetRowsReturnsEmptyArrayWhenNoData(): void
     {
         $statRepository = $this->createStub(StatRepository::class);
         $statRepository->method('findLatest')->willReturn([]);
 
         $subject = new LatestSearchesDataProvider($statRepository);
 
-        self::assertSame([], $subject->getItems());
+        self::assertSame([], $subject->getRows());
     }
 }

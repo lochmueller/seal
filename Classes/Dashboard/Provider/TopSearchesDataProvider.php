@@ -5,34 +5,33 @@ declare(strict_types=1);
 namespace Lochmueller\Seal\Dashboard\Provider;
 
 use Lochmueller\Seal\Repository\StatRepository;
-use TYPO3\CMS\Dashboard\Widgets\ListDataProviderInterface;
 
-class TopSearchesDataProvider implements ListDataProviderInterface
+class TopSearchesDataProvider implements TableDataProviderInterface
 {
     public function __construct(
         private readonly StatRepository $statRepository,
     ) {}
 
-    /**
-     * @return array<int, string>
-     */
-    public function getItems(): array
+    public function getHeaders(): array
     {
-        $rows = $this->statRepository->findTopSearchesOfCurrentMonth();
+        return [
+            'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.column.searchTerm',
+            'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.column.site',
+            'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.column.count',
+        ];
+    }
 
-        if ($rows === []) {
-            return [];
-        }
-
-        $items = [];
-        foreach ($rows as $row) {
-            $items[] = implode(' / ', [
+    public function getRows(): array
+    {
+        $rows = [];
+        foreach ($this->statRepository->findTopSearchesOfCurrentMonth() as $row) {
+            $rows[] = [
                 (string) $row['search_term'],
                 (string) $row['site'],
                 (string) $row['count'],
-            ]);
+            ];
         }
 
-        return $items;
+        return $rows;
     }
 }

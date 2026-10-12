@@ -1,0 +1,34 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:layout name="Widget/Widget" />
+<f:section name="main">
+
+    <f:if condition="{rows}">
+        <f:then>
+            <div class="widget-table-wrapper">
+                <table class="widget-table table">
+                    <thead>
+                        <tr>
+                            <f:for each="{headers}" as="header">
+                                <th><f:translate key="{header}" default="{header}" /></th>
+                            </f:for>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <f:for each="{rows}" as="row">
+                            <tr>
+                                <f:for each="{row}" as="cell">
+                                    <td>{cell}</td>
+                                </f:for>
+                            </tr>
+                        </f:for>
+                    </tbody>
+                </table>
+            </div>
+        </f:then>
+        <f:else>
+            <p><f:translate key="LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.noData" /></p>
+        </f:else>
+    </f:if>
+
+</f:section>
+</html>

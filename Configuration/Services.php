@@ -17,11 +17,12 @@ use CmsIg\Seal\Adapter\Typesense\TypesenseAdapterFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use TYPO3\CMS\Backend\View\BackendViewFactory;
-use TYPO3\CMS\Dashboard\Widgets\ListWidget;
+use TYPO3\CMS\Dashboard\Widgets\WidgetInterface;
 use Lochmueller\Seal\Adapter\Typo3\Typo3AdapterFactory;
 use Lochmueller\Seal\Dashboard\Provider\IndexDocumentCountDataProvider;
 use Lochmueller\Seal\Dashboard\Provider\LatestSearchesDataProvider;
 use Lochmueller\Seal\Dashboard\Provider\TopSearchesDataProvider;
+use Lochmueller\Seal\Dashboard\Widget\TableWidget;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -60,9 +61,9 @@ return function (ContainerConfigurator $container): void {
     $services->set(AdapterFactory::class)
         ->arg('$factories', tagged_iterator('seal.adapter_factory', null, 'getName'));
 
-    if (class_exists(ListWidget::class)) {
+    if (interface_exists(WidgetInterface::class)) {
         $services->set('dashboard.widget.seal.latestSearches')
-            ->class(ListWidget::class)
+            ->class(TableWidget::class)
             ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
             ->arg('$dataProvider', new Reference(LatestSearchesDataProvider::class))
             ->tag('dashboard.widget', [
@@ -70,13 +71,13 @@ return function (ContainerConfigurator $container): void {
                 'groupNames' => 'seal',
                 'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.latestSearches.title',
                 'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.latestSearches.description',
-                'iconIdentifier' => 'content-widget-list',
+                'iconIdentifier' => 'content-widget-table',
                 'height' => 'medium',
                 'width' => 'small',
             ]);
 
         $services->set('dashboard.widget.seal.topSearches')
-            ->class(ListWidget::class)
+            ->class(TableWidget::class)
             ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
             ->arg('$dataProvider', new Reference(TopSearchesDataProvider::class))
             ->tag('dashboard.widget', [
@@ -84,13 +85,13 @@ return function (ContainerConfigurator $container): void {
                 'groupNames' => 'seal',
                 'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.topSearches.title',
                 'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.topSearches.description',
-                'iconIdentifier' => 'content-widget-list',
+                'iconIdentifier' => 'content-widget-table',
                 'height' => 'medium',
                 'width' => 'small',
             ]);
 
         $services->set('dashboard.widget.seal.indexDocumentCount')
-            ->class(ListWidget::class)
+            ->class(TableWidget::class)
             ->arg('$backendViewFactory', new Reference(BackendViewFactory::class))
             ->arg('$dataProvider', new Reference(IndexDocumentCountDataProvider::class))
             ->tag('dashboard.widget', [
@@ -98,7 +99,7 @@ return function (ContainerConfigurator $container): void {
                 'groupNames' => 'seal',
                 'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.indexDocumentCount.title',
                 'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.indexDocumentCount.description',
-                'iconIdentifier' => 'content-widget-list',
+                'iconIdentifier' => 'content-widget-table',
                 'height' => 'medium',
                 'width' => 'small',
             ]);

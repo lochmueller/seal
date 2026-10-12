@@ -8,9 +8,8 @@ use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use ReflectionProperty;
 use TYPO3\CMS\Core\Site\SiteFinder;
-use TYPO3\CMS\Dashboard\Widgets\ListDataProviderInterface;
 
-class IndexDocumentCountDataProvider implements ListDataProviderInterface
+class IndexDocumentCountDataProvider implements TableDataProviderInterface
 {
     public function __construct(
         private readonly Seal $seal,
@@ -18,19 +17,25 @@ class IndexDocumentCountDataProvider implements ListDataProviderInterface
         private readonly SchemaBuilder $schemaBuilder,
     ) {}
 
-    /**
-     * @return array<int, string>
-     */
-    public function getItems(): array
+    public function getHeaders(): array
+    {
+        return [
+            'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.column.site',
+            'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.column.index',
+            'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.column.documents',
+            'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.column.adapter',
+        ];
+    }
+
+    public function getRows(): array
     {
         $sites = $this->siteFinder->getAllSites();
-
         if ($sites === []) {
             return [];
         }
 
         $indexNames = array_keys($this->schemaBuilder->getSchema()->indexes);
-        $items = [];
+        $rows = [];
 
         foreach ($sites as $site) {
             try {
@@ -38,26 +43,26 @@ class IndexDocumentCountDataProvider implements ListDataProviderInterface
 
                 $reflectionProperty = new ReflectionProperty($engine, 'adapter');
                 $adapter = $reflectionProperty->getValue($engine);
-                $adapterClassName = $adapter::class;
+                $adapterName = is_object($adapter) ? (new \ReflectionClass($adapter))->getShortName() : '';
 
                 foreach ($indexNames as $indexName) {
-                    $count = $engine->countDocuments($indexName);
-                    $items[] = implode(' / ', [
+                    $rows[] = [
                         $site->getIdentifier(),
                         $indexName,
-                        (string) $count,
-                        $adapterClassName,
-                    ]);
+                        (string) $engine->countDocuments($indexName),
+                        $adapterName,
+                    ];
                 }
             } catch (\Exception $exception) {
-                $items[] = implode(' / ', [
+                $rows[] = [
                     $site->getIdentifier(),
-                    'Error',
-                    $exception->getMessage(),
-                ]);
+                    '-',
+                    'Error: ' . $exception->getMessage(),
+                    '-',
+                ];
             }
         }
 
-        return $items;
+        return $rows;
     }
 }
