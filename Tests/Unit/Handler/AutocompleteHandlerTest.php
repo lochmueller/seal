@@ -294,6 +294,26 @@ class AutocompleteHandlerTest extends AbstractTest
         self::assertContains('Testing', $body);
     }
 
+    public function testHandleReturnsJsonListWhenDuplicatesAreRemoved(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
+
+        $this->configureSearchResult($site, [
+            ['title' => 'Testing', 'content' => 'test'],
+            ['title' => 'Testing', 'content' => 'tester'],
+        ]);
+
+        $request = $this->createRequest('test', $site);
+
+        $response = $this->subject->handle($request);
+
+        // The duplicate "Testing" of the second document must not leave a gap in the keys,
+        // otherwise the list would be encoded as a JSON object.
+        self::assertSame('["Testing","test","tester"]', (string) $response->getBody());
+    }
+
     public function testHandleUsesLanguageFromRequestAttributes(): void
     {
         $site = $this->createSiteStub();

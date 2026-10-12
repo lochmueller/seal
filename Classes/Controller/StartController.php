@@ -35,7 +35,8 @@ class StartController extends AbstractSealController
             return $this->redirect('search', 'Search');
         }
 
-        $filterRows = iterator_to_array($this->getFilterRowsByContentElementUid($currentContentElementData['uid']));
+        $contentElementUid = (int) $currentContentElementData['uid'];
+        $filterRows = iterator_to_array($this->getFilterRowsByContentElementUid($contentElementUid));
 
         $hasTagCondition = false;
         foreach ($filterRows as $filterItem) {
@@ -71,7 +72,7 @@ class StartController extends AbstractSealController
         $requestData = $this->searchRequestDataResolver->resolve($this->request);
 
         $this->view->assignMultiple([
-            'sealId' => $this->buildSealId((int) $currentContentElementData['uid']),
+            'sealId' => $this->buildSealId($contentElementUid),
             'pluginNamespace' => SearchRequestDataResolver::PARAM_KEY,
             'requestData' => $requestData,
             'filters' => $this->addCalculatedValuesForFilterRows(

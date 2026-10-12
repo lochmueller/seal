@@ -324,6 +324,30 @@
                 <source>Determining location…</source>
                 <target>Standort wird ermittelt …</target>
             </trans-unit>
+            <trans-unit id="dashboard.widget.latestSearches.title">
+                <source>Latest 20 search queries</source>
+                <target>Neueste 20 Suchanfragen</target>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.latestSearches.description">
+                <source>Shows the 20 latest search queries</source>
+                <target>Zeigt die 20 neuesten Suchanfragen an</target>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.topSearches.title">
+                <source>Top 10 searches of the month</source>
+                <target>Top 10 Suchen des Monats</target>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.topSearches.description">
+                <source>Shows the 10 most searched terms of the current month</source>
+                <target>Zeigt die 10 meistgesuchten Begriffe des aktuellen Monats an</target>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.indexDocumentCount.title">
+                <source>Index document count</source>
+                <target>Index-Dokumentenanzahl</target>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.indexDocumentCount.description">
+                <source>Shows the number of documents in the SEAL indexes per site</source>
+                <target>Zeigt die Anzahl der Dokumente in den SEAL-Indizes pro Site an</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

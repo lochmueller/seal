@@ -20,9 +20,9 @@ class StatRepository
     ) {}
 
     /**
-     * Speichert eine Suchanfrage in der Statistiktabelle.
-     * Ignoriert leere Suchbegriffe (nur Whitespace) und kürzt zu lange Suchbegriffe auf die
-     * Spaltenlänge, da der Insert sonst im Strict Mode fehlschlägt.
+     * Stores a search query in the statistics table.
+     * Empty search terms (whitespace only) are ignored. Search terms that exceed the column
+     * length are truncated, otherwise the insert fails in strict mode.
      */
     public function logSearchQuery(string $searchTerm, string $siteIdentifier, int $languageId): void
     {
@@ -42,7 +42,7 @@ class StatRepository
     }
 
     /**
-     * Liefert die neuesten $limit Suchanfragen, absteigend nach crdate.
+     * Returns the latest $limit search queries, ordered by crdate descending.
      *
      * @return list<array<string, mixed>>
      */
@@ -60,7 +60,7 @@ class StatRepository
     }
 
     /**
-     * Liefert die $limit häufigsten Suchbegriffe des aktuellen Kalendermonats.
+     * Returns the $limit most frequent search terms of the current calendar month.
      *
      * @return list<array<string, mixed>>
      */

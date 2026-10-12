@@ -52,7 +52,7 @@ class Typo3Indexer implements IndexerInterface, LoggerAwareInterface
                 $connection->insert($tableName, $data);
             }
         } catch (\Exception $e) {
-            $this->logger?->error($e->getMessage());
+            $this->logger?->error($e->getMessage(), ['exception' => $e]);
 
             return null;
         }

@@ -7,11 +7,11 @@ namespace Lochmueller\Seal\Filter;
 class RadiusConfigurationParser
 {
     /**
-     * Parst den Radius-Konfigurationstext in ein strukturiertes Array.
-     * Format: Eine Zeile pro Eintrag, "wert=Label" (z.B. "10=10 km")
-     * Wert ist numerisch (Kilometer).
+     * Parses the radius configuration text into a structured array.
+     * Format: One entry per line, "value=Label" (e.g. "10=10 km").
+     * The value is numeric (kilometers).
      *
-     * @param string $configuration Mehrzeiliger Text im Format "wert=Label"
+     * @param string $configuration Multiline text in the format "value=Label"
      * @return array<int, array{value: int, label: string}>
      */
     public function parse(string $configuration): array
@@ -55,7 +55,7 @@ class RadiusConfigurationParser
     }
 
     /**
-     * Formatiert ein Array von Radius-Einträgen zurück in das Textformat.
+     * Formats an array of radius entries back into the text format.
      *
      * @param array<int, array{value: int, label: string}> $radii
      * @return string

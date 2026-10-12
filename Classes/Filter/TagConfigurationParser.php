@@ -7,9 +7,9 @@ namespace Lochmueller\Seal\Filter;
 class TagConfigurationParser
 {
     /**
-     * Parst den Tag-Konfigurationstext in ein strukturiertes Array.
+     * Parses the tag configuration text into a structured array.
      *
-     * @param string $configuration Mehrzeiliger Text im Format "wert=Label"
+     * @param string $configuration Multiline text in the format "value=Label"
      * @return array<int, array{value: string, label: string}>
      */
     public function parse(string $configuration): array
@@ -53,7 +53,7 @@ class TagConfigurationParser
     }
 
     /**
-     * Formatiert ein Array von Tag-Einträgen zurück in das Textformat.
+     * Formats an array of tag entries back into the text format.
      *
      * @param array<int, array{value: string, label: string}> $tags
      * @return string

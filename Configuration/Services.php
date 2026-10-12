@@ -68,8 +68,8 @@ return function (ContainerConfigurator $container): void {
             ->tag('dashboard.widget', [
                 'identifier' => 'seal-latest-searches',
                 'groupNames' => 'seal',
-                'title' => 'Neueste 20 Suchanfragen',
-                'description' => 'Zeigt die 20 neuesten Suchanfragen an',
+                'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.latestSearches.title',
+                'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.latestSearches.description',
                 'iconIdentifier' => 'content-widget-list',
                 'height' => 'medium',
                 'width' => 'small',
@@ -82,8 +82,8 @@ return function (ContainerConfigurator $container): void {
             ->tag('dashboard.widget', [
                 'identifier' => 'seal-top-searches',
                 'groupNames' => 'seal',
-                'title' => 'Top 10 Suchen des Monats',
-                'description' => 'Zeigt die 10 meistgesuchten Begriffe des aktuellen Monats an',
+                'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.topSearches.title',
+                'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.topSearches.description',
                 'iconIdentifier' => 'content-widget-list',
                 'height' => 'medium',
                 'width' => 'small',
@@ -96,8 +96,8 @@ return function (ContainerConfigurator $container): void {
             ->tag('dashboard.widget', [
                 'identifier' => 'seal-index-document-count',
                 'groupNames' => 'seal',
-                'title' => 'Index-Dokumentenanzahl',
-                'description' => 'Zeigt die Anzahl der Dokumente in den SEAL-Indizes pro Site an',
+                'title' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.indexDocumentCount.title',
+                'description' => 'LLL:EXT:seal/Resources/Private/Language/locallang.xlf:dashboard.widget.indexDocumentCount.description',
                 'iconIdentifier' => 'content-widget-list',
                 'height' => 'medium',
                 'width' => 'small',

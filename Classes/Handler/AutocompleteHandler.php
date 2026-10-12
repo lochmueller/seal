@@ -55,7 +55,9 @@ class AutocompleteHandler implements RequestHandlerInterface
             $data = array_merge($data, $this->findSuggestions($searchWord, $item['title'] . ' ' . $item['content']));
         }
 
-        return new JsonResponse(array_unique($data), 200, ['X-Seal-Info' => $result->total() . ' search items']);
+        // array_values(): array_unique() keeps the keys, and a list with gaps would be
+        // encoded as a JSON object instead of an array.
+        return new JsonResponse(array_values(array_unique($data)), 200, ['X-Seal-Info' => $result->total() . ' search items']);
     }
 
     /**
@@ -73,6 +75,6 @@ class AutocompleteHandler implements RequestHandlerInterface
             }
         }
 
-        return array_keys($suggestions); // eindeutige Vorschläge
+        return array_keys($suggestions); // unique suggestions
     }
 }

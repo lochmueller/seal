@@ -244,6 +244,24 @@
             <trans-unit id="geo.status.locating">
                 <source>Determining location…</source>
             </trans-unit>
+            <trans-unit id="dashboard.widget.latestSearches.title">
+                <source>Latest 20 search queries</source>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.latestSearches.description">
+                <source>Shows the 20 latest search queries</source>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.topSearches.title">
+                <source>Top 10 searches of the month</source>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.topSearches.description">
+                <source>Shows the 10 most searched terms of the current month</source>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.indexDocumentCount.title">
+                <source>Index document count</source>
+            </trans-unit>
+            <trans-unit id="dashboard.widget.indexDocumentCount.description">
+                <source>Shows the number of documents in the SEAL indexes per site</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

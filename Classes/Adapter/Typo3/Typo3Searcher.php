@@ -12,6 +12,7 @@ use CmsIg\Seal\Search\Facet\MinMaxFacet;
 use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
 use CmsIg\Seal\Search\Condition;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 
@@ -267,12 +268,20 @@ class Typo3Searcher implements SearcherInterface
         $lng = (float) $condition->longitude;
         $distance = (float) $condition->distance;
 
+        // The ACOS argument is clamped to [-1, 1]: rounding errors can push it slightly above 1
+        // (e.g. for a document exactly at the search point), which would make ACOS return NULL
+        // and drop the document from the result. SQLite has no LEAST/GREATEST, but its
+        // multi-argument MIN/MAX are the scalar equivalents.
+        [$least, $greatest] = $connection->getDatabasePlatform() instanceof SQLitePlatform
+            ? ['MIN', 'MAX']
+            : ['LEAST', 'GREATEST'];
+
         return \sprintf(
-            '6371000 * ACOS('
+            '6371000 * ACOS(' . $least . '(1, ' . $greatest . '(-1, '
             . 'COS(RADIANS(%F)) * COS(RADIANS(%s))'
             . ' * COS(RADIANS(%s) - RADIANS(%F))'
             . ' + SIN(RADIANS(%F)) * SIN(RADIANS(%s))'
-            . ') <= %F',
+            . '))) <= %F',
             $lat,
             $latField,
             $lngField,

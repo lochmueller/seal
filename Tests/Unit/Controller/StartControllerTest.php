@@ -135,6 +135,15 @@ class StartControllerTest extends AbstractTest
         ], $this->capturedViewVariables['filters'][0]['parsedTags']);
     }
 
+    public function testStartActionAcceptsContentElementUidAsString(): void
+    {
+        // Database drivers may return the uid as string, which must not lead to a TypeError.
+        $subject = $this->buildController([], [], ['uid' => '100']);
+        $subject->startAction();
+
+        self::assertSame('seal-100', $this->capturedViewVariables['sealId']);
+    }
+
     /**
      * @param array<int, array<string, mixed>> $filterRows
      * @param array<string, mixed> $facetData

@@ -11,6 +11,7 @@ use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Search\Condition;
 use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Result as DoctrineResult;
 use Lochmueller\Seal\Adapter\Typo3\Typo3AdapterHelper;
 use Lochmueller\Seal\Adapter\Typo3\Typo3Searcher;
@@ -560,7 +561,8 @@ class Typo3SearcherTest extends AbstractTest
         self::assertCount(1, $capturedWhere);
 
         $sql = (string) $capturedWhere[0];
-        self::assertStringContainsString('6371000 * ACOS(', $sql);
+        self::assertStringContainsString('6371000 * ACOS(LEAST(1, GREATEST(-1, ', $sql);
+        self::assertStringContainsString(')))) <= 10000.000000', $sql);
         self::assertStringContainsString('COS(RADIANS(48.137154))', $sql);
         self::assertStringContainsString('COS(RADIANS(idx.location_latitude))', $sql);
         self::assertStringContainsString('COS(RADIANS(idx.location_longitude) - RADIANS(11.576124))', $sql);
@@ -684,4 +686,25 @@ class Typo3SearcherTest extends AbstractTest
         self::assertSame(11.576124, $documents[0]['location']['longitude']);
     }
 
+    public function testGeoDistanceExpressionUsesMinMaxOnSqlite(): void
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('quoteIdentifier')->willReturnCallback(static fn(string $v): string => $v);
+        $connection->method('getDatabasePlatform')->willReturn(new SQLitePlatform());
+
+        $adapterHelper = $this->createStub(Typo3AdapterHelper::class);
+        $adapterHelper->method('getConnection')->willReturn($connection);
+
+        $subject = new Typo3Searcher($adapterHelper);
+        $method = new \ReflectionMethod(Typo3Searcher::class, 'buildGeoDistanceExpression');
+        $sql = $method->invoke(
+            $subject,
+            new Condition\GeoDistanceCondition('location', 48.137154, 11.576124, 10000),
+            $this->createStub(ExpressionBuilder::class),
+            'idx',
+        );
+
+        self::assertStringContainsString('6371000 * ACOS(MIN(1, MAX(-1, ', $sql);
+        self::assertStringNotContainsString('LEAST', $sql);
+    }
 }

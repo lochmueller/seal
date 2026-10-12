@@ -107,13 +107,14 @@ class Typo3IndexerTest extends AbstractTest
         $selectResult->method('fetchAssociative')->willReturn(false);
 
         $connection = $this->createStub(Connection::class);
-        $connection->method('count')->will(self::throwException(new \Exception('DB error')));
+        $exception = new \Exception('DB error');
+        $connection->method('count')->will(self::throwException($exception));
         $connection->method('select')->willReturn($selectResult);
 
         $subject = $this->createSubjectWithConnection($connection);
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(self::once())->method('error');
+        $logger->expects(self::once())->method('error')->with('DB error', ['exception' => $exception]);
         $subject->setLogger($logger);
 
         $subject->save($this->index, ['id' => 'doc-1', 'title' => 'Test', 'content' => 'Body']);
