@@ -10,13 +10,19 @@ class StatRepository
 {
     private const TABLE_NAME = 'tx_seal_domain_model_stat';
 
+    /**
+     * Length of the "search_term" column (varchar(255) in ext_tables.sql).
+     */
+    private const MAX_SEARCH_TERM_LENGTH = 255;
+
     public function __construct(
         private readonly ConnectionPool $connectionPool,
     ) {}
 
     /**
      * Speichert eine Suchanfrage in der Statistiktabelle.
-     * Ignoriert leere Suchbegriffe (nur Whitespace).
+     * Ignoriert leere Suchbegriffe (nur Whitespace) und kürzt zu lange Suchbegriffe auf die
+     * Spaltenlänge, da der Insert sonst im Strict Mode fehlschlägt.
      */
     public function logSearchQuery(string $searchTerm, string $siteIdentifier, int $languageId): void
     {
@@ -27,7 +33,7 @@ class StatRepository
 
         $connection = $this->connectionPool->getConnectionForTable(self::TABLE_NAME);
         $connection->insert(self::TABLE_NAME, [
-            'search_term' => $searchTerm,
+            'search_term' => mb_substr($searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH),
             'site' => $siteIdentifier,
             'language' => (string) $languageId,
             'crdate' => time(),

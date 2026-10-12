@@ -66,7 +66,10 @@ class AutocompleteHandlerTest extends AbstractTest
         return $language;
     }
 
-    private function createRequest(string $query, SiteInterface $site, ?SiteLanguage $language = null): Stub&ServerRequestInterface
+    /**
+     * @param string|array<int, string> $query
+     */
+    private function createRequest(string|array $query, SiteInterface $site, ?SiteLanguage $language = null): Stub&ServerRequestInterface
     {
         $request = $this->createStub(ServerRequestInterface::class);
         $request->method('getQueryParams')->willReturn(['q' => $query]);
@@ -212,6 +215,19 @@ class AutocompleteHandlerTest extends AbstractTest
         $this->configurationLoader->method('loadBySite')->willReturn($config);
 
         $request = $this->createRequest('   ', $site);
+
+        $response = $this->subject->handle($request);
+
+        self::assertSame(204, $response->getStatusCode());
+    }
+
+    public function testHandleReturnsTooFewCharsForArrayQuery(): void
+    {
+        $site = $this->createSiteStub();
+        $config = new Configuration('typo3://', 3, 10);
+        $this->configurationLoader->method('loadBySite')->willReturn($config);
+
+        $request = $this->createRequest(['search'], $site);
 
         $response = $this->subject->handle($request);
 

@@ -46,8 +46,10 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
 
     public function searchAction(): ResponseInterface
     {
+        // The page number is part of the URL, so it has to be clamped: a value below 1 would
+        // produce a negative offset and is rejected by the paginator.
         $currentPage = $this->request->hasArgument('currentPageNumber')
-            ? (int) $this->request->getArgument('currentPageNumber')
+            ? max(1, (int) $this->request->getArgument('currentPageNumber'))
             : 1;
 
         /** @var Site $site */

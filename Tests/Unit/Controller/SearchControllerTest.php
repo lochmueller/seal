@@ -224,6 +224,40 @@ class SearchControllerTest extends AbstractTest
         self::assertInstanceOf(ResponseInterface::class, $response);
     }
 
+    /**
+     * @return array<string, array{0: mixed}>
+     */
+    public static function invalidPageNumberDataProvider(): array
+    {
+        return [
+            'zero' => [0],
+            'negative' => [-3],
+            'non numeric' => ['abc'],
+            'array' => [['2']],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidPageNumberDataProvider')]
+    public function testSearchActionFallsBackToFirstPageForInvalidPageNumber(mixed $pageNumber): void
+    {
+        $subject = $this->buildController([], [], null, null, null, null, ['currentPageNumber' => $pageNumber]);
+        $subject->searchAction();
+
+        self::assertNotNull($this->capturedSearch);
+        self::assertSame(0, $this->capturedSearch->offset);
+        self::assertSame(1, $this->capturedViewVariables['currentPageNumber']);
+    }
+
+    public function testSearchActionUsesOffsetOfRequestedPage(): void
+    {
+        $subject = $this->buildController([], [], null, null, null, null, ['currentPageNumber' => '3']);
+        $subject->searchAction();
+
+        self::assertNotNull($this->capturedSearch);
+        self::assertSame(20, $this->capturedSearch->offset);
+        self::assertSame(3, $this->capturedViewVariables['currentPageNumber']);
+    }
+
     public function testSearchActionDispatchesEventToModifySearchBuilderBeforeExecution(): void
     {
         $eventDispatcher = new class implements EventDispatcherInterface {
@@ -318,8 +352,9 @@ class SearchControllerTest extends AbstractTest
      * @param array<int, array<string, mixed>> $filterRows
      * @param array<string, mixed> $facetData
      * @param array<string, mixed>|null $parsedBody
+     * @param array<string, mixed> $arguments
      */
-    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null, ?StatRepository $statRepository = null, ?EventDispatcherInterface $eventDispatcher = null, ?Configuration $configuration = null): SearchController
+    private function buildController(array $filterRows, array $facetData, ?array $parsedBody = null, ?StatRepository $statRepository = null, ?EventDispatcherInterface $eventDispatcher = null, ?Configuration $configuration = null, array $arguments = []): SearchController
     {
         $this->capturedSearch = null;
         $this->capturedViewVariables = [];
@@ -391,6 +426,7 @@ class SearchControllerTest extends AbstractTest
         $siteLanguage->method('getLanguageId')->willReturn(0);
 
         $extbaseParams = new ExtbaseRequestParameters();
+        $extbaseParams->setArguments($arguments);
         $serverRequest = new ServerRequest('https://example.com/', 'GET');
         $serverRequest = $serverRequest
             ->withAttribute('extbase', $extbaseParams)

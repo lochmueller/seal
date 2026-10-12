@@ -70,6 +70,23 @@ class StatRepositoryTest extends AbstractTest
         $subject->logSearchQuery('  trimmed  ', 'main', 0);
     }
 
+    public function testLogSearchQueryTruncatesSearchTermToColumnLength(): void
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('insert')
+            ->with(
+                'tx_seal_domain_model_stat',
+                self::callback(static fn(array $data): bool => $data['search_term'] === str_repeat('ä', 255)),
+            );
+
+        $connectionPool = $this->createStub(ConnectionPool::class);
+        $connectionPool->method('getConnectionForTable')->willReturn($connection);
+
+        $subject = new StatRepository($connectionPool);
+        $subject->logSearchQuery(str_repeat('ä', 300), 'main', 0);
+    }
+
     public function testFindLatestReturnsCorrectlySortedResults(): void
     {
         $expectedRows = [

@@ -46,6 +46,34 @@ class SearchConditionTest extends AbstractTest
         self::assertSame([], $this->subject->getFilterConfiguration(['type' => 'searchCondition'], $request));
     }
 
+    public function testReturnsEmptyArrayForWhitespaceOnlySearchTerm(): void
+    {
+        $request = (new ServerRequest('https://example.com/', 'GET'))
+            ->withQueryParams([SearchRequestDataResolver::PARAM_KEY => ['search' => '   ']]);
+
+        self::assertSame([], $this->subject->getFilterConfiguration(['type' => 'searchCondition'], $request));
+    }
+
+    public function testTrimsSearchTerm(): void
+    {
+        $request = (new ServerRequest('https://example.com/', 'GET'))
+            ->withQueryParams([SearchRequestDataResolver::PARAM_KEY => ['search' => '  TYPO3  ']]);
+
+        $result = $this->subject->getFilterConfiguration(['type' => 'searchCondition'], $request);
+
+        self::assertCount(1, $result);
+        self::assertInstanceOf(SealSearchCondition::class, $result[0]);
+        self::assertSame('TYPO3', $result[0]->query);
+    }
+
+    public function testReturnsEmptyArrayForArraySearchTerm(): void
+    {
+        $request = (new ServerRequest('https://example.com/', 'GET'))
+            ->withQueryParams([SearchRequestDataResolver::PARAM_KEY => ['search' => ['TYPO3']]]);
+
+        self::assertSame([], $this->subject->getFilterConfiguration(['type' => 'searchCondition'], $request));
+    }
+
     public function testReturnsEmptyArrayWithoutSearchTerm(): void
     {
         $request = new ServerRequest('https://example.com/', 'GET');

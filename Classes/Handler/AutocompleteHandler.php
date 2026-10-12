@@ -20,8 +20,9 @@ class AutocompleteHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $params = $request->getQueryParams();
-        $searchWord = trim($params['q'] ?? '');
+        // The value is user input and may be an array (e.g. "q[]=term").
+        $query = $request->getQueryParams()['q'] ?? '';
+        $searchWord = \is_string($query) ? trim($query) : '';
 
         /** @var SiteInterface $site */
         $site = $request->getAttribute('site');

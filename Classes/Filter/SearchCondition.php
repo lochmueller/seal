@@ -28,8 +28,9 @@ class SearchCondition implements FilterInterface
     {
         $search = '';
         if ($request instanceof ServerRequestInterface) {
-            $searchData = $this->searchRequestDataResolver->resolve($request);
-            $search = $searchData['search'] ?? '';
+            // The value is user input and may be an array (e.g. "search[]=term").
+            $searchValue = $this->searchRequestDataResolver->resolve($request)['search'] ?? '';
+            $search = \is_string($searchValue) ? trim($searchValue) : '';
         }
         if ($search === '') {
             return [];
