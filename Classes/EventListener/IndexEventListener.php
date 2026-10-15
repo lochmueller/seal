@@ -9,6 +9,7 @@ use Lochmueller\Index\Event\IndexFileEvent;
 use Lochmueller\Index\Event\IndexPageEvent;
 use Lochmueller\Index\Traversing\RecordSelection;
 use Lochmueller\Seal\Event\BeforeSaveDocumentEvent;
+use Lochmueller\Seal\Event\Enum\IndexType;
 use Lochmueller\Seal\Seal;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -40,12 +41,15 @@ class IndexEventListener implements LoggerAwareInterface
             $size = 0;
             $extension = '';
             $uri = $event->uri;
+            $indexType = null;
+            $uid = 0;
 
             if ($event instanceof IndexFileEvent && $event->fileIdentifier !== '') {
-
+                $indexType = IndexType::File;
                 try {
                     $file = $this->resourceFactory->getFileObjectFromCombinedIdentifier($event->fileIdentifier);
                     if ($file !== null) {
+                        $uid = $file->getUid();
                         $size = $file->getSize();
                         $extension = $file->getExtension();
                         $uri = $event->site->getBase() . $file->getPublicUrl();
@@ -65,14 +69,19 @@ class IndexEventListener implements LoggerAwareInterface
                 } catch (\Exception $exception) {
                     $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
                 }
-            } elseif ($event instanceof IndexPageEvent && $uri === '' && $event->site instanceof Site) {
-                $arguments = [];
-                try {
-                    $language = $event->site->getLanguageById($event->language);
-                    $arguments['_language'] = $language;
-                } catch (\InvalidArgumentException $e) {
+            } elseif ($event instanceof IndexPageEvent && $event->site instanceof Site) {
+                $indexType = IndexType::Page;
+                $uid = $event->pageUid;
+
+                if ($uri === '') {
+                    $arguments = [];
+                    try {
+                        $language = $event->site->getLanguageById($event->language);
+                        $arguments['_language'] = $language;
+                    } catch (\InvalidArgumentException $e) {
+                    }
+                    $uri = (string) $event->site->getRouter()->generateUri($event->pageUid, $arguments);
                 }
-                $uri = (string) $event->site->getRouter()->generateUri($event->pageUid, $arguments);
             }
 
             $document = [
@@ -89,7 +98,7 @@ class IndexEventListener implements LoggerAwareInterface
                 'preview' => $preview,
             ];
 
-            $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, $this->seal->getIndexNameBySite($event->site));
+            $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, $this->seal->getIndexNameBySite($event->site), $indexType, $uid);
             $this->eventDispatcher->dispatch($beforeSaveEvent);
 
             $engine->saveDocument($beforeSaveEvent->indexName, $beforeSaveEvent->document);

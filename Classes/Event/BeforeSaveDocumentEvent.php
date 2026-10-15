@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lochmueller\Seal\Event;
 
+use Lochmueller\Seal\Event\Enum\IndexType;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 final class BeforeSaveDocumentEvent
@@ -15,5 +16,7 @@ final class BeforeSaveDocumentEvent
         public array $document,
         public readonly SiteInterface $site,
         public readonly string $indexName,
+        public readonly ?IndexType $indexType,
+        public int $uid,
     ) {}
 }
