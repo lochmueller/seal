@@ -19,7 +19,7 @@ use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 class EngineFactory
 {
-    public static SiteInterface $currentSite;
+    public static ?SiteInterface $currentSite = null;
 
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
