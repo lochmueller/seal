@@ -35,6 +35,7 @@ class IndexEventListener implements LoggerAwareInterface
     public function __invoke(IndexFileEvent|IndexPageEvent $event): void
     {
         try {
+            $this->logger?->info('Start index handling of EXT:seal', ['event' => $event::class]);
             $engine = $this->seal->buildEngineBySite($event->site);
 
             $preview = '';
@@ -101,6 +102,7 @@ class IndexEventListener implements LoggerAwareInterface
             $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, $this->seal->getIndexNameBySite($event->site), $indexType, $uid);
             $this->eventDispatcher->dispatch($beforeSaveEvent);
 
+            $this->logger?->info('Save document to EXT:seal engine', ['engine' => $engine]);
             $engine->saveDocument($beforeSaveEvent->indexName, $beforeSaveEvent->document);
         } catch (\Exception $exception) {
             $this->logger?->error($exception->getMessage(), ['exception' => $exception]);

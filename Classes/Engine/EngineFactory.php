@@ -19,9 +19,8 @@ use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 class EngineFactory
 {
-    /**
-     *
-     */
+    public static SiteInterface $currentSite;
+
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         protected ConfigurationLoader $configurationLoader,
@@ -33,9 +32,11 @@ class EngineFactory
 
     public function buildEngineBySite(SiteInterface $site): EngineInterface
     {
+        self::$currentSite = $site;
         $configuration = $this->configurationLoader->loadBySite($site);
         $searchDsn = $this->dsnNormalizer->normalize($configuration->searchDsn);
         $dsn = $this->dsnParser->parse($searchDsn);
+
         try {
             $adapter = $this->adapterFactory->createAdapter($searchDsn);
         } catch (InvalidArgumentException) {
