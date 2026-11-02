@@ -10,8 +10,13 @@ use CmsIg\Seal\Schema\Schema;
 use CmsIg\Seal\Search\SearchBuilder;
 use Doctrine\DBAL\Result;
 use Lochmueller\Seal\Controller\AbstractSealController;
+use Lochmueller\Seal\Filter\Filter;
+use Lochmueller\Seal\Filter\GeoDistanceCondition;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
+use Lochmueller\Seal\Filter\SearchCondition;
+use Lochmueller\Seal\Filter\TagCondition;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
+use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Lochmueller\Seal\Seal;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -87,7 +92,10 @@ class AbstractSealControllerTest extends AbstractTest
             ['uid' => 1, 'type' => 'searchCondition'],
         ];
 
-        self::assertSame($filterRows, $this->buildSubject()->callAddCalculatedValuesForFilterRows($filterRows));
+        self::assertSame(
+            [['uid' => 1, 'type' => 'searchCondition', 'partial' => 'Form/SearchCondition']],
+            $this->buildSubject()->callAddCalculatedValuesForFilterRows($filterRows),
+        );
     }
 
     public function testAddCalculatedValuesHandlesMissingConfiguration(): void
@@ -158,9 +166,15 @@ class AbstractSealControllerTest extends AbstractTest
 
     private function buildSubject(?Seal $seal = null): TestableSealController
     {
+        $searchRequestDataResolver = new SearchRequestDataResolver();
+        $filter = new Filter([
+            new SearchCondition($searchRequestDataResolver),
+            new TagCondition(new TagConfigurationParser(), $searchRequestDataResolver),
+            new GeoDistanceCondition(new RadiusConfigurationParser(), $searchRequestDataResolver),
+        ]);
+
         return new TestableSealController(
-            new TagConfigurationParser(),
-            new RadiusConfigurationParser(),
+            $filter,
             $seal ?? $this->createStub(Seal::class),
         );
     }

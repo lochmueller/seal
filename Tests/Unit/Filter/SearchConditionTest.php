@@ -85,4 +85,16 @@ class SearchConditionTest extends AbstractTest
     {
         self::assertSame([], $this->subject->getFilterConfiguration(['type' => 'searchCondition'], $this->createStub(RequestInterface::class)));
     }
+
+    public function testGetPartialNameIsDerivedFromTheType(): void
+    {
+        self::assertSame('Form/SearchCondition', $this->subject->getPartialName());
+    }
+
+    public function testEnrichFilterRowKeepsTheRowUntouched(): void
+    {
+        $filterRow = ['uid' => 1, 'type' => 'searchCondition'];
+
+        self::assertSame($filterRow, $this->subject->enrichFilterRow($filterRow, ['search' => 'TYPO3'], ['page' => 7]));
+    }
 }

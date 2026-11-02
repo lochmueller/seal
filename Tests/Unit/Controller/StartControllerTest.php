@@ -16,7 +16,11 @@ use CmsIg\Seal\Search\Result;
 use CmsIg\Seal\Search\Search;
 use CmsIg\Seal\Search\SearchBuilder;
 use Lochmueller\Seal\Controller\StartController;
+use Lochmueller\Seal\Filter\Filter;
+use Lochmueller\Seal\Filter\GeoDistanceCondition;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
+use Lochmueller\Seal\Filter\SearchCondition;
+use Lochmueller\Seal\Filter\TagCondition;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Lochmueller\Seal\Schema\SchemaBuilder;
@@ -191,8 +195,15 @@ class StartControllerTest extends AbstractTest
         $seal->method('buildEngineBySite')->willReturn($engine);
         $seal->method('getIndexNameBySite')->willReturn(SchemaBuilder::DEFAULT_INDEX);
 
+        $searchRequestDataResolver = new SearchRequestDataResolver();
+        $filter = new Filter([
+            new SearchCondition($searchRequestDataResolver),
+            new TagCondition(new TagConfigurationParser(), $searchRequestDataResolver),
+            new GeoDistanceCondition(new RadiusConfigurationParser(), $searchRequestDataResolver),
+        ]);
+
         $subject = $this->getMockBuilder(StartController::class)
-            ->setConstructorArgs([new TagConfigurationParser(), new RadiusConfigurationParser(), $seal, new SearchRequestDataResolver()])
+            ->setConstructorArgs([$filter, $seal, $searchRequestDataResolver])
             ->onlyMethods(['getFilterRowsByContentElementUid', 'getCurrentContentElementRow', 'redirect'])
             ->getMock();
 

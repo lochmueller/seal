@@ -33,4 +33,49 @@ class Filter
         return $filter;
     }
 
+    /**
+     * Hands every filter record to the filter that owns its type, so that the parsed
+     * configuration, the current selection and the facet counts are added by the filter
+     * itself. "partial" names the Fluid partial that renders the record afterwards.
+     *
+     * @param array<int, array<string, mixed>> $filterRows
+     * @param array<string, mixed> $requestData
+     * @param array<string, int> $facetCounts
+     * @return array<int, array<string, mixed>>
+     */
+    public function enrichFilterRows(array $filterRows, array $requestData = [], array $facetCounts = []): array
+    {
+        foreach ($filterRows as &$filterRow) {
+            $filter = $this->findByType((string) ($filterRow['type'] ?? ''));
+            if ($filter === null) {
+                continue;
+            }
+
+            $filterRow = $filter->enrichFilterRow($filterRow, $requestData, $facetCounts);
+            $filterRow['partial'] = $filter->getPartialName();
+        }
+        unset($filterRow);
+
+        return $filterRows;
+    }
+
+    /**
+     * Several filters may contribute conditions for one type, but only one of them renders it:
+     * the first registered filter wins, so that a project is able to override a shipped filter
+     * by registering its own service earlier.
+     */
+    private function findByType(string $type): ?FilterInterface
+    {
+        if ($type === '') {
+            return null;
+        }
+
+        foreach ($this->filters as $filter) {
+            if ($filter->getType() === $type) {
+                return $filter;
+            }
+        }
+
+        return null;
+    }
 }

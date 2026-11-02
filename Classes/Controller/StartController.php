@@ -6,8 +6,7 @@ namespace Lochmueller\Seal\Controller;
 
 use CmsIg\Seal\Search\Condition\Condition;
 use CmsIg\Seal\Search\Facet\Facet;
-use Lochmueller\Seal\Filter\RadiusConfigurationParser;
-use Lochmueller\Seal\Filter\TagConfigurationParser;
+use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Lochmueller\Seal\Seal;
 use Psr\Http\Message\ResponseInterface;
@@ -17,12 +16,11 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 class StartController extends AbstractSealController
 {
     public function __construct(
-        TagConfigurationParser $tagConfigurationParser,
-        RadiusConfigurationParser $radiusConfigurationParser,
+        Filter $filter,
         Seal $seal,
         protected SearchRequestDataResolver $searchRequestDataResolver,
     ) {
-        parent::__construct($tagConfigurationParser, $radiusConfigurationParser, $seal);
+        parent::__construct($filter, $seal);
     }
 
     public function startAction(): ResponseInterface

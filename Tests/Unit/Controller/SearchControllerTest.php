@@ -19,7 +19,10 @@ use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Controller\SearchController;
 use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
 use Lochmueller\Seal\Filter\Filter;
+use Lochmueller\Seal\Filter\GeoDistanceCondition;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
+use Lochmueller\Seal\Filter\SearchCondition;
+use Lochmueller\Seal\Filter\TagCondition;
 use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Highlight\Highlighting;
 use Lochmueller\Seal\Repository\StatRepository;
@@ -28,6 +31,7 @@ use Lochmueller\Seal\Schema\SchemaBuilder;
 use Lochmueller\Seal\Seal;
 use Lochmueller\Seal\Tests\Unit\AbstractTest;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -398,20 +402,27 @@ class SearchControllerTest extends AbstractTest
         $configLoader = $this->createStub(ConfigurationLoader::class);
         $configLoader->method('loadBySite')->willReturn($config);
 
-        // Mock Filter service (returns input array unchanged)
-        $filter = $this->createStub(Filter::class);
-        $filter->method('addFilterConfiguration')->willReturnArgument(0);
-
         // Mock StatRepository (use provided or create no-op stub)
         $statRepository ??= $this->createStub(StatRepository::class);
 
         $searchRequestDataResolver = new SearchRequestDataResolver();
 
+        // Real filters, so that the rows are enriched as they are in production, but without
+        // contributing conditions to the search builder.
+        $filter = new class ([
+            new SearchCondition($searchRequestDataResolver),
+            new TagCondition(new TagConfigurationParser(), $searchRequestDataResolver),
+            new GeoDistanceCondition(new RadiusConfigurationParser(), $searchRequestDataResolver),
+        ]) extends Filter {
+            public function addFilterConfiguration(array $filter, array $filterItem, RequestInterface $request): array
+            {
+                return $filter;
+            }
+        };
+
         // Create controller with a partial mock to override getFilterRowsByContentElementUid
-        $tagConfigurationParser = new TagConfigurationParser();
-        $radiusConfigurationParser = new RadiusConfigurationParser();
         $subject = $this->getMockBuilder(SearchController::class)
-            ->setConstructorArgs([$tagConfigurationParser, $radiusConfigurationParser, $seal, $configLoader, $filter, $statRepository, $searchRequestDataResolver])
+            ->setConstructorArgs([$filter, $seal, $configLoader, $statRepository, $searchRequestDataResolver])
             ->onlyMethods(['getFilterRowsByContentElementUid', 'getCurrentContentElementRow'])
             ->getMock();
 

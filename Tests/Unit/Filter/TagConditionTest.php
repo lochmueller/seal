@@ -133,4 +133,28 @@ class TagConditionTest extends AbstractTest
 
         return $request;
     }
+
+    public function testGetPartialNameIsDerivedFromTheType(): void
+    {
+        self::assertSame('Form/TagCondition', $this->subject->getPartialName());
+    }
+
+    public function testEnrichFilterRowAddsParsedTagsWithCountAndSelection(): void
+    {
+        $filterRow = $this->subject->enrichFilterRow(
+            ['uid' => 5, 'type' => 'tagCondition', 'tags' => "page=Seiten\nfile=Dateien"],
+            ['field_5' => ['file']],
+            ['page' => 7],
+        );
+
+        self::assertSame([
+            ['value' => 'page', 'label' => 'Seiten', 'count' => 7, 'selected' => false],
+            ['value' => 'file', 'label' => 'Dateien', 'count' => 0, 'selected' => true],
+        ], $filterRow['parsedTags']);
+    }
+
+    public function testEnrichFilterRowHandlesMissingConfiguration(): void
+    {
+        self::assertSame([], $this->subject->enrichFilterRow(['uid' => 5], [], [])['parsedTags']);
+    }
 }

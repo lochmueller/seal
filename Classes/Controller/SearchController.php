@@ -10,8 +10,6 @@ use GeorgRinger\NumberedPagination\NumberedPagination;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
 use Lochmueller\Seal\Filter\Filter;
-use Lochmueller\Seal\Filter\RadiusConfigurationParser;
-use Lochmueller\Seal\Filter\TagConfigurationParser;
 use Lochmueller\Seal\Highlight\Highlighting;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
 use Lochmueller\Seal\Repository\StatRepository;
@@ -33,15 +31,13 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
     use LoggerAwareTrait;
 
     public function __construct(
-        TagConfigurationParser $tagConfigurationParser,
-        RadiusConfigurationParser $radiusConfigurationParser,
+        Filter $filter,
         Seal $seal,
         protected ConfigurationLoader $configurationLoader,
-        protected Filter $filter,
         private readonly StatRepository $statRepository,
         protected SearchRequestDataResolver $searchRequestDataResolver,
     ) {
-        parent::__construct($tagConfigurationParser, $radiusConfigurationParser, $seal);
+        parent::__construct($filter, $seal);
     }
 
     public function searchAction(): ResponseInterface

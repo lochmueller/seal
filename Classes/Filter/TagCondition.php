@@ -9,7 +9,7 @@ use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class TagCondition implements FilterInterface
+class TagCondition extends AbstractFilter
 {
     public function __construct(
         private readonly TagConfigurationParser $parser,
@@ -55,5 +55,29 @@ class TagCondition implements FilterInterface
         }
 
         return $conditions;
+    }
+
+    /**
+     * @param array<string, mixed> $filterRow
+     * @param array<string, mixed> $requestData
+     * @param array<string, int> $facetCounts
+     * @return array<string, mixed>
+     */
+    public function enrichFilterRow(array $filterRow, array $requestData, array $facetCounts): array
+    {
+        $configuredTags = $this->parser->parse((string) ($filterRow['tags'] ?? ''));
+        $selectedValues = (array) ($requestData['field_' . ($filterRow['uid'] ?? 0)] ?? []);
+
+        $filterRow['parsedTags'] = array_map(
+            static fn(array $tag): array => [
+                'value' => $tag['value'],
+                'label' => $tag['label'],
+                'count' => $facetCounts[$tag['value']] ?? 0,
+                'selected' => in_array($tag['value'], $selectedValues, true),
+            ],
+            $configuredTags,
+        );
+
+        return $filterRow;
     }
 }

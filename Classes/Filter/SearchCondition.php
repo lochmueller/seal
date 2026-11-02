@@ -9,7 +9,7 @@ use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class SearchCondition implements FilterInterface
+class SearchCondition extends AbstractFilter
 {
     public function __construct(
         protected SearchRequestDataResolver $searchRequestDataResolver,

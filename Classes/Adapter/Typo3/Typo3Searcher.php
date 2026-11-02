@@ -23,13 +23,21 @@ class Typo3Searcher implements SearcherInterface
      */
     private const string HIGHLIGHT_KEY = '_formatted';
 
-    private readonly FlattenMarshaller $marshaller;
+    private ?FlattenMarshaller $marshaller = null;
 
-    public function __construct(private Typo3AdapterHelper $adapterHelper)
+    public function __construct(private Typo3AdapterHelper $adapterHelper) {}
+
+    /**
+     * Built on first use and not in the constructor: the date format has to be read from the
+     * database platform, which opens a database connection. CmsIg\Seal\Adapter\AdapterFactory
+     * instantiates every registered adapter factory, so the constructor runs even for sites
+     * that search with a completely different engine - and in contexts without a configured
+     * database (install tool, early CLI) it would fail outright.
+     */
+    private function getMarshaller(): FlattenMarshaller
     {
-        $dateTimeFormat = $this->adapterHelper->getConnection()->getDatabasePlatform()->getDateTimeFormatString();
-        $this->marshaller = new FlattenMarshaller(
-            dateFormat: $dateTimeFormat,
+        return $this->marshaller ??= new FlattenMarshaller(
+            dateFormat: $this->adapterHelper->getConnection()->getDatabasePlatform()->getDateTimeFormatString(),
             fieldSeparator: '_',
         );
     }
@@ -102,7 +110,7 @@ class Typo3Searcher implements SearcherInterface
 
             // The marshaller only knows the configured index fields, so the highlighting
             // information has to be added afterwards - same behaviour as in the other adapters.
-            yield $this->highlightDocument($this->marshaller->unmarshall($index->fields, $hit), $search, $highlightTerms);
+            yield $this->highlightDocument($this->getMarshaller()->unmarshall($index->fields, $hit), $search, $highlightTerms);
         }
     }
 

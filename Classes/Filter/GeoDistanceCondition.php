@@ -9,7 +9,7 @@ use Lochmueller\Seal\Resolver\SearchRequestDataResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class GeoDistanceCondition implements FilterInterface
+class GeoDistanceCondition extends AbstractFilter
 {
     public function __construct(
         private readonly RadiusConfigurationParser $parser,
@@ -62,5 +62,18 @@ class GeoDistanceCondition implements FilterInterface
         }
 
         return [Condition::geoDistance('location', $lat, $lng, $radius * 1000)];
+    }
+
+    /**
+     * @param array<string, mixed> $filterRow
+     * @param array<string, mixed> $requestData
+     * @param array<string, int> $facetCounts
+     * @return array<string, mixed>
+     */
+    public function enrichFilterRow(array $filterRow, array $requestData, array $facetCounts): array
+    {
+        $filterRow['parsedRadii'] = $this->parser->parse((string) ($filterRow['radius_steps'] ?? ''));
+
+        return $filterRow;
     }
 }

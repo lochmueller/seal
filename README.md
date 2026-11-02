@@ -140,6 +140,41 @@ Install the adapter you need via composer:
 | Read/Write Split | `composer require cmsig/seal-read-write-adapter`          |
 | Multi Adapter    | `composer require cmsig/seal-multi-adapter`               |
 
+### Own Search Filters
+
+A filter owns everything that belongs to one entry of the filter type select: the conditions
+it contributes to the search, the values its form controls need and the partial that renders
+them. Extend `Lochmueller\Seal\Filter\AbstractFilter` - the service tag `seal.filter` is added
+automatically, nothing in the controllers or in `Partials/Form.html` has to be touched:
+
+```php
+class ColorCondition extends AbstractFilter
+{
+    public function getType(): string
+    {
+        return 'colorCondition';
+    }
+
+    public function getFilterConfiguration(array $filterItem, RequestInterface $request): array
+    {
+        // ... return SEAL conditions, or [] if the filter is not active
+    }
+
+    public function enrichFilterRow(array $filterRow, array $requestData, array $facetCounts): array
+    {
+        // everything the partial needs on top of the raw record
+        $filterRow['parsedColors'] = ...;
+
+        return $filterRow;
+    }
+}
+```
+
+`AbstractFilter::getPartialName()` resolves to `Form/ColorCondition`, so the partial is picked
+up from your own `partialRootPaths`. Override the method to render a partial of a different
+name. What is left to register yourself is the TCA side of the new type: an item for
+`tx_seal_domain_model_filter.type`, its `types` showitem and any additional column.
+
 ## CLI Commands
 
 ```bash

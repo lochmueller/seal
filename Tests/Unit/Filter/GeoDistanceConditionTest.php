@@ -116,4 +116,28 @@ class GeoDistanceConditionTest extends AbstractTest
 
         return $request;
     }
+
+    public function testGetPartialNameIsDerivedFromTheType(): void
+    {
+        self::assertSame('Form/GeoDistanceCondition', $this->subject->getPartialName());
+    }
+
+    public function testEnrichFilterRowAddsParsedRadii(): void
+    {
+        $filterRow = $this->subject->enrichFilterRow(
+            ['uid' => 6, 'type' => 'geoDistanceCondition', 'radius_steps' => "10=10 km\n50=50 km"],
+            [],
+            [],
+        );
+
+        self::assertSame([
+            ['value' => 10, 'label' => '10 km'],
+            ['value' => 50, 'label' => '50 km'],
+        ], $filterRow['parsedRadii']);
+    }
+
+    public function testEnrichFilterRowHandlesMissingConfiguration(): void
+    {
+        self::assertSame([], $this->subject->enrichFilterRow(['uid' => 6], [], [])['parsedRadii']);
+    }
 }

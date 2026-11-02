@@ -23,9 +23,16 @@
     <input type="hidden" name="{pluginNamespace}[action]" value="search"/>
     <input type="hidden" name="{pluginNamespace}[controller]" value="Search"/>
 
+    <f:comment>
+        The partial is named by the filter itself (FilterInterface::getPartialName()) and not
+        derived from the type here, so a filter shipped by another extension is able to render
+        its own form controls without this template knowing it.
+    </f:comment>
     <f:for each="{filters}" as="filter">
-        <f:render partial="Form/{filter.type -> f:format.case(mode: 'capital')}"
-                  arguments="{filter: filter, requestData: requestData, sealId: sealId, pluginNamespace: pluginNamespace}"/>
+        <f:if condition="{filter.partial}">
+            <f:render partial="{filter.partial}"
+                      arguments="{filter: filter, requestData: requestData, sealId: sealId, pluginNamespace: pluginNamespace}"/>
+        </f:if>
     </f:for>
 
     <button type="submit" class="btn btn-primary seal-form__submit">
