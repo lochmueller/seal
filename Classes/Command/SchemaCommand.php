@@ -30,15 +30,18 @@ class SchemaCommand extends Command implements LoggerAwareInterface
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $hasFailure = false;
+
         foreach ($this->siteFinder->getAllSites() as $site) {
             try {
                 $engine = $this->seal->buildEngineBySite($site);
                 $engine->createSchema();
-            } catch (\Exception $e) {
-                $this->logger?->warning($e->getMessage(), ['exception' => $e]);
+            } catch (\Throwable $e) {
+                $hasFailure = true;
+                $this->logger?->error($e->getMessage(), ['exception' => $e]);
             }
         }
 
-        return Command::SUCCESS;
+        return $hasFailure ? Command::FAILURE : Command::SUCCESS;
     }
 }

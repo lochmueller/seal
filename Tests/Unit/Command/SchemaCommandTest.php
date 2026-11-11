@@ -43,15 +43,15 @@ class SchemaCommandTest extends AbstractTest
 
         $this->sealMock->expects(self::never())->method('buildEngineBySite');
 
-        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
+        $result = $this->invokeExecute(self::createStub(InputInterface::class), self::createStub(OutputInterface::class));
 
         self::assertSame(Command::SUCCESS, $result);
     }
 
     public function testExecuteCreatesSchemaForEachSite(): void
     {
-        $site1 = $this->createStub(Site::class);
-        $site2 = $this->createStub(Site::class);
+        $site1 = self::createStub(Site::class);
+        $site2 = self::createStub(Site::class);
 
         $engine1 = $this->createMock(EngineInterface::class);
         $engine2 = $this->createMock(EngineInterface::class);
@@ -73,15 +73,15 @@ class SchemaCommandTest extends AbstractTest
         $engine1->expects(self::once())->method('createSchema');
         $engine2->expects(self::once())->method('createSchema');
 
-        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
+        $result = $this->invokeExecute(self::createStub(InputInterface::class), self::createStub(OutputInterface::class));
 
         self::assertSame(Command::SUCCESS, $result);
     }
 
-    public function testExecuteCatchesExceptionAndContinues(): void
+    public function testExecuteReturnsFailureWhenOneSiteThrowsAndContinues(): void
     {
-        $site1 = $this->createStub(Site::class);
-        $site2 = $this->createStub(Site::class);
+        $site1 = self::createStub(Site::class);
+        $site2 = self::createStub(Site::class);
 
         $engine1 = $this->createMock(EngineInterface::class);
         $engine2 = $this->createMock(EngineInterface::class);
@@ -106,14 +106,14 @@ class SchemaCommandTest extends AbstractTest
 
         $engine2->expects(self::once())->method('createSchema');
 
-        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
+        $result = $this->invokeExecute(self::createStub(InputInterface::class), self::createStub(OutputInterface::class));
 
-        self::assertSame(Command::SUCCESS, $result);
+        self::assertSame(Command::FAILURE, $result);
     }
 
     public function testExecuteLogsExceptionMessage(): void
     {
-        $site = $this->createStub(Site::class);
+        $site = self::createStub(Site::class);
         $engine = $this->createMock(EngineInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -133,19 +133,19 @@ class SchemaCommandTest extends AbstractTest
             ->willThrowException(new \Exception('Schema creation failed'));
 
         $logger->expects(self::once())
-            ->method('warning')
+            ->method('error')
             ->with('Schema creation failed', self::arrayHasKey('exception'));
 
         $this->subject->setLogger($logger);
 
-        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
+        $result = $this->invokeExecute(self::createStub(InputInterface::class), self::createStub(OutputInterface::class));
 
-        self::assertSame(Command::SUCCESS, $result);
+        self::assertSame(Command::FAILURE, $result);
     }
 
     public function testExecuteHandlesExceptionFromBuildEngineBySite(): void
     {
-        $site = $this->createStub(Site::class);
+        $site = self::createStub(Site::class);
 
         $this->siteFinderMock
             ->expects(self::once())
@@ -158,9 +158,9 @@ class SchemaCommandTest extends AbstractTest
             ->with($site)
             ->willThrowException(new \Exception('Engine build failed'));
 
-        $result = $this->invokeExecute($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
+        $result = $this->invokeExecute(self::createStub(InputInterface::class), self::createStub(OutputInterface::class));
 
-        self::assertSame(Command::SUCCESS, $result);
+        self::assertSame(Command::FAILURE, $result);
     }
 
     private function invokeExecute(InputInterface $input, OutputInterface $output): int
