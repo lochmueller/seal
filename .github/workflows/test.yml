@@ -31,6 +31,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Resolve matching Index branch
+        id: index-ref
+        env:
+          INDEX_HEAD_REF: ${{ github.head_ref }}
+        run: |
+          ref="${INDEX_HEAD_REF:-main}"
+          if ! git ls-remote --exit-code --heads https://github.com/can0199/index.git "refs/heads/${ref}" >/dev/null; then
+            ref=main
+          fi
+          echo "ref=${ref}" >> "${GITHUB_OUTPUT}"
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -41,6 +52,13 @@ jobs:
 
       - name: Require the right versions
         run: composer require typo3/cms-core:${{ matrix.typo3 }} typo3/cms-extbase:${{ matrix.typo3 }} --no-update
+
+      - name: Require the matching Index branch
+        env:
+          INDEX_REF: ${{ steps.index-ref.outputs.ref }}
+        run: |
+          composer config repositories.index vcs https://github.com/can0199/index.git
+          composer require --no-update "lochmueller/index:dev-${INDEX_REF}@dev"
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
