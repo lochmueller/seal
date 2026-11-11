@@ -18,6 +18,7 @@ use Lochmueller\Seal\Configuration\Configuration;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Controller\SearchController;
 use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
+use Lochmueller\Seal\Event\ResultSearchEvent;
 use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Filter\GeoDistanceCondition;
 use Lochmueller\Seal\Filter\RadiusConfigurationParser;
@@ -350,6 +351,60 @@ class SearchControllerTest extends AbstractTest
 
         self::assertNotNull($this->capturedSearch, 'Search should have been executed');
         self::assertSame(['title'], $this->capturedSearch->highlightFields);
+    }
+
+    public function testSearchActionDispatchesResultSearchEvent(): void
+    {
+        $eventDispatcher = new class implements EventDispatcherInterface {
+            public string $searchTermFromResultSearchEvent = '';
+            public int $currentPageNumberFromResultSearchEvent = 0;
+            public int $totalResultsFromResultSearchEvent = 0;
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof ModifySearchBuilderEvent) {
+                    $searcher = new class implements SearcherInterface {
+                        public function search(Search $search): Result
+                        {
+                            return new Result(new \Generator(), 42, []);
+                        }
+
+                        public function count(Index $index): int
+                        {
+                            throw new \Exception('not implemented');
+                        }
+                    };
+
+                    $index = new Index(SchemaBuilder::DEFAULT_INDEX, [
+                        'id' => new IdentifierField('id'),
+                        'title' => new TextField('title'),
+                        'tags' => new TextField('tags', multiple: true, filterable: true, facet: true),
+                    ]);
+                    $event->searchBuilder = new SearchBuilder(new Schema([SchemaBuilder::DEFAULT_INDEX => $index]), $searcher);
+                }
+
+                if ($event instanceof ResultSearchEvent) {
+                    $this->searchTermFromResultSearchEvent = $event->searchTerm;
+                    $this->currentPageNumberFromResultSearchEvent = $event->currentPageNumber;
+                    $this->totalResultsFromResultSearchEvent = $event->totalResults;
+                }
+
+                return $event;
+            }
+        };
+
+        $subject = $this->buildController(
+            [['uid' => 1, 'type' => 'searchCondition', 'sorting' => 1]],
+            [],
+            ['tx_seal_search' => ['search' => 'TYPO3']],
+            eventDispatcher: $eventDispatcher,
+            arguments: ['currentPageNumber' => 2]
+        );
+        $subject->searchAction();
+
+        self::assertSame('TYPO3', $eventDispatcher->searchTermFromResultSearchEvent);
+        self::assertSame(2, $eventDispatcher->currentPageNumberFromResultSearchEvent);
+        self::assertSame(42, $eventDispatcher->totalResultsFromResultSearchEvent);
     }
 
     /**
