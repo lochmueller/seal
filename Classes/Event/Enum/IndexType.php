@@ -8,4 +8,5 @@ enum IndexType
 {
     case File;
     case Page;
+    case Record;
 }

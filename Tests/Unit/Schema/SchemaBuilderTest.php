@@ -130,4 +130,26 @@ class SchemaBuilderTest extends AbstractTest
         self::assertTrue($index->fields['location']->filterable, "Field 'location' should be filterable");
     }
 
+    public function testGetSchemaAddsTypedRecordFields(): void
+    {
+        $schema = $this->subject->getSchema([
+            'departmentId' => [
+                'source' => 'department',
+                'type' => 'integer',
+                'multiple' => false,
+                'searchable' => false,
+                'filterable' => true,
+                'sortable' => true,
+                'distinct' => false,
+                'facet' => false,
+                'options' => [],
+            ],
+        ]);
+
+        self::assertInstanceOf(Field\IntegerField::class, $schema->indexes[SchemaBuilder::DEFAULT_INDEX]->fields['departmentId']);
+        self::assertFalse($schema->indexes[SchemaBuilder::DEFAULT_INDEX]->fields['departmentId']->searchable);
+        self::assertTrue($schema->indexes[SchemaBuilder::DEFAULT_INDEX]->fields['departmentId']->filterable);
+        self::assertTrue($schema->indexes[SchemaBuilder::DEFAULT_INDEX]->fields['departmentId']->sortable);
+    }
+
 }
