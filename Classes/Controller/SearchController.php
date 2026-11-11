@@ -9,6 +9,7 @@ use CmsIg\Seal\Search\Facet\Facet;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Lochmueller\Seal\Configuration\ConfigurationLoader;
 use Lochmueller\Seal\Event\ModifySearchBuilderEvent;
+use Lochmueller\Seal\Event\ResultSearchEvent;
 use Lochmueller\Seal\Filter\Filter;
 use Lochmueller\Seal\Highlight\Highlighting;
 use Lochmueller\Seal\Pagination\SearchResultArrayPaginator;
@@ -94,14 +95,16 @@ class SearchController extends AbstractSealController implements LoggerAwareInte
         $result = $modifySearchBuilderEvent->searchBuilder->getResult();
 
         $requestData = $this->searchRequestDataResolver->resolve($this->request);
+        $searchTermValue = $requestData['search'] ?? '';
+        $searchTerm = is_scalar($searchTermValue) ? (string) $searchTermValue : '';
+
+        $resultSearchEvent = new ResultSearchEvent($searchTerm, $result->total(), $currentPage, $site, $language);
+        $this->eventDispatcher->dispatch($resultSearchEvent);
 
         // The form is submitted via GET, so the search term is part of the URL and reaches
         // this action again on every pagination click. Only the first page counts as a new
         // search, otherwise paging through the results would inflate the statistics.
         if ($currentPage === 1) {
-            $searchTermValue = $requestData['search'] ?? '';
-            $searchTerm = is_scalar($searchTermValue) ? (string) $searchTermValue : '';
-
             try {
                 $this->statRepository->logSearchQuery($searchTerm, $site->getIdentifier(), $language->getLanguageId());
             } catch (\Exception $exception) {
