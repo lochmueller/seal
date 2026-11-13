@@ -79,6 +79,7 @@ class IndexEventListenerTest extends AbstractTest
                         && $document['content'] === 'Hello World'
                         && $document['site'] === 'main'
                         && $document['language'] === '0'
+                        && !isset($document['record_table'], $document['record_uid'])
                         && $document['uri'] === 'https://example.com/test'
                         && str_starts_with($document['id'], 'p-')
                         && in_array('Page', $document['tags'], true)),
@@ -150,8 +151,9 @@ class IndexEventListenerTest extends AbstractTest
                         && $document['title'] === 'Example item'
                         && $document['content'] === 'Searchable description'
                         && $document['departmentId'] === 7
-                        && in_array('Record', $document['tags'], true)
-                        && in_array('tx_example_domain_model_item', $document['tags'], true)),
+                        && $document['record_table'] === 'tx_example_domain_model_item'
+                        && $document['record_uid'] === 42
+                        && $document['tags'] === ['Record']),
             );
 
         ($this->subject)($event);

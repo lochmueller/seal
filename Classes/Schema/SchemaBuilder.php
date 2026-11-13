@@ -135,6 +135,8 @@ class SchemaBuilder
             'site' => new Field\TextField('site', searchable: false, filterable: true), // Site identifier. Example: portal
             'language' => new Field\TextField('language', searchable: false, filterable: true), // Language UID as string. Example: "0"
             'uri' => new Field\TextField('uri', searchable: false), // URI.
+            'record_table' => new Field\TextField('record_table', searchable: false, filterable: true), // TCA table for record documents.
+            'record_uid' => new Field\IntegerField('record_uid', filterable: true), // Record UID for record documents.
             'location' => new Field\GeoPointField('location', filterable: true), // Geo coordinates for distance search
             'indexdate' => new Field\DateTimeField('indexdate'), // The date time of the index insert/update
             // Content

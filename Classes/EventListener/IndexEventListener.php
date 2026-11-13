@@ -122,6 +122,10 @@ class IndexEventListener implements LoggerAwareInterface
                 'preview' => $preview,
             ];
             $document = array_replace($document, $recordFields);
+            if ($event instanceof IndexRecordReadyEvent) {
+                $document['record_table'] = $event->table;
+                $document['record_uid'] = $event->recordUid;
+            }
 
             $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, $this->seal->getIndexNameBySite($event->site), $indexType, $uid);
             $this->eventDispatcher->dispatch($beforeSaveEvent);
@@ -168,9 +172,6 @@ class IndexEventListener implements LoggerAwareInterface
             $event instanceof IndexPageEvent => 'Page',
             default => 'File',
         };
-        if ($event instanceof IndexRecordReadyEvent) {
-            $tags[] = $event->table;
-        }
         if ($event instanceof IndexPageEvent && $event->pageUid) {
             $row = $this->recordSelection->findRenderablePage($event->pageUid, $event->language);
             if (isset($row['keywords'])) {

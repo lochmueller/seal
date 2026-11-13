@@ -90,7 +90,7 @@ class SchemaBuilderTest extends AbstractTest
 
         $expectedFields = [
             'id', 'site', 'language', 'uri', 'location', 'indexdate',
-            'title', 'content', 'tags', 'size', 'extension', 'preview',
+            'record_table', 'record_uid', 'title', 'content', 'tags', 'size', 'extension', 'preview',
         ];
 
         foreach ($expectedFields as $fieldName) {
@@ -106,6 +106,11 @@ class SchemaBuilderTest extends AbstractTest
         self::assertInstanceOf(Field\TextField::class, $index->fields['site']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['language']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['uri']);
+        self::assertInstanceOf(Field\TextField::class, $index->fields['record_table']);
+        self::assertFalse($index->fields['record_table']->searchable);
+        self::assertTrue($index->fields['record_table']->filterable);
+        self::assertInstanceOf(Field\IntegerField::class, $index->fields['record_uid']);
+        self::assertTrue($index->fields['record_uid']->filterable);
         self::assertInstanceOf(Field\DateTimeField::class, $index->fields['indexdate']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['title']);
         self::assertInstanceOf(Field\TextField::class, $index->fields['content']);
