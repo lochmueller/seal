@@ -8,15 +8,29 @@
                     accessibility tree instead of getting its own (duplicated) name, so that
                     there are no two adjacent links with the same purpose (WCAG 2.4.4 / 4.1.2).
                 </f:comment>
-                <a href="{item.uri}" class="seal-result__preview-link" tabindex="-1" aria-hidden="true">
-                    <img src="{item.preview}" alt="" loading="lazy" class="img-fluid rounded-start"/>
-                </a>
+                <f:if condition="{item.uri}">
+                    <f:then>
+                        <a href="{item.uri}" class="seal-result__preview-link" tabindex="-1" aria-hidden="true">
+                            <img src="{item.preview}" alt="" loading="lazy" class="img-fluid rounded-start"/>
+                        </a>
+                    </f:then>
+                    <f:else>
+                        <img src="{item.preview}" alt="" loading="lazy" class="img-fluid rounded-start"/>
+                    </f:else>
+                </f:if>
             </div>
         </f:if>
         <div class="col-md-8">
             <div class="card-body">
                 <h3 class="card-title" id="{sealId}-result-{itemIteration.index}-title">
-                    <a href="{item.uri}" class="seal-result__link"><seal:highlight item="{item}" field="title"/></a>
+                    <f:if condition="{item.uri}">
+                        <f:then>
+                            <a href="{item.uri}" class="seal-result__link"><seal:highlight item="{item}" field="title"/></a>
+                        </f:then>
+                        <f:else>
+                            <seal:highlight item="{item}" field="title"/>
+                        </f:else>
+                    </f:if>
                 </h3>
                 <p class="card-text">
                     <seal:highlight item="{item}" field="content" crop="300"/>
@@ -25,10 +39,12 @@
                     "Open" alone is not a descriptive link text. The title is appended for
                     assistive technology only, so the visible button stays short (WCAG 2.4.4).
                 </f:comment>
-                <a href="{item.uri}" class="card-link btn btn-secondary seal-result__open">
-                    <f:translate key="result.open"/>
-                    <span class="seal-visually-hidden">: {item.title}</span>
-                </a>
+                <f:if condition="{item.uri}">
+                    <a href="{item.uri}" class="card-link btn btn-secondary seal-result__open">
+                        <f:translate key="result.open"/>
+                        <span class="seal-visually-hidden">: {item.title}</span>
+                    </a>
+                </f:if>
             </div>
         </div>
     </div>

@@ -9,6 +9,7 @@ use Lochmueller\Index\Enums\IndexTechnology;
 use Lochmueller\Index\Enums\IndexType;
 use Lochmueller\Index\Event\IndexFileEvent;
 use Lochmueller\Index\Event\IndexPageEvent;
+use Lochmueller\Index\Event\IndexRecordReadyEvent;
 use Lochmueller\Index\Traversing\RecordSelection;
 use Lochmueller\Seal\EventListener\IndexEventListener;
 use Lochmueller\Seal\Schema\SchemaBuilder;
@@ -78,6 +79,7 @@ class IndexEventListenerTest extends AbstractTest
                         && $document['content'] === 'Hello World'
                         && $document['site'] === 'main'
                         && $document['language'] === '0'
+                        && !isset($document['record_table'], $document['record_uid'])
                         && $document['uri'] === 'https://example.com/test'
                         && str_starts_with($document['id'], 'p-')
                         && in_array('Page', $document['tags'], true)),
@@ -113,6 +115,73 @@ class IndexEventListenerTest extends AbstractTest
                         && in_array('File', $document['tags'], true)),
             );
 
+        ($this->subject)($event);
+    }
+
+    public function testInvokeWithRecordEventSavesDocumentWithoutUri(): void
+    {
+        $site = $this->createStub(SiteInterface::class);
+        $site->method('getIdentifier')->willReturn('main');
+
+        $event = new IndexRecordReadyEvent(
+            site: $site,
+            technology: IndexTechnology::Http,
+            type: IndexType::Partial,
+            indexConfigurationRecordId: 1,
+            indexProcessId: 'proc-1',
+            table: 'tx_example_domain_model_item',
+            recordUid: 42,
+            language: 2,
+            fields: [
+                'title' => 'Example item',
+                'content' => 'Searchable description',
+                'departmentId' => 7,
+            ],
+        );
+
+        $engine = $this->createMock(EngineInterface::class);
+        $this->sealStub->method('buildEngineBySite')->willReturn($engine);
+
+        $engine->expects(self::once())
+            ->method('saveDocument')
+            ->with(
+                SchemaBuilder::DEFAULT_INDEX,
+                self::callback(fn(array $document): bool => $document['id'] === 'r-tx_example_domain_model_item-42-2'
+                        && $document['uri'] === ''
+                        && $document['title'] === 'Example item'
+                        && $document['content'] === 'Searchable description'
+                        && $document['departmentId'] === 7
+                        && $document['record_table'] === 'tx_example_domain_model_item'
+                        && $document['record_uid'] === 42
+                        && $document['tags'] === ['Record']),
+            );
+
+        ($this->subject)($event);
+    }
+
+    public function testInvokePropagatesRecordSaveFailures(): void
+    {
+        $site = $this->createStub(SiteInterface::class);
+        $engine = $this->createMock(EngineInterface::class);
+        $engine->expects(self::once())
+            ->method('saveDocument')
+            ->willThrowException(new \RuntimeException('Adapter unavailable'));
+        $this->sealStub->method('buildEngineBySite')->willReturn($engine);
+
+        $event = new IndexRecordReadyEvent(
+            site: $site,
+            technology: IndexTechnology::Database,
+            type: IndexType::Partial,
+            indexConfigurationRecordId: 1,
+            indexProcessId: 'proc-1',
+            table: 'tx_example_domain_model_item',
+            recordUid: 42,
+            language: 0,
+            fields: ['title' => 'Example item'],
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Adapter unavailable');
         ($this->subject)($event);
     }
 

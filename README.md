@@ -45,6 +45,14 @@ The ViewHelper escapes the indexed value and renders the matches as `<mark>` ele
 unescaped HTML from the index ends up in the frontend. With `crop` the text is shortened around the
 first match. Every field without a match falls back to the raw value of the document.
 
+### Record document metadata
+
+Record documents keep the `Record` tag and expose their TCA table and UID as
+`record_table` and `record_uid`. The table name is not duplicated in `tags`,
+which remains available for actual tags and facets. Existing strict index
+mappings need the adapter's safe rebuild and reindex procedure to receive these
+fields.
+
 ### Search Form, URLs and Caching
 
 The search form is submitted via **GET**, so the complete search state (search word, tag

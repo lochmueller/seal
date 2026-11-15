@@ -7,6 +7,7 @@ namespace Lochmueller\Seal\EventListener;
 use DateTimeImmutable;
 use Lochmueller\Index\Event\IndexFileEvent;
 use Lochmueller\Index\Event\IndexPageEvent;
+use Lochmueller\Index\Event\IndexRecordReadyEvent;
 use Lochmueller\Index\Traversing\RecordSelection;
 use Lochmueller\Seal\Event\BeforeSaveDocumentEvent;
 use Lochmueller\Seal\Event\Enum\IndexType;
@@ -32,7 +33,7 @@ class IndexEventListener implements LoggerAwareInterface
     ) {}
 
     #[AsEventListener('seal-index')]
-    public function __invoke(IndexFileEvent|IndexPageEvent $event): void
+    public function __invoke(IndexFileEvent|IndexPageEvent|IndexRecordReadyEvent $event): void
     {
         try {
             $this->logger?->info('Start index handling of EXT:seal', ['event' => $event::class]);
@@ -41,9 +42,10 @@ class IndexEventListener implements LoggerAwareInterface
             $preview = '';
             $size = 0;
             $extension = '';
-            $uri = $event->uri;
+            $uri = $event instanceof IndexRecordReadyEvent ? '' : $event->uri;
             $indexType = null;
             $uid = 0;
+            $recordFields = [];
 
             if ($event instanceof IndexFileEvent && $event->fileIdentifier !== '') {
                 $indexType = IndexType::File;
@@ -70,6 +72,10 @@ class IndexEventListener implements LoggerAwareInterface
                 } catch (\Exception $exception) {
                     $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
                 }
+            } elseif ($event instanceof IndexRecordReadyEvent) {
+                $indexType = IndexType::Record;
+                $uid = $event->recordUid;
+                $recordFields = $event->fields;
             } elseif ($event instanceof IndexPageEvent && $event->site instanceof Site) {
                 $indexType = IndexType::Page;
                 $uid = $event->pageUid;
@@ -85,19 +91,41 @@ class IndexEventListener implements LoggerAwareInterface
                 }
             }
 
+            $language = $event instanceof IndexFileEvent ? 0 : $event->language;
+            $title = $event instanceof IndexRecordReadyEvent
+                ? (is_scalar($recordFields['title'] ?? null) ? (string) $recordFields['title'] : $event->table . ' ' . $uid)
+                : $event->title;
+            $content = $event instanceof IndexRecordReadyEvent
+                ? (is_scalar($recordFields['content'] ?? null) ? (string) $recordFields['content'] : '')
+                : $event->content;
+            if ($event instanceof IndexRecordReadyEvent) {
+                $recordFields['title'] = $title;
+                $recordFields['content'] = $content;
+            }
+            $identifier = match (true) {
+                $event instanceof IndexRecordReadyEvent => 'r-' . $event->table . '-' . $uid . '-' . $language,
+                $event instanceof IndexPageEvent => 'p-' . md5($uri),
+                default => 'd-' . md5($uri),
+            };
+
             $document = [
-                'id' => $event instanceof IndexPageEvent ? 'p-' . md5($uri) : 'd-' . md5($uri),
+                'id' => $identifier,
                 'site' => $event->site->getIdentifier(),
-                'language' => isset($event->language) ? (string) $event->language : '0',
+                'language' => (string) $language,
                 'uri' => $uri,
                 'indexdate' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM),
-                'title' => $event->title,
-                'content' => $this->toPlainText($event->content),
+                'title' => $title,
+                'content' => $this->toPlainText($content),
                 'tags' => $this->getTags($event),
                 'size' => $size,
                 'extension' => $extension,
                 'preview' => $preview,
             ];
+            $document = array_replace($document, $recordFields);
+            if ($event instanceof IndexRecordReadyEvent) {
+                $document['record_table'] = $event->table;
+                $document['record_uid'] = $event->recordUid;
+            }
 
             $beforeSaveEvent = new BeforeSaveDocumentEvent($document, $event->site, $this->seal->getIndexNameBySite($event->site), $indexType, $uid);
             $this->eventDispatcher->dispatch($beforeSaveEvent);
@@ -106,6 +134,9 @@ class IndexEventListener implements LoggerAwareInterface
             $engine->saveDocument($beforeSaveEvent->indexName, $beforeSaveEvent->document);
         } catch (\Exception $exception) {
             $this->logger?->error($exception->getMessage(), ['exception' => $exception]);
+            if ($event instanceof IndexRecordReadyEvent) {
+                throw $exception;
+            }
         }
 
     }
@@ -133,10 +164,14 @@ class IndexEventListener implements LoggerAwareInterface
     /**
      * @return array<int, string>
      */
-    protected function getTags(IndexFileEvent|IndexPageEvent $event): array
+    protected function getTags(IndexFileEvent|IndexPageEvent|IndexRecordReadyEvent $event): array
     {
         $tags = [];
-        $tags[] = $event instanceof IndexPageEvent ? 'Page' : 'File';
+        $tags[] = match (true) {
+            $event instanceof IndexRecordReadyEvent => 'Record',
+            $event instanceof IndexPageEvent => 'Page',
+            default => 'File',
+        };
         if ($event instanceof IndexPageEvent && $event->pageUid) {
             $row = $this->recordSelection->findRenderablePage($event->pageUid, $event->language);
             if (isset($row['keywords'])) {
