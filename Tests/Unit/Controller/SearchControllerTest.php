@@ -366,7 +366,13 @@ class SearchControllerTest extends AbstractTest
                     $searcher = new class implements SearcherInterface {
                         public function search(Search $search): Result
                         {
-                            return new Result(new \Generator(), 42, []);
+                            return new Result(
+                                (static function (): \Generator {
+                                    yield from [];
+                                })(),
+                                42,
+                                [],
+                            );
                         }
 
                         public function count(Index $index): int
@@ -381,6 +387,7 @@ class SearchControllerTest extends AbstractTest
                         'tags' => new TextField('tags', multiple: true, filterable: true, facet: true),
                     ]);
                     $event->searchBuilder = new SearchBuilder(new Schema([SchemaBuilder::DEFAULT_INDEX => $index]), $searcher);
+                    $event->searchBuilder->index(SchemaBuilder::DEFAULT_INDEX);
                 }
 
                 if ($event instanceof ResultSearchEvent) {
